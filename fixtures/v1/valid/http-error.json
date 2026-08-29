@@ -1,0 +1,8 @@
+{
+  "protocol_version": 1,
+  "error": {
+    "code": "PROVIDER_BUSY",
+    "message": "The provider is processing another job.",
+    "retryable": true
+  }
+}

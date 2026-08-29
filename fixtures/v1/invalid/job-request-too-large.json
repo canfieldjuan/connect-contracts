@@ -1,0 +1,18 @@
+{
+  "protocol_version": 1,
+  "job_id": "22222222-2222-4222-8222-222222222222",
+  "capability": {
+    "id": "document.summarize",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "33333333-3333-4333-8333-333333333333",
+      "media_type": "application/pdf",
+      "byte_size": 104857601,
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "display_name": "too-large.pdf",
+      "source_app_id": "email-watcher"
+    }
+  ]
+}

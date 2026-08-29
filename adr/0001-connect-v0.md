@@ -153,6 +153,25 @@ asynchronous job channel.
 - Multiple-provider selection, Windows packaging, and alternate transports
   require later decisions.
 
+## v1 contract freeze
+
+The first executable contract uses protocol integer `1`; application and
+capability versions remain independent strings. Provider availability is not a
+mutable manifest flag: it is proven by a supported runtime registration plus
+an authenticated `GET /v1/manifest` response carrying the same instance ID.
+
+`POST /v1/jobs` uses two multipart fields: a bounded `request` JSON part and
+one streamed `artifact` part. `GET /v1/jobs/{job_id}` carries the polling state
+and, when complete, the inline versioned summary artifact. The JSON descriptor
+contains a display name, media type, byte size, SHA-256 digest, and source-app
+attribution but cannot contain a filesystem path or mailbox metadata.
+
+The schemas constrain wire shape. Implementations must additionally parse and
+validate URLs, enforce port and body limits, authenticate before accepting
+bytes, compare the streamed size and digest with the descriptor, sanitize the
+display name before provider-owned storage, and verify idempotent job reuse.
+Those checks cannot safely be delegated to JSON Schema alone.
+
 ## Implementation gates
 
 1. Email Watcher must independently persist, display, and retrieve attachment

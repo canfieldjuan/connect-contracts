@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/v1/registration.schema.json",
+  "title": "Local Connect v1 Runtime Registration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "instance_id", "app_id", "pid", "started_at", "transport", "auth"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "instance_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "app_id": { "type": "string", "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$", "maxLength": 100 },
+    "pid": { "type": "integer", "minimum": 1 },
+    "started_at": { "type": "string", "format": "date-time" },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "base_url"],
+      "properties": {
+        "kind": { "const": "http-loopback-v1" },
+        "base_url": {
+          "type": "string",
+          "pattern": "^http://(?:127\\.0\\.0\\.1|\\[::1\\]):[1-9][0-9]{0,4}/?$",
+          "maxLength": 100
+        }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "token"],
+      "properties": {
+        "scheme": { "const": "bearer" },
+        "token": { "type": "string", "pattern": "^[A-Za-z0-9_-]{43,128}$" }
+      }
+    }
+  }
+}

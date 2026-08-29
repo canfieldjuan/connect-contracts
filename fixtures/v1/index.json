@@ -1,0 +1,13 @@
+[
+  { "schema": "manifest.schema.json", "fixture": "valid/manifest.json", "valid": true },
+  { "schema": "registration.schema.json", "fixture": "valid/registration.json", "valid": true },
+  { "schema": "job-request.schema.json", "fixture": "valid/job-request.json", "valid": true },
+  { "schema": "job-status.schema.json", "fixture": "valid/job-completed.json", "valid": true },
+  { "schema": "job-status.schema.json", "fixture": "valid/job-failed.json", "valid": true },
+  { "schema": "error.schema.json", "fixture": "valid/http-error.json", "valid": true },
+  { "schema": "manifest.schema.json", "fixture": "invalid/manifest-protocol-mismatch.json", "valid": false },
+  { "schema": "registration.schema.json", "fixture": "invalid/registration-remote-endpoint.json", "valid": false },
+  { "schema": "job-request.schema.json", "fixture": "invalid/job-request-with-path.json", "valid": false },
+  { "schema": "job-request.schema.json", "fixture": "invalid/job-request-too-large.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-without-result.json", "valid": false }
+]

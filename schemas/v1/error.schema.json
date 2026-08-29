@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/v1/error.schema.json",
+  "title": "Local Connect v1 HTTP Error",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "error"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z0-9_]+$", "maxLength": 100 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "retryable": { "type": "boolean" }
+      }
+    }
+  }
+}
