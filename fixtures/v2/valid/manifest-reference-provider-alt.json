@@ -1,0 +1,46 @@
+{
+  "protocol_version": 2,
+  "instance_id": "88888888-8888-4888-8888-888888888888",
+  "app": {
+    "id": "connect-reference-provider-alt",
+    "name": "Connect Alternate Reference Provider",
+    "version": "0.1.0"
+  },
+  "capabilities": [
+    {
+      "id": "document.translate",
+      "version": "1.0",
+      "action": {
+        "label": "Translate text",
+        "description": "Create a local translation of this text document."
+      },
+      "accepts": [
+        {
+          "media_type": "text/plain",
+          "max_bytes": 1048576
+        }
+      ],
+      "produces": ["text/plain"],
+      "parameters": [
+        {
+          "name": "target-language",
+          "value_type": "string",
+          "required": true,
+          "label": "Target language",
+          "description": "Language to produce."
+        },
+        {
+          "name": "formality-level",
+          "value_type": "integer",
+          "required": false,
+          "label": "Formality level",
+          "description": "Optional numeric formality level."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    }
+  ]
+}

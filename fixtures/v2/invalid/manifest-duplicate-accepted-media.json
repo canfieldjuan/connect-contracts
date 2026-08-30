@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "instance_id": "77777777-7777-4777-8777-777777777777",
+  "app": {
+    "id": "connect-reference-provider",
+    "name": "Connect Reference Provider",
+    "version": "0.1.0"
+  },
+  "capabilities": [
+    {
+      "id": "document.translate",
+      "version": "1.0",
+      "action": {
+        "label": "Translate",
+        "description": "Create a local translation of this document."
+      },
+      "accepts": [
+        {
+          "media_type": "application/pdf",
+          "max_bytes": 52428800
+        },
+        {
+          "media_type": "application/pdf",
+          "max_bytes": 104857600
+        }
+      ],
+      "produces": ["text/plain"],
+      "parameters": [],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    }
+  ]
+}

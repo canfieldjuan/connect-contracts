@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/v2/manifest.schema.json",
+  "title": "Local Connect v2 Provider Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "instance_id", "app", "capabilities"],
+  "properties": {
+    "protocol_version": { "const": 2 },
+    "instance_id": { "$ref": "#/$defs/uuid" },
+    "app": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/capability" }
+    }
+  },
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+      "maxLength": 100
+    },
+    "media_type": {
+      "type": "string",
+      "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$",
+      "maxLength": 127
+    },
+    "accepted_media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["media_type", "max_bytes"],
+      "properties": {
+        "media_type": { "$ref": "#/$defs/media_type" },
+        "max_bytes": { "type": "integer", "minimum": 1, "maximum": 1073741824 }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value_type", "required", "label", "description"],
+      "properties": {
+        "name": { "$ref": "#/$defs/identifier" },
+        "value_type": { "enum": ["string", "integer", "boolean"] },
+        "required": { "type": "boolean" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "action",
+        "accepts",
+        "produces",
+        "parameters",
+        "effects"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "action": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "description"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+            "description": { "type": "string", "minLength": 1, "maxLength": 500 }
+          }
+        },
+        "accepts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/accepted_media" }
+        },
+        "produces": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/media_type" }
+        },
+        "parameters": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/parameter" }
+        },
+        "effects": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["external", "confirmation_required"],
+          "properties": {
+            "external": { "type": "boolean" },
+            "confirmation_required": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}
