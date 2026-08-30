@@ -1,0 +1,16 @@
+{
+  "protocol_version": 2,
+  "job_id": "55555555-5555-4555-8555-555555555555",
+  "capability": { "id": "document.translate", "version": "1.0" },
+  "inputs": [
+    {
+      "artifact_id": "22222222-2222-4222-8222-222222222222",
+      "media_type": "application/pdf",
+      "byte_size": 28,
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "display_name": "invoice.pdf",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": { "target-language": true }
+}

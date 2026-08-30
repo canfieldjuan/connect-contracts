@@ -65,8 +65,10 @@ Accepted media types and parameter names must be unique within a capability,
 so one declaration cannot advertise conflicting size limits. Job parameters
 may be strings, bounded integers, or booleans. Implementations reject
 undeclared parameters, missing required parameters, and values whose primitive
-type does not match the declaration. V2 intentionally does not embed arbitrary
-JSON Schema or provider-authored forms.
+type does not match the declaration. The request capability version, input
+media type, and input byte size are also validated against that same provider
+declaration before acceptance. V2 intentionally does not embed arbitrary JSON
+Schema or provider-authored forms.
 
 ### Jobs and artifacts
 

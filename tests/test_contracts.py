@@ -20,7 +20,67 @@ SCHEMA_NAMES = {
 }
 
 
-def semantic_errors(version: str, schema_name: str, instance: dict) -> list[str]:
+def _parameter_type_matches(value_type: str, value: object) -> bool:
+    return (
+        (value_type == "string" and isinstance(value, str))
+        or (value_type == "integer" and type(value) is int)
+        or (value_type == "boolean" and type(value) is bool)
+    )
+
+
+def _job_request_errors(instance: dict, capabilities: list[dict]) -> list[str]:
+    reference = (instance["capability"]["id"], instance["capability"]["version"])
+    candidates = [
+        capability
+        for capability in capabilities
+        if (capability["id"], capability["version"]) == reference
+    ]
+    if not candidates:
+        return [f"job request capability is not declared: {reference}"]
+
+    candidate_errors: list[list[str]] = []
+    for capability in candidates:
+        errors: list[str] = []
+        input_artifact = instance["inputs"][0]
+        accepted = next(
+            (
+                item
+                for item in capability["accepts"]
+                if item["media_type"] == input_artifact["media_type"]
+            ),
+            None,
+        )
+        if accepted is None:
+            errors.append("job request input media type is not accepted")
+        elif input_artifact["byte_size"] > accepted["max_bytes"]:
+            errors.append("job request input exceeds the declared size limit")
+
+        declared_parameters = {
+            parameter["name"]: parameter for parameter in capability["parameters"]
+        }
+        supplied_parameters = instance["parameters"]
+        for name, parameter in declared_parameters.items():
+            if parameter["required"] and name not in supplied_parameters:
+                errors.append(f"required job parameter is missing: {name}")
+        for name, value in supplied_parameters.items():
+            declaration = declared_parameters.get(name)
+            if declaration is None:
+                errors.append(f"job parameter is undeclared: {name}")
+            elif not _parameter_type_matches(declaration["value_type"], value):
+                errors.append(f"job parameter has the wrong type: {name}")
+
+        if not errors:
+            return []
+        candidate_errors.append(errors)
+    return min(candidate_errors, key=len)
+
+
+def semantic_errors(
+    version: str,
+    schema_name: str,
+    instance: dict,
+    capabilities: list[dict] | None = None,
+) -> list[str]:
     if version != "v2":
         return []
 
@@ -46,6 +106,9 @@ def semantic_errors(version: str, schema_name: str, instance: dict) -> list[str]
                 if name in parameter_names:
                     errors.append(f"duplicate parameter name: {name}")
                 parameter_names.add(name)
+
+    if schema_name == "job-request.schema.json":
+        errors.extend(_job_request_errors(instance, capabilities or []))
 
     if schema_name == "job-status.schema.json" and instance["status"] == "completed":
         artifact_ids: set[str] = set()
@@ -91,6 +154,15 @@ class ConnectContractTests(unittest.TestCase):
                 self.assertEqual(set(schemas), SCHEMA_NAMES)
                 self.assertEqual({case["schema"] for case in cases}, SCHEMA_NAMES)
 
+                capabilities = []
+                if version == "v2":
+                    for case in cases:
+                        if case["valid"] and case["schema"] == "manifest.schema.json":
+                            manifest = json.loads(
+                                (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
+                            )
+                            capabilities.extend(manifest["capabilities"])
+
                 for case in cases:
                     with self.subTest(version=version, fixture=case["fixture"]):
                         instance = json.loads(
@@ -103,7 +175,12 @@ class ConnectContractTests(unittest.TestCase):
                         contract_errors = (
                             []
                             if schema_errors
-                            else semantic_errors(version, case["schema"], instance)
+                            else semantic_errors(
+                                version,
+                                case["schema"],
+                                instance,
+                                capabilities,
+                            )
                         )
                         errors = (
                             [error.message for error in schema_errors] + contract_errors
