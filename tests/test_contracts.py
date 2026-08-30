@@ -154,14 +154,14 @@ class ConnectContractTests(unittest.TestCase):
                 self.assertEqual(set(schemas), SCHEMA_NAMES)
                 self.assertEqual({case["schema"] for case in cases}, SCHEMA_NAMES)
 
-                capabilities = []
+                provider_manifests: dict[str, dict] = {}
                 if version == "v2":
                     for case in cases:
                         if case["valid"] and case["schema"] == "manifest.schema.json":
                             manifest = json.loads(
                                 (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
                             )
-                            capabilities.extend(manifest["capabilities"])
+                            provider_manifests[case["fixture"]] = manifest
 
                 for case in cases:
                     with self.subTest(version=version, fixture=case["fixture"]):
@@ -172,6 +172,17 @@ class ConnectContractTests(unittest.TestCase):
                             schemas[case["schema"]], format_checker=FormatChecker()
                         )
                         schema_errors = list(validator.iter_errors(instance))
+                        capabilities = None
+                        if (
+                            version == "v2"
+                            and case["schema"] == "job-request.schema.json"
+                        ):
+                            provider_fixture = case.get("provider_manifest")
+                            self.assertIsInstance(provider_fixture, str)
+                            self.assertIn(provider_fixture, provider_manifests)
+                            capabilities = provider_manifests[provider_fixture][
+                                "capabilities"
+                            ]
                         contract_errors = (
                             []
                             if schema_errors
