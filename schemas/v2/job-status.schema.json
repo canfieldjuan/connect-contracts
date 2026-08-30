@@ -76,7 +76,7 @@
       "properties": {
         "artifact_id": { "$ref": "#/$defs/uuid" },
         "media_type": { "$ref": "#/$defs/media_type" },
-        "byte_size": { "type": "integer", "minimum": 1, "maximum": 1073741824 },
+        "byte_size": { "type": "integer", "minimum": 0, "maximum": 1073741824 },
         "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
       }
     },

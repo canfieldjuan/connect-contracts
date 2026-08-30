@@ -1,0 +1,22 @@
+{
+  "protocol_version": 2,
+  "job_id": "88888888-8888-4888-8888-888888888888",
+  "capability": {
+    "id": "document.translate",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "22222222-2222-4222-8222-222222222222",
+      "media_type": "text/plain",
+      "byte_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "display_name": "blank.txt",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {
+    "target-language": "Spanish",
+    "formality-level": 1.5
+  }
+}

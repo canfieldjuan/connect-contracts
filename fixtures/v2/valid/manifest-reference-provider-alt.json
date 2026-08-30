@@ -28,6 +28,13 @@
           "required": true,
           "label": "Target language",
           "description": "Language to produce."
+        },
+        {
+          "name": "formality-level",
+          "value_type": "integer",
+          "required": false,
+          "label": "Formality level",
+          "description": "Optional numeric formality level."
         }
       ],
       "effects": {

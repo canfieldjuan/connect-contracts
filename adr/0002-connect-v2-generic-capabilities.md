@@ -70,6 +70,12 @@ media type, and input byte size are also validated against that same provider
 declaration before acceptance. V2 intentionally does not embed arbitrary JSON
 Schema or provider-authored forms.
 
+Input artifacts may contain zero bytes; accepted-media declarations impose an
+upper bound and do not imply a positive minimum. Integer parameters follow JSON
+Schema numeric semantics, so mathematically integral forms such as `1.0` are
+valid while booleans and fractional values are not. Runtime registration ports
+are additionally validated to the TCP range 1 through 65535.
+
 ### Jobs and artifacts
 
 V2 retains caller-created stable job and artifact identities. Repeated

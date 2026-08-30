@@ -4,6 +4,7 @@ import hashlib
 import json
 import unittest
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from jsonschema import Draft202012Validator, FormatChecker
 
@@ -23,7 +24,12 @@ SCHEMA_NAMES = {
 def _parameter_type_matches(value_type: str, value: object) -> bool:
     return (
         (value_type == "string" and isinstance(value, str))
-        or (value_type == "integer" and type(value) is int)
+        or (
+            value_type == "integer"
+            and not isinstance(value, bool)
+            and isinstance(value, (int, float))
+            and (isinstance(value, int) or value.is_integer())
+        )
         or (value_type == "boolean" and type(value) is bool)
     )
 
@@ -85,6 +91,14 @@ def semantic_errors(
         return []
 
     errors: list[str] = []
+    if schema_name == "registration.schema.json":
+        try:
+            port = urlsplit(instance["transport"]["base_url"]).port
+        except ValueError:
+            port = None
+        if port is None or not 1 <= port <= 65_535:
+            errors.append("registration loopback port is out of range")
+
     if schema_name == "manifest.schema.json":
         capability_keys: set[tuple[str, str]] = set()
         for capability in instance["capabilities"]:
@@ -132,6 +146,20 @@ def semantic_errors(
 
 
 class ConnectContractTests(unittest.TestCase):
+    def test_v2_registration_port_boundaries(self) -> None:
+        registration = json.loads(
+            (FIXTURES / "v2/valid/registration.json").read_text(encoding="utf-8")
+        )
+        registration["transport"]["base_url"] = "http://127.0.0.1:65535/"
+        self.assertEqual(
+            semantic_errors("v2", "registration.schema.json", registration), []
+        )
+        registration["transport"]["base_url"] = "http://127.0.0.1:65536/"
+        self.assertEqual(
+            semantic_errors("v2", "registration.schema.json", registration),
+            ["registration loopback port is out of range"],
+        )
+
     def test_schemas_are_valid_and_fixtures_match_expectations(self) -> None:
         versions = sorted(path.name for path in FIXTURES.iterdir() if path.is_dir())
         self.assertEqual(versions, ["v1", "v2"])
