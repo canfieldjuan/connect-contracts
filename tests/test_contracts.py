@@ -81,11 +81,48 @@ def _job_request_errors(instance: dict, capabilities: list[dict]) -> list[str]:
     return min(candidate_errors, key=len)
 
 
+def _job_status_errors(instance: dict, provider_manifest: dict) -> list[str]:
+    provider = instance["provider"]
+    if (
+        provider["app_id"] != provider_manifest["app"]["id"]
+        or provider["instance_id"] != provider_manifest["instance_id"]
+    ):
+        return ["job status provider does not match the selected manifest"]
+    reference = (instance["capability"]["id"], instance["capability"]["version"])
+    capability = next(
+        (
+            candidate
+            for candidate in provider_manifest["capabilities"]
+            if (candidate["id"], candidate["version"]) == reference
+        ),
+        None,
+    )
+    if capability is None:
+        return [f"job status capability is not declared: {reference}"]
+
+    errors: list[str] = []
+    accepted_limits = {
+        accepted["media_type"]: accepted["max_bytes"] for accepted in capability["accepts"]
+    }
+    for input_artifact in instance["input_artifacts"]:
+        limit = accepted_limits.get(input_artifact["media_type"])
+        if limit is None:
+            errors.append("job status input media type is not accepted")
+        elif input_artifact["byte_size"] > limit:
+            errors.append("job status input exceeds the declared size limit")
+    if instance["status"] == "completed":
+        produced_types = set(capability["produces"])
+        for output in instance["result"]["outputs"]:
+            if output["media_type"] not in produced_types:
+                errors.append("job status output media type is not declared")
+    return errors
+
+
 def semantic_errors(
     version: str,
     schema_name: str,
     instance: dict,
-    capabilities: list[dict] | None = None,
+    provider_manifest: dict | None = None,
 ) -> list[str]:
     if version != "v2":
         return []
@@ -122,7 +159,15 @@ def semantic_errors(
                 parameter_names.add(name)
 
     if schema_name == "job-request.schema.json":
-        errors.extend(_job_request_errors(instance, capabilities or []))
+        errors.extend(
+            _job_request_errors(
+                instance,
+                provider_manifest["capabilities"] if provider_manifest else [],
+            )
+        )
+
+    if schema_name == "job-status.schema.json" and provider_manifest is not None:
+        errors.extend(_job_status_errors(instance, provider_manifest))
 
     if schema_name == "job-status.schema.json" and instance["status"] == "completed":
         artifact_ids: set[str] = set()
@@ -200,17 +245,16 @@ class ConnectContractTests(unittest.TestCase):
                             schemas[case["schema"]], format_checker=FormatChecker()
                         )
                         schema_errors = list(validator.iter_errors(instance))
-                        capabilities = None
+                        provider_manifest = None
                         if (
                             version == "v2"
-                            and case["schema"] == "job-request.schema.json"
+                            and case["schema"]
+                            in {"job-request.schema.json", "job-status.schema.json"}
                         ):
                             provider_fixture = case.get("provider_manifest")
                             self.assertIsInstance(provider_fixture, str)
                             self.assertIn(provider_fixture, provider_manifests)
-                            capabilities = provider_manifests[provider_fixture][
-                                "capabilities"
-                            ]
+                            provider_manifest = provider_manifests[provider_fixture]
                         contract_errors = (
                             []
                             if schema_errors
@@ -218,7 +262,7 @@ class ConnectContractTests(unittest.TestCase):
                                 version,
                                 case["schema"],
                                 instance,
-                                capabilities,
+                                provider_manifest,
                             )
                         )
                         errors = (
@@ -234,7 +278,7 @@ class ConnectContractTests(unittest.TestCase):
     def test_valid_v2_job_statuses_match_a_declared_provider_capability(self) -> None:
         fixture_dir = FIXTURES / "v2"
         cases = json.loads((fixture_dir / "index.json").read_text(encoding="utf-8"))
-        declarations: dict[tuple[str, str, str, str], set[str]] = {}
+        declarations: dict[tuple[str, str, str, str], dict[str, object]] = {}
         for case in cases:
             if not case["valid"] or case["schema"] != "manifest.schema.json":
                 continue
@@ -246,7 +290,13 @@ class ConnectContractTests(unittest.TestCase):
                     capability["id"],
                     capability["version"],
                 )
-                declarations.setdefault(attribution, set()).update(capability["produces"])
+                declarations[attribution] = {
+                    "accepts": {
+                        accepted["media_type"]: accepted["max_bytes"]
+                        for accepted in capability["accepts"]
+                    },
+                    "produces": set(capability["produces"]),
+                }
 
         for case in cases:
             if not case["valid"] or case["schema"] != "job-status.schema.json":
@@ -259,11 +309,20 @@ class ConnectContractTests(unittest.TestCase):
                 status["capability"]["version"],
             )
             self.assertIn(attribution, declarations, case["fixture"])
+            accepted_limits = declarations[attribution]["accepts"]
+            self.assertIsInstance(accepted_limits, dict)
+            for input_artifact in status["input_artifacts"]:
+                self.assertIn(input_artifact["media_type"], accepted_limits, case["fixture"])
+                self.assertLessEqual(
+                    input_artifact["byte_size"],
+                    accepted_limits[input_artifact["media_type"]],
+                    case["fixture"],
+                )
             if status["status"] == "completed":
                 for output in status["result"]["outputs"]:
                     self.assertIn(
                         output["media_type"],
-                        declarations[attribution],
+                        declarations[attribution]["produces"],
                         case["fixture"],
                     )
 
