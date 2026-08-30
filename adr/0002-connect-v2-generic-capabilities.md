@@ -84,7 +84,8 @@ Completed jobs return generic output artifacts. Each output contains:
 
 Always carrying bytes gives every output one deterministic integrity rule and
 avoids placing provider-private paths in the contract. Payloads use canonical
-base64, and output artifact identities are unique within a completed job.
+base64, including the empty string for a zero-byte artifact, and output
+artifact identities are unique within a completed job.
 Known media types may be decoded and rendered by consumer-owned code after
 size and digest checks. Unknown media types may only be saved/exported through
 a generated or sanitized filename; they are never executed or interpreted

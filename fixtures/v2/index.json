@@ -6,6 +6,7 @@
   { "schema": "job-request.schema.json", "fixture": "valid/job-request-with-parameter.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-completed.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-completed-generic-output.json", "valid": true },
+  { "schema": "job-status.schema.json", "fixture": "valid/job-completed-empty-output.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed.json", "valid": true },
   { "schema": "error.schema.json", "fixture": "valid/http-error.json", "valid": true },
   { "schema": "manifest.schema.json", "fixture": "invalid/manifest-protocol-mismatch.json", "valid": false },

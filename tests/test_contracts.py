@@ -118,20 +118,19 @@ class ConnectContractTests(unittest.TestCase):
     def test_valid_v2_job_statuses_match_a_declared_provider_capability(self) -> None:
         fixture_dir = FIXTURES / "v2"
         cases = json.loads((fixture_dir / "index.json").read_text(encoding="utf-8"))
-        declarations: set[tuple[str, str, str, str]] = set()
+        declarations: dict[tuple[str, str, str, str], set[str]] = {}
         for case in cases:
             if not case["valid"] or case["schema"] != "manifest.schema.json":
                 continue
             manifest = json.loads((fixture_dir / case["fixture"]).read_text(encoding="utf-8"))
             for capability in manifest["capabilities"]:
-                declarations.add(
-                    (
-                        manifest["app"]["id"],
-                        manifest["instance_id"],
-                        capability["id"],
-                        capability["version"],
-                    )
+                attribution = (
+                    manifest["app"]["id"],
+                    manifest["instance_id"],
+                    capability["id"],
+                    capability["version"],
                 )
+                declarations.setdefault(attribution, set()).update(capability["produces"])
 
         for case in cases:
             if not case["valid"] or case["schema"] != "job-status.schema.json":
@@ -144,6 +143,13 @@ class ConnectContractTests(unittest.TestCase):
                 status["capability"]["version"],
             )
             self.assertIn(attribution, declarations, case["fixture"])
+            if status["status"] == "completed":
+                for output in status["result"]["outputs"]:
+                    self.assertIn(
+                        output["media_type"],
+                        declarations[attribution],
+                        case["fixture"],
+                    )
 
 
 if __name__ == "__main__":
