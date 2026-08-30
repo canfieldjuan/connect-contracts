@@ -61,11 +61,12 @@ Every v2 capability declares:
 Labels and descriptions are untrusted text. Consumers render them only with
 consumer-owned native components and never interpret them as markup or code.
 
-Parameter names must be unique within a capability. Job parameters may be
-strings, bounded integers, or booleans. Implementations reject undeclared
-parameters, missing required parameters, and values whose primitive type does
-not match the declaration. V2 intentionally does not embed arbitrary JSON
-Schema or provider-authored forms.
+Accepted media types and parameter names must be unique within a capability,
+so one declaration cannot advertise conflicting size limits. Job parameters
+may be strings, bounded integers, or booleans. Implementations reject
+undeclared parameters, missing required parameters, and values whose primitive
+type does not match the declaration. V2 intentionally does not embed arbitrary
+JSON Schema or provider-authored forms.
 
 ### Jobs and artifacts
 
@@ -82,10 +83,12 @@ Completed jobs return generic output artifacts. Each output contains:
 - bounded base64-encoded bytes.
 
 Always carrying bytes gives every output one deterministic integrity rule and
-avoids placing provider-private paths in the contract. Known media types may
-be decoded and rendered by consumer-owned code after size and digest checks.
-Unknown media types may only be saved/exported through a generated or
-sanitized filename; they are never executed or interpreted automatically.
+avoids placing provider-private paths in the contract. Payloads use canonical
+base64, and output artifact identities are unique within a completed job.
+Known media types may be decoded and rendered by consumer-owned code after
+size and digest checks. Unknown media types may only be saved/exported through
+a generated or sanitized filename; they are never executed or interpreted
+automatically.
 
 Output artifacts are limited to 2 MiB each and eight outputs per job. The
 transport implementation must bound the complete response before parsing.

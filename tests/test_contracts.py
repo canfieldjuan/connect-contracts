@@ -33,6 +33,13 @@ def semantic_errors(version: str, schema_name: str, instance: dict) -> list[str]
                 errors.append(f"duplicate capability declaration: {capability_key}")
             capability_keys.add(capability_key)
 
+            accepted_media_types: set[str] = set()
+            for accepted in capability["accepts"]:
+                media_type = accepted["media_type"]
+                if media_type in accepted_media_types:
+                    errors.append(f"duplicate accepted media type: {media_type}")
+                accepted_media_types.add(media_type)
+
             parameter_names: set[str] = set()
             for parameter in capability["parameters"]:
                 name = parameter["name"]
@@ -41,12 +48,19 @@ def semantic_errors(version: str, schema_name: str, instance: dict) -> list[str]
                 parameter_names.add(name)
 
     if schema_name == "job-status.schema.json" and instance["status"] == "completed":
+        artifact_ids: set[str] = set()
         for output in instance["result"]["outputs"]:
+            artifact_id = output["artifact_id"]
+            if artifact_id in artifact_ids:
+                errors.append(f"duplicate output artifact_id: {artifact_id}")
+            artifact_ids.add(artifact_id)
             try:
                 payload = base64.b64decode(output["payload_base64"], validate=True)
             except (binascii.Error, ValueError):
                 errors.append("output payload is not canonical base64")
                 continue
+            if base64.b64encode(payload).decode("ascii") != output["payload_base64"]:
+                errors.append("output payload is not canonical base64")
             if len(payload) != output["byte_size"]:
                 errors.append("output payload byte_size does not match")
             if hashlib.sha256(payload).hexdigest() != output["sha256"]:
@@ -100,6 +114,36 @@ class ConnectContractTests(unittest.TestCase):
                             self.assertNotEqual(
                                 errors, [], "invalid fixture unexpectedly passed"
                             )
+
+    def test_valid_v2_job_statuses_match_a_declared_provider_capability(self) -> None:
+        fixture_dir = FIXTURES / "v2"
+        cases = json.loads((fixture_dir / "index.json").read_text(encoding="utf-8"))
+        declarations: set[tuple[str, str, str, str]] = set()
+        for case in cases:
+            if not case["valid"] or case["schema"] != "manifest.schema.json":
+                continue
+            manifest = json.loads((fixture_dir / case["fixture"]).read_text(encoding="utf-8"))
+            for capability in manifest["capabilities"]:
+                declarations.add(
+                    (
+                        manifest["app"]["id"],
+                        manifest["instance_id"],
+                        capability["id"],
+                        capability["version"],
+                    )
+                )
+
+        for case in cases:
+            if not case["valid"] or case["schema"] != "job-status.schema.json":
+                continue
+            status = json.loads((fixture_dir / case["fixture"]).read_text(encoding="utf-8"))
+            attribution = (
+                status["provider"]["app_id"],
+                status["provider"]["instance_id"],
+                status["capability"]["id"],
+                status["capability"]["version"],
+            )
+            self.assertIn(attribution, declarations, case["fixture"])
 
 
 if __name__ == "__main__":
