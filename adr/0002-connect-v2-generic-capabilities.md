@@ -84,6 +84,17 @@ reuse is rejected. The first v2 transport accepts exactly one streamed input
 artifact per job. Multi-input jobs require a later transport contract rather
 than an undocumented multipart convention.
 
+The v2 `instance_id` names the provider-owned durable state namespace that
+owns accepted jobs, not one operating-system process lifetime. A provider
+keeps that identifier while it retains the corresponding job state and creates
+a new one only when that state is reset or replaced. Exactly one live provider
+process may advertise a given identifier. The registration `pid`,
+`started_at`, endpoint, and bearer token describe the current process and may
+change on every restart; the token must rotate. This separation lets a caller
+rediscover the restarted owner and reconcile a previously accepted stable job
+identity without resubmitting work. V1 retains its existing per-process
+instance semantics.
+
 Completed jobs return generic output artifacts. Each output contains:
 
 - artifact identity, media type, and untrusted display name;
