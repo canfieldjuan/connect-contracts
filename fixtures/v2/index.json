@@ -10,6 +10,7 @@
   { "schema": "error.schema.json", "fixture": "valid/http-error.json", "valid": true },
   { "schema": "manifest.schema.json", "fixture": "invalid/manifest-protocol-mismatch.json", "valid": false },
   { "schema": "manifest.schema.json", "fixture": "invalid/manifest-missing-effects.json", "valid": false },
+  { "schema": "manifest.schema.json", "fixture": "invalid/manifest-duplicate-capability.json", "valid": false },
   { "schema": "manifest.schema.json", "fixture": "invalid/manifest-duplicate-parameter-name.json", "valid": false },
   { "schema": "registration.schema.json", "fixture": "invalid/registration-remote-endpoint.json", "valid": false },
   { "schema": "job-request.schema.json", "fixture": "invalid/job-request-with-path.json", "valid": false },
