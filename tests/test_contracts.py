@@ -118,11 +118,39 @@ def _job_status_errors(instance: dict, provider_manifest: dict) -> list[str]:
     return errors
 
 
+def _registration_manifest_errors(registration: dict, manifest: dict) -> list[str]:
+    errors: list[str] = []
+    if registration["app_id"] != manifest["app"]["id"]:
+        errors.append("registration app does not match the fetched manifest")
+    if registration["instance_id"] != manifest["instance_id"]:
+        errors.append("registration instance does not match the fetched manifest")
+    return errors
+
+
+def _job_status_request_errors(status: dict, request: dict) -> list[str]:
+    errors: list[str] = []
+    if status["job_id"] != request["job_id"]:
+        errors.append("job status identity does not match its request")
+    if status["capability"] != request["capability"]:
+        errors.append("job status capability does not match its request")
+    expected_inputs = [
+        {
+            key: input_artifact[key]
+            for key in ("artifact_id", "media_type", "byte_size", "sha256")
+        }
+        for input_artifact in request["inputs"]
+    ]
+    if status["input_artifacts"] != expected_inputs:
+        errors.append("job status input provenance does not match its request")
+    return errors
+
+
 def semantic_errors(
     version: str,
     schema_name: str,
     instance: dict,
     provider_manifest: dict | None = None,
+    job_request: dict | None = None,
 ) -> list[str]:
     if version != "v2":
         return []
@@ -135,6 +163,8 @@ def semantic_errors(
             port = None
         if port is None or not 1 <= port <= 65_535:
             errors.append("registration loopback port is out of range")
+        if provider_manifest is not None:
+            errors.extend(_registration_manifest_errors(instance, provider_manifest))
 
     if schema_name == "manifest.schema.json":
         capability_keys: set[tuple[str, str]] = set()
@@ -168,9 +198,13 @@ def semantic_errors(
 
     if schema_name == "job-status.schema.json" and provider_manifest is not None:
         errors.extend(_job_status_errors(instance, provider_manifest))
+    if schema_name == "job-status.schema.json" and job_request is not None:
+        errors.extend(_job_status_request_errors(instance, job_request))
 
     if schema_name == "job-status.schema.json" and instance["status"] == "completed":
-        artifact_ids: set[str] = set()
+        artifact_ids = {
+            input_artifact["artifact_id"] for input_artifact in instance["input_artifacts"]
+        }
         for output in instance["result"]["outputs"]:
             artifact_id = output["artifact_id"]
             if artifact_id in artifact_ids:
@@ -205,6 +239,36 @@ class ConnectContractTests(unittest.TestCase):
             ["registration loopback port is out of range"],
         )
 
+    def test_v2_cross_document_identity_boundaries(self) -> None:
+        fixture_dir = FIXTURES / "v2/valid"
+        registration = json.loads(
+            (fixture_dir / "registration.json").read_text(encoding="utf-8")
+        )
+        manifest = json.loads((fixture_dir / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(_registration_manifest_errors(registration, manifest), [])
+        registration["app_id"] = "different-app"
+        self.assertEqual(
+            _registration_manifest_errors(registration, manifest),
+            ["registration app does not match the fetched manifest"],
+        )
+
+        request = json.loads((fixture_dir / "job-request.json").read_text(encoding="utf-8"))
+        status = json.loads((fixture_dir / "job-completed.json").read_text(encoding="utf-8"))
+        self.assertEqual(_job_status_request_errors(status, request), [])
+        for field, value, expected in (
+            ("job_id", "99999999-9999-4999-8999-999999999999", "job status identity"),
+            ("capability", {"id": "document.translate", "version": "1.0"}, "capability"),
+            (
+                "input_artifacts",
+                [{**status["input_artifacts"][0], "sha256": "b" * 64}],
+                "input provenance",
+            ),
+        ):
+            changed = {**status, field: value}
+            self.assertTrue(
+                any(expected in error for error in _job_status_request_errors(changed, request))
+            )
+
     def test_schemas_are_valid_and_fixtures_match_expectations(self) -> None:
         versions = sorted(path.name for path in FIXTURES.iterdir() if path.is_dir())
         self.assertEqual(versions, ["v1", "v2"])
@@ -228,6 +292,7 @@ class ConnectContractTests(unittest.TestCase):
                 self.assertEqual({case["schema"] for case in cases}, SCHEMA_NAMES)
 
                 provider_manifests: dict[str, dict] = {}
+                job_requests: dict[str, dict] = {}
                 if version == "v2":
                     for case in cases:
                         if case["valid"] and case["schema"] == "manifest.schema.json":
@@ -235,6 +300,11 @@ class ConnectContractTests(unittest.TestCase):
                                 (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
                             )
                             provider_manifests[case["fixture"]] = manifest
+                        if case["valid"] and case["schema"] == "job-request.schema.json":
+                            request = json.loads(
+                                (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
+                            )
+                            job_requests[case["fixture"]] = request
 
                 for case in cases:
                     with self.subTest(version=version, fixture=case["fixture"]):
@@ -249,12 +319,22 @@ class ConnectContractTests(unittest.TestCase):
                         if (
                             version == "v2"
                             and case["schema"]
-                            in {"job-request.schema.json", "job-status.schema.json"}
+                            in {
+                                "registration.schema.json",
+                                "job-request.schema.json",
+                                "job-status.schema.json",
+                            }
                         ):
                             provider_fixture = case.get("provider_manifest")
                             self.assertIsInstance(provider_fixture, str)
                             self.assertIn(provider_fixture, provider_manifests)
                             provider_manifest = provider_manifests[provider_fixture]
+                        job_request = None
+                        if version == "v2" and case["schema"] == "job-status.schema.json":
+                            request_fixture = case.get("request_fixture")
+                            self.assertIsInstance(request_fixture, str)
+                            self.assertIn(request_fixture, job_requests)
+                            job_request = job_requests[request_fixture]
                         contract_errors = (
                             []
                             if schema_errors
@@ -263,6 +343,7 @@ class ConnectContractTests(unittest.TestCase):
                                 case["schema"],
                                 instance,
                                 provider_manifest,
+                                job_request,
                             )
                         )
                         errors = (
