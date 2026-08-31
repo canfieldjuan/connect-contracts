@@ -12,6 +12,7 @@ Current decisions:
 - [ADR-0001: Connect v0 local capability interoperability](adr/0001-connect-v0.md)
 - [ADR-0002: Connect v2 generic capability participation](adr/0002-connect-v2-generic-capabilities.md)
 - [ADR-0003: Connect entitlement v1](adr/0003-connect-entitlement-v1.md)
+- [ADR-0004: Connect entitlement activation v1](adr/0004-connect-entitlement-activation-v1.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
@@ -29,6 +30,10 @@ Commercial Connect authorization is a separate, signed local contract under
 `entitlements/v1/`. It does not add fields to either Connect wire protocol.
 The committed public key and licenses there are conformance fixtures only and
 must never be used as a production issuer.
+
+Activation is an app-local operation governed by ADR-0004. Either application
+may securely install the same signed entitlement, but no application becomes
+the owner of another application's settings or private data.
 
 Both versions use the same intentionally small HTTP shape under their own
 versioned routes:
