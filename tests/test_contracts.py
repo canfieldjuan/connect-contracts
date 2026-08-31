@@ -294,10 +294,20 @@ class ConnectContractTests(unittest.TestCase):
         Draft202012Validator.check_schema(envelope_schema)
         claims_schema = json.loads((root / "claims.schema.json").read_text(encoding="utf-8"))
         Draft202012Validator.check_schema(claims_schema)
-        index = json.loads((root / "fixtures/index.json").read_text(encoding="utf-8"))
-        key_fixture = json.loads(
-            (root / "fixtures/test-public-key.json").read_text(encoding="utf-8")
+        keyring_schema = json.loads(
+            (root / "keyring.schema.json").read_text(encoding="utf-8")
         )
+        Draft202012Validator.check_schema(keyring_schema)
+        keyring = json.loads(
+            (root / "fixtures/test-keyring.json").read_text(encoding="utf-8")
+        )
+        Draft202012Validator(keyring_schema).validate(keyring)
+        self.assertEqual(
+            len({key["key_id"] for key in keyring["keys"]}),
+            len(keyring["keys"]),
+        )
+        index = json.loads((root / "fixtures/index.json").read_text(encoding="utf-8"))
+        key_fixture = keyring["keys"][0]
         public_key = _base64url_decode(key_fixture["public_key_base64url"])
         now = _timestamp(index["evaluated_at"])
 
@@ -330,8 +340,8 @@ class ConnectContractTests(unittest.TestCase):
             (root / "fixtures/valid/active.json").read_text(encoding="utf-8")
         )
         key_fixture = json.loads(
-            (root / "fixtures/test-public-key.json").read_text(encoding="utf-8")
-        )
+            (root / "fixtures/test-keyring.json").read_text(encoding="utf-8")
+        )["keys"][0]
         public_key = _base64url_decode(key_fixture["public_key_base64url"])
         claims = json.loads(_base64url_decode(envelope["payload_base64url"]))
         issued_at = _timestamp(claims["issued_at"])

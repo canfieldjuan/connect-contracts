@@ -1,0 +1,9 @@
+{
+  "keys": [
+    {
+      "key_id": "connect-test-2026-01",
+      "algorithm": "Ed25519",
+      "public_key_base64url": "YlGF8Xp5vpReiDXbYqFi0GBYF5TnNnTm6aueN7jAAkk"
+    }
+  ]
+}
