@@ -3,15 +3,19 @@ import binascii
 import hashlib
 import json
 import unittest
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema import Draft202012Validator, FormatChecker
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
 FIXTURES = ROOT / "fixtures"
+ENTITLEMENTS = ROOT / "entitlements"
 SCHEMA_NAMES = {
     "error.schema.json",
     "job-request.schema.json",
@@ -19,6 +23,63 @@ SCHEMA_NAMES = {
     "manifest.schema.json",
     "registration.schema.json",
 }
+ENTITLEMENT_FEATURE = "connect.capability_exchange"
+
+
+def _base64url_decode(value: str) -> bytes:
+    if "=" in value:
+        raise ValueError("base64url padding is not canonical")
+    try:
+        decoded = base64.b64decode(
+            value + "=" * (-len(value) % 4),
+            altchars=b"-_",
+            validate=True,
+        )
+    except (binascii.Error, ValueError) as exc:
+        raise ValueError("invalid base64url") from exc
+    if base64.urlsafe_b64encode(decoded).rstrip(b"=").decode("ascii") != value:
+        raise ValueError("base64url is not canonical")
+    return decoded
+
+
+def _timestamp(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if "T" not in value or parsed.tzinfo is None:
+        raise ValueError("timestamp must include time and UTC offset")
+    return parsed
+
+
+def _verify_entitlement(
+    envelope: dict,
+    *,
+    key_id: str,
+    public_key: bytes,
+    now: datetime,
+) -> tuple[bool, bool]:
+    if envelope["key_id"] != key_id:
+        return False, False
+    try:
+        payload = _base64url_decode(envelope["payload_base64url"])
+        signature = _base64url_decode(envelope["signature_base64url"])
+        Ed25519PublicKey.from_public_bytes(public_key).verify(signature, payload)
+    except (InvalidSignature, ValueError):
+        return False, False
+    claims = json.loads(payload)
+    claims_schema = json.loads(
+        (ENTITLEMENTS / "v1/claims.schema.json").read_text(encoding="utf-8")
+    )
+    Draft202012Validator(
+        claims_schema,
+        format_checker=FormatChecker(),
+    ).validate(claims)
+    issued_at = _timestamp(claims["issued_at"])
+    not_before = _timestamp(claims["not_before"])
+    expires_at = _timestamp(claims["expires_at"])
+    entitled = (
+        issued_at <= not_before <= now < expires_at
+        and ENTITLEMENT_FEATURE in claims["features"]
+    )
+    return True, entitled
 
 
 def _parameter_type_matches(value_type: str, value: object) -> bool:
@@ -225,6 +286,88 @@ def semantic_errors(
 
 
 class ConnectContractTests(unittest.TestCase):
+    def test_entitlement_v1_fixtures_match_schema_signature_and_time_contract(self) -> None:
+        root = ENTITLEMENTS / "v1"
+        envelope_schema = json.loads(
+            (root / "envelope.schema.json").read_text(encoding="utf-8")
+        )
+        Draft202012Validator.check_schema(envelope_schema)
+        claims_schema = json.loads((root / "claims.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(claims_schema)
+        index = json.loads((root / "fixtures/index.json").read_text(encoding="utf-8"))
+        key_fixture = json.loads(
+            (root / "fixtures/test-public-key.json").read_text(encoding="utf-8")
+        )
+        public_key = _base64url_decode(key_fixture["public_key_base64url"])
+        now = _timestamp(index["evaluated_at"])
+
+        for case in index["cases"]:
+            with self.subTest(fixture=case["fixture"]):
+                envelope = json.loads(
+                    (root / "fixtures" / case["fixture"]).read_text(encoding="utf-8")
+                )
+                schema_errors = list(
+                    Draft202012Validator(envelope_schema).iter_errors(envelope)
+                )
+                self.assertEqual(not schema_errors, case["schema_valid"])
+                if schema_errors:
+                    self.assertFalse(case["signature_valid"])
+                    self.assertFalse(case["entitled"])
+                    continue
+                signature_valid, entitled = _verify_entitlement(
+                    envelope,
+                    key_id=key_fixture["key_id"],
+                    public_key=public_key,
+                    now=now,
+                )
+                self.assertEqual(signature_valid, case["signature_valid"])
+                self.assertEqual(entitled, case["entitled"])
+
+    def test_entitlement_v1_time_boundaries_are_exact_and_claims_are_strict(self) -> None:
+        root = ENTITLEMENTS / "v1"
+        claims_schema = json.loads((root / "claims.schema.json").read_text(encoding="utf-8"))
+        envelope = json.loads(
+            (root / "fixtures/valid/active.json").read_text(encoding="utf-8")
+        )
+        key_fixture = json.loads(
+            (root / "fixtures/test-public-key.json").read_text(encoding="utf-8")
+        )
+        public_key = _base64url_decode(key_fixture["public_key_base64url"])
+        claims = json.loads(_base64url_decode(envelope["payload_base64url"]))
+        issued_at = _timestamp(claims["issued_at"])
+        not_before = _timestamp(claims["not_before"])
+        expires_at = _timestamp(claims["expires_at"])
+
+        self.assertLessEqual(issued_at, not_before)
+        self.assertEqual(
+            _verify_entitlement(
+                envelope,
+                key_id=key_fixture["key_id"],
+                public_key=public_key,
+                now=not_before,
+            ),
+            (True, True),
+        )
+        self.assertEqual(
+            _verify_entitlement(
+                envelope,
+                key_id=key_fixture["key_id"],
+                public_key=public_key,
+                now=expires_at,
+            ),
+            (True, False),
+        )
+
+        duplicate = {**claims, "features": [ENTITLEMENT_FEATURE, ENTITLEMENT_FEATURE]}
+        errors = list(Draft202012Validator(claims_schema).iter_errors(duplicate))
+        self.assertTrue(errors)
+        unknown = {**claims, "unexpected": True}
+        errors = list(Draft202012Validator(claims_schema).iter_errors(unknown))
+        self.assertTrue(errors)
+        offset_timestamp = {**claims, "expires_at": "2027-01-01T00:00:00+00:00"}
+        errors = list(Draft202012Validator(claims_schema).iter_errors(offset_timestamp))
+        self.assertTrue(errors)
+
     def test_v2_registration_port_boundaries(self) -> None:
         registration = json.loads(
             (FIXTURES / "v2/valid/registration.json").read_text(encoding="utf-8")

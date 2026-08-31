@@ -1,0 +1,6 @@
+{
+  "format_version": 1,
+  "key_id": "connect-test-2026-01",
+  "payload_base64url": "eyJlbnRpdGxlbWVudF9pZCI6IjExMTExMTExLTExMTEtNDExMS04MTExLTExMTExMTExMTExMSIsImV4cGlyZXNfYXQiOiIyMDI3LTAxLTAxVDAwOjAwOjAwWiIsImZlYXR1cmVzIjpbImRvY3VtZW50LmxvY2FsX3Byb2Nlc3NpbmciXSwiZm9ybWF0X3ZlcnNpb24iOjEsImlzc3VlZF9hdCI6IjIwMjYtMDEtMDFUMDA6MDA6MDBaIiwibm90X2JlZm9yZSI6IjIwMjYtMDEtMDFUMDA6MDA6MDBaIiwic3ViamVjdCI6ImZpeHR1cmUtY3VzdG9tZXIifQ",
+  "signature_base64url": "OYa9pYPPQDGewpyEdiI2RiWiM7fI33OZbtQzAQ6Yfsh8xTe5LFlDiB1iX0f-46wquo93ROvtjVMxP4PlC7k1AA"
+}

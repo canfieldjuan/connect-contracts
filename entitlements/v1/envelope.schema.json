@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/entitlements/v1/envelope.schema.json",
+  "title": "Local Connect entitlement envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "key_id",
+    "payload_base64url",
+    "signature_base64url"
+  ],
+  "properties": {
+    "format_version": { "const": 1 },
+    "key_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+      "maxLength": 100
+    },
+    "payload_base64url": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "minLength": 2,
+      "maxLength": 8192
+    },
+    "signature_base64url": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{86}$"
+    }
+  }
+}
