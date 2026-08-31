@@ -131,7 +131,8 @@ that the two-application offline proof does not need.
 - Connect can be sold independently of either standalone application.
 - Missing, malformed, expired, or not-yet-valid licenses deterministically hide
   capabilities and deny live jobs.
-- License delivery and production issuer-key custody are release operations,
-  not application runtime behavior.
+- License acquisition and production issuer-key custody remain release
+  operations. App-local installation of an acquired license is defined by
+  ADR-0004.
 - Billing checkout, account UI, renewal UI, revocation, machine binding,
   Windows/macOS placement, and grace policy remain deferred.
