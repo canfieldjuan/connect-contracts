@@ -1,0 +1,13 @@
+{
+  "evaluated_at": "2026-09-01T00:00:00Z",
+  "cases": [
+    { "fixture": "valid/active.json", "schema_valid": true, "signature_valid": true, "entitled": true },
+    { "fixture": "valid/expired.json", "schema_valid": true, "signature_valid": true, "entitled": false },
+    { "fixture": "valid/not-yet-valid.json", "schema_valid": true, "signature_valid": true, "entitled": false },
+    { "fixture": "valid/missing-feature.json", "schema_valid": true, "signature_valid": true, "entitled": false },
+    { "fixture": "invalid/unknown-key.json", "schema_valid": true, "signature_valid": false, "entitled": false },
+    { "fixture": "invalid/bad-signature.json", "schema_valid": true, "signature_valid": false, "entitled": false },
+    { "fixture": "invalid/duplicate-claim-key.json", "schema_valid": true, "signature_valid": true, "entitled": false },
+    { "fixture": "invalid/malformed-base64.json", "schema_valid": false, "signature_valid": false, "entitled": false }
+  ]
+}

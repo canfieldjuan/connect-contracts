@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/entitlements/v1/claims.schema.json",
+  "title": "Local Connect entitlement claims v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "entitlement_id",
+    "subject",
+    "features",
+    "issued_at",
+    "not_before",
+    "expires_at"
+  ],
+  "properties": {
+    "format_version": { "const": 1 },
+    "entitlement_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$",
+        "maxLength": 100
+      }
+    },
+    "issued_at": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "not_before": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "expires_at": { "type": "string", "format": "date-time", "pattern": "Z$" }
+  }
+}
