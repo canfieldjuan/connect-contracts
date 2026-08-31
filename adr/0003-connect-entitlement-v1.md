@@ -54,8 +54,9 @@ an opaque subject, a unique feature list, and UTC `issued_at`, `not_before`, and
 Signing the encoded bytes rather than a reconstructed JSON object avoids
 cross-language canonicalization. Verifiers bound and decode the payload, verify
 the signature with a compiled public-key ring, then strictly validate claims.
-Unknown key IDs, unknown fields, malformed encoding, invalid signatures,
-invalid intervals, missing features, and unsupported versions fail closed.
+Unknown key IDs, unknown fields, duplicate JSON object member names, malformed
+encoding, invalid signatures, invalid intervals, missing features, and
+unsupported versions fail closed.
 
 An entitlement is active exactly when:
 

@@ -26,6 +26,22 @@ SCHEMA_NAMES = {
 ENTITLEMENT_FEATURE = "connect.capability_exchange"
 
 
+def _reject_duplicate_members(pairs: list[tuple[str, object]]) -> dict:
+    value: dict[str, object] = {}
+    for key, child in pairs:
+        if key in value:
+            raise ValueError(f"duplicate JSON object member: {key}")
+        value[key] = child
+    return value
+
+
+def _strict_json_loads(value: str | bytes) -> dict:
+    parsed = json.loads(value, object_pairs_hook=_reject_duplicate_members)
+    if not isinstance(parsed, dict):
+        raise ValueError("entitlement JSON must be an object")
+    return parsed
+
+
 def _base64url_decode(value: str) -> bytes:
     if "=" in value:
         raise ValueError("base64url padding is not canonical")
@@ -52,11 +68,11 @@ def _timestamp(value: str) -> datetime:
 def _verify_entitlement(
     envelope: dict,
     *,
-    key_id: str,
-    public_key: bytes,
+    keys: dict[str, bytes],
     now: datetime,
 ) -> tuple[bool, bool]:
-    if envelope["key_id"] != key_id:
+    public_key = keys.get(envelope["key_id"])
+    if public_key is None:
         return False, False
     try:
         payload = _base64url_decode(envelope["payload_base64url"])
@@ -64,7 +80,10 @@ def _verify_entitlement(
         Ed25519PublicKey.from_public_bytes(public_key).verify(signature, payload)
     except (InvalidSignature, ValueError):
         return False, False
-    claims = json.loads(payload)
+    try:
+        claims = _strict_json_loads(payload)
+    except (json.JSONDecodeError, ValueError):
+        return True, False
     claims_schema = json.loads(
         (ENTITLEMENTS / "v1/claims.schema.json").read_text(encoding="utf-8")
     )
@@ -298,7 +317,7 @@ class ConnectContractTests(unittest.TestCase):
             (root / "keyring.schema.json").read_text(encoding="utf-8")
         )
         Draft202012Validator.check_schema(keyring_schema)
-        keyring = json.loads(
+        keyring = _strict_json_loads(
             (root / "fixtures/test-keyring.json").read_text(encoding="utf-8")
         )
         Draft202012Validator(keyring_schema).validate(keyring)
@@ -307,13 +326,15 @@ class ConnectContractTests(unittest.TestCase):
             len(keyring["keys"]),
         )
         index = json.loads((root / "fixtures/index.json").read_text(encoding="utf-8"))
-        key_fixture = keyring["keys"][0]
-        public_key = _base64url_decode(key_fixture["public_key_base64url"])
+        keys = {
+            key["key_id"]: _base64url_decode(key["public_key_base64url"])
+            for key in keyring["keys"]
+        }
         now = _timestamp(index["evaluated_at"])
 
         for case in index["cases"]:
             with self.subTest(fixture=case["fixture"]):
-                envelope = json.loads(
+                envelope = _strict_json_loads(
                     (root / "fixtures" / case["fixture"]).read_text(encoding="utf-8")
                 )
                 schema_errors = list(
@@ -326,8 +347,7 @@ class ConnectContractTests(unittest.TestCase):
                     continue
                 signature_valid, entitled = _verify_entitlement(
                     envelope,
-                    key_id=key_fixture["key_id"],
-                    public_key=public_key,
+                    keys=keys,
                     now=now,
                 )
                 self.assertEqual(signature_valid, case["signature_valid"])
@@ -336,14 +356,17 @@ class ConnectContractTests(unittest.TestCase):
     def test_entitlement_v1_time_boundaries_are_exact_and_claims_are_strict(self) -> None:
         root = ENTITLEMENTS / "v1"
         claims_schema = json.loads((root / "claims.schema.json").read_text(encoding="utf-8"))
-        envelope = json.loads(
+        envelope = _strict_json_loads(
             (root / "fixtures/valid/active.json").read_text(encoding="utf-8")
         )
-        key_fixture = json.loads(
+        keyring = _strict_json_loads(
             (root / "fixtures/test-keyring.json").read_text(encoding="utf-8")
-        )["keys"][0]
-        public_key = _base64url_decode(key_fixture["public_key_base64url"])
-        claims = json.loads(_base64url_decode(envelope["payload_base64url"]))
+        )
+        keys = {
+            key["key_id"]: _base64url_decode(key["public_key_base64url"])
+            for key in keyring["keys"]
+        }
+        claims = _strict_json_loads(_base64url_decode(envelope["payload_base64url"]))
         issued_at = _timestamp(claims["issued_at"])
         not_before = _timestamp(claims["not_before"])
         expires_at = _timestamp(claims["expires_at"])
@@ -352,8 +375,7 @@ class ConnectContractTests(unittest.TestCase):
         self.assertEqual(
             _verify_entitlement(
                 envelope,
-                key_id=key_fixture["key_id"],
-                public_key=public_key,
+                keys=keys,
                 now=not_before,
             ),
             (True, True),
@@ -361,8 +383,7 @@ class ConnectContractTests(unittest.TestCase):
         self.assertEqual(
             _verify_entitlement(
                 envelope,
-                key_id=key_fixture["key_id"],
-                public_key=public_key,
+                keys=keys,
                 now=expires_at,
             ),
             (True, False),
