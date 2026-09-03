@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from cryptography.exceptions import InvalidSignature
+from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
@@ -98,6 +98,8 @@ def _read_regular_file(path: Path, *, limit: int, private: bool) -> bytes:
     flags = os.O_RDONLY | os.O_CLOEXEC
     if hasattr(os, "O_NOFOLLOW"):
         flags |= os.O_NOFOLLOW
+    if hasattr(os, "O_NONBLOCK"):
+        flags |= os.O_NONBLOCK
     try:
         descriptor = os.open(path, flags)
         try:
@@ -341,7 +343,7 @@ def issue_entitlement(
     )
     try:
         loaded = serialization.load_pem_private_key(private_bytes, password=passphrase)
-    except (TypeError, ValueError) as exc:
+    except (TypeError, ValueError, UnsupportedAlgorithm) as exc:
         raise IssuerError("private issuer key or passphrase is invalid") from exc
     if not isinstance(loaded, Ed25519PrivateKey):
         raise IssuerError("private issuer key is not Ed25519")

@@ -1,5 +1,6 @@
 import base64
 import json
+import os
 import stat
 import tempfile
 import unittest
@@ -7,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import Mock
 
+from cryptography.exceptions import UnsupportedAlgorithm
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema import Draft202012Validator, FormatChecker
 
@@ -171,6 +173,13 @@ class EntitlementIssuerTests(unittest.TestCase):
         with self.assertRaisesRegex(IssuerError, "key or passphrase is invalid"):
             self.issue(passphrase=b"wrong passphrase with length")
 
+        with unittest.mock.patch(
+            "tools.entitlement_issuer.serialization.load_pem_private_key",
+            side_effect=UnsupportedAlgorithm("unsupported key algorithm"),
+        ):
+            with self.assertRaisesRegex(IssuerError, "key or passphrase is invalid"):
+                self.issue()
+
         other_private = self.private_parent / "other.private.pem"
         other_keyring = self.root / "other-keyring.json"
         initialize_authority(
@@ -245,6 +254,14 @@ class EntitlementIssuerTests(unittest.TestCase):
 
         with self.assertRaisesRegex(IssuerError, "not present"):
             self.issue(key_id="local-connect-prod-2099-01")
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO support is unavailable")
+    def test_issue_input_reader_rejects_fifo_without_waiting_for_a_writer(self):
+        fifo = self.root / "keyring.fifo"
+        os.mkfifo(fifo)
+
+        with self.assertRaisesRegex(IssuerError, "bounded regular file"):
+            self.issue(keyring_path=fifo)
 
     def test_secret_collection_unlock_accepts_successful_prompt(self):
         collection = Mock()
