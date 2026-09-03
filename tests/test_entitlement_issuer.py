@@ -20,8 +20,10 @@ from tools.entitlement_issuer import (
     _ensure_secret_collection_unlocked,
     _interactive_passphrase,
     _read_secret_service_passphrase,
+    _write_new,
     initialize_authority,
     issue_entitlement,
+    main,
 )
 
 
@@ -175,6 +177,33 @@ class EntitlementIssuerTests(unittest.TestCase):
             self.initialize()
         self.assertEqual(self.private_key.read_bytes(), original_private)
         self.assertEqual(self.keyring.read_bytes(), original_keyring)
+
+    def test_initialization_interrupts_remove_partial_outputs(self):
+        partial = self.private_parent / "partial"
+        with unittest.mock.patch(
+            "tools.entitlement_issuer.os.write", side_effect=KeyboardInterrupt()
+        ):
+            with self.assertRaises(KeyboardInterrupt):
+                _write_new(partial, b"private", 0o600)
+        self.assertFalse(partial.exists())
+
+        real_write_new = _write_new
+        calls = 0
+
+        def interrupt_keyring(path, content, mode):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise KeyboardInterrupt()
+            return real_write_new(path, content, mode)
+
+        with unittest.mock.patch(
+            "tools.entitlement_issuer._write_new", side_effect=interrupt_keyring
+        ):
+            with self.assertRaises(KeyboardInterrupt):
+                self.initialize()
+        self.assertFalse(self.private_key.exists())
+        self.assertFalse(self.keyring.exists())
 
     def test_issue_rejects_wrong_passphrase_keyring_and_unsafe_private_mode(self):
         self.initialize()
@@ -336,6 +365,49 @@ class EntitlementIssuerTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(IssuerError, "cancelled or unavailable"):
                 _interactive_passphrase("Issuer passphrase: ")
+
+    def test_secret_service_initialization_interrupt_rolls_back_item(self):
+        secret_item = Mock()
+        arguments = [
+            "init",
+            "--key-id",
+            self.key_id,
+            "--private-key",
+            str(self.private_key),
+            "--keyring",
+            str(self.keyring),
+            "--secret-service",
+        ]
+        with (
+            unittest.mock.patch(
+                "tools.entitlement_issuer._create_secret_service_passphrase",
+                return_value=(PASSPHRASE, secret_item),
+            ),
+            unittest.mock.patch(
+                "tools.entitlement_issuer.initialize_authority",
+                side_effect=KeyboardInterrupt(),
+            ),
+        ):
+            with self.assertRaises(KeyboardInterrupt):
+                main(arguments)
+        secret_item.delete.assert_called_once_with()
+
+        secret_item.reset_mock()
+        secret_item.delete.side_effect = OSError("delete failed")
+        error = unittest.mock.MagicMock()
+        with (
+            unittest.mock.patch(
+                "tools.entitlement_issuer._create_secret_service_passphrase",
+                return_value=(PASSPHRASE, secret_item),
+            ),
+            unittest.mock.patch(
+                "tools.entitlement_issuer.initialize_authority",
+                side_effect=KeyboardInterrupt(),
+            ),
+            unittest.mock.patch("tools.entitlement_issuer.print", error),
+        ):
+            self.assertEqual(main(arguments), 2)
+        self.assertIn("rollback failed", error.call_args.args[0])
 
 
 if __name__ == "__main__":

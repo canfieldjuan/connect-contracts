@@ -168,6 +168,16 @@ def _write_new(path: Path, content: bytes, mode: int) -> None:
             f"issuer output parent is unavailable: {path.parent}"
         ) from exc
     created = False
+
+    def rollback_created_output() -> None:
+        if not created:
+            return
+        try:
+            os.unlink(path.name, dir_fd=parent)
+            os.fsync(parent)
+        except OSError as exc:
+            raise IssuerError(f"issuer output rollback failed: {path}") from exc
+
     try:
         try:
             try:
@@ -190,15 +200,13 @@ def _write_new(path: Path, content: bytes, mode: int) -> None:
         except IssuerError:
             raise
         except OSError as exc:
-            if created:
-                try:
-                    os.unlink(path.name, dir_fd=parent)
-                    os.fsync(parent)
-                except OSError:
-                    pass
+            rollback_created_output()
             raise IssuerError(
                 f"issuer output could not be created safely: {path}"
             ) from exc
+        except BaseException:
+            rollback_created_output()
+            raise
     finally:
         os.close(parent)
 
@@ -277,8 +285,11 @@ def initialize_authority(
     _write_new(private_key_path, private_bytes, 0o600)
     try:
         _write_new(keyring_path, keyring_bytes, 0o644)
-    except Exception:
-        private_key_path.unlink(missing_ok=True)
+    except BaseException:
+        try:
+            private_key_path.unlink(missing_ok=True)
+        except OSError as exc:
+            raise IssuerError("private issuer key rollback failed") from exc
         raise
     return {
         "key_id": key_id,
@@ -482,6 +493,13 @@ def _interactive_new_passphrase() -> bytes:
     return first
 
 
+def _rollback_secret_service_item(item: Any) -> None:
+    try:
+        item.delete()
+    except BaseException as exc:
+        raise IssuerError("Secret Service issuer rollback failed") from exc
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -522,12 +540,9 @@ def main(argv: list[str] | None = None) -> int:
                     keyring_path=args.keyring,
                     passphrase=passphrase,
                 )
-            except Exception:
+            except BaseException:
                 if secret_item is not None:
-                    try:
-                        secret_item.delete()
-                    except Exception:
-                        pass
+                    _rollback_secret_service_item(secret_item)
                 raise
         else:
             now = datetime.now(timezone.utc).replace(microsecond=0)

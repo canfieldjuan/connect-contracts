@@ -81,8 +81,8 @@ the requested entitlement without replacing an existing file.
 
 Results:
 
-- `python3 -m unittest tests.test_entitlement_issuer` passed 13 tests.
-- `python3 -m unittest` passed 19 tests.
+- `python3 -m unittest tests.test_entitlement_issuer` passed 15 tests.
+- `python3 -m unittest` passed 21 tests.
 - Ruff lint passed, and both new Python files passed Ruff's format check.
 - `python3 -m compileall -q tools tests` passed.
 - `init --secret-service` created `local-connect-prod-2026-01` with an
@@ -110,6 +110,9 @@ Results:
   failures use the same safe operator error contract.
 - Interactive passphrase EOF, cancellation, terminal failure, and encoding
   errors are normalized through one prompt helper on both command paths.
+- Cancellation after output or Secret Service creation rolls back partial
+  files, the private-key half of an interrupted key pair, and the newly created
+  credential item; rollback failure is surfaced to the operator.
 
 ## Estimated diff size
 
