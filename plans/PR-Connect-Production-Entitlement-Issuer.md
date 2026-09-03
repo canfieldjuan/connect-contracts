@@ -81,8 +81,8 @@ the requested entitlement without replacing an existing file.
 
 Results:
 
-- `python3 -m unittest tests.test_entitlement_issuer` passed 9 tests.
-- `python3 -m unittest` passed 15 tests.
+- `python3 -m unittest tests.test_entitlement_issuer` passed 11 tests.
+- `python3 -m unittest` passed 17 tests.
 - Ruff lint passed, and both new Python files passed Ruff's format check.
 - `python3 -m compileall -q tools tests` passed.
 - `init --secret-service` created `local-connect-prod-2026-01` with an
@@ -100,10 +100,15 @@ Results:
   destinations.
 - Type-invalid public keys and non-UTC claim datetimes fail through the issuer's
   stable `IssuerError` contract rather than escaping as raw Python exceptions.
+- Fractional claim datetimes are rejected before they can collapse to the same
+  serialized second. FIFO inputs cannot block the issuer before regular-file
+  validation, unsupported private-key algorithms remain inside the safe error
+  contract, and Secret Service query failures are normalized on both command
+  paths.
 
 ## Estimated diff size
 
-Approximately 885 added lines across the issuer, boundary tests, plan, public
+Approximately 1,000 added lines across the issuer, boundary tests, plan, public
 keyring, and release documentation. The private-file admission and atomic
 creation code accounts for the larger-than-initially-estimated surface. The
 security-sensitive init/issue lifecycle is one indivisible slice; splitting it
