@@ -66,9 +66,12 @@ location.
 ### Windows owner-private boundary
 
 The current user's Local AppData profile ACL is the owner-private boundary.
-Implementations verify the effective DACL on that root and every Connect-owned
-directory, published registration, installed entitlement, temporary, and lock
-file before trusting it. A null or unreadable DACL fails closed. The owner must be the current user,
+Implementations establish a protected current-user/SYSTEM/Administrators DACL
+on each directory they newly create, then verify the effective DACL on that root
+and every Connect-owned directory, published registration, installed
+entitlement, temporary, and lock file before trusting it. Existing unsafe paths
+are rejected rather than silently rewritten. A null or unreadable DACL fails
+closed. The owner must be the current user,
 SYSTEM, or the built-in Administrators group. An access-allowed ACE that grants
 file content/list, mutation, deletion, DACL, ownership, generic-read,
 generic-write, or generic-all rights to any other principal fails closed;
