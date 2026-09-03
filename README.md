@@ -28,8 +28,45 @@ dependency in `requirements-dev.txt`.
 
 Commercial Connect authorization is a separate, signed local contract under
 `entitlements/v1/`. It does not add fields to either Connect wire protocol.
-The committed public key and licenses there are conformance fixtures only and
-must never be used as a production issuer.
+The key and licenses under `entitlements/v1/fixtures/` are conformance fixtures
+only and must never be used as a production issuer. The separately named
+`entitlements/v1/release/keyring.json` is the publishable production public
+keyring consumed by official application builds; it contains no private key.
+
+The current production authority is already bootstrapped. Release operators
+issue licenses against its committed public keyring through the offline issuer:
+
+```bash
+python3 tools/entitlement_issuer.py issue \
+  --key-id local-connect-prod-2026-01 \
+  --private-key /absolute/private/path/issuer.private.pem \
+  --keyring "$PWD/entitlements/v1/release/keyring.json" \
+  --subject customer-or-installation-reference \
+  --expires-at 2027-09-02T00:00:00Z \
+  --output /absolute/private/path/entitlement-v1.json \
+  --secret-service
+```
+
+`init` is reserved for bootstrapping a new authority or rotation candidate and
+requires both destinations not to exist. Never point it at the committed
+current keyring. For example, stage the next public keyring separately, review
+it, then intentionally publish its public entry through the normal release
+process:
+
+```bash
+python3 tools/entitlement_issuer.py init \
+  --key-id local-connect-prod-2027-01 \
+  --private-key /absolute/private/path/issuer-2027.private.pem \
+  --keyring /absolute/release/staging/keyring-2027.json \
+  --secret-service
+```
+
+Without `--secret-service`, both commands prompt locally for the encryption
+passphrase without echoing it. The CLI never accepts a passphrase argument.
+Private-key parents must be owner-only, and the CLI refuses to place a private
+key anywhere inside this repository. Official application packages embed only
+the public keyring. Entitlements are created owner-private and are installed by
+an application's ADR-0004 activation adapter.
 
 Activation is an app-local operation governed by ADR-0004. Either application
 may securely install the same signed entitlement, but no application becomes
