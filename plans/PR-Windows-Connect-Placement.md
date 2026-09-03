@@ -46,13 +46,17 @@ concrete owner; Creator Owner remains inherit-only. V1 permits one active
 publisher per `app_id`, holds the fixed
 `.local-connect-v1-<app_id>.lock` while serving, and publishes
 `local-connect-v1-<app_id>.json`; the fixed prefix prevents valid app IDs from
-becoming reserved Windows device basenames. V2 uses one registration per
-durable provider instance. Registration temporaries end in `.tmp`, are removed
-on every handled path, and never count as candidates after a crash. Restart
-cycles therefore replace rather than accumulate registration candidates.
-Consumers inspect at most 256 case-insensitive `.json` names in each
-protocol-specific providers directory and fail closed before probing if a 257th
-is encountered.
+becoming reserved Windows device basenames. V2 publishes
+`local-connect-v2-<app_id>-<instance_id>.json` and holds
+`.local-connect-v2-<instance_id>.lock` from before bind/publication through
+token-owned cleanup; the lock excludes `app_id` because the durable instance
+alone owns retained jobs. Registration temporaries end in `.tmp`, are removed
+on every handled path, and never become candidates after a crash, although they
+still consume the directory traversal budget. Restart cycles therefore replace
+rather than accumulate registration candidates. Consumers inspect at most 256
+total direct children in each protocol-specific providers directory, filter
+case-insensitive `.json` names only after counting, and fail closed before
+probing if a 257th child is encountered.
 
 The current-user profile ACL is the Windows owner-private boundary. Connect
 must fail unavailable when it cannot establish that boundary or when the root
