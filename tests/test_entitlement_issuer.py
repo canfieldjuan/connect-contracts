@@ -14,7 +14,9 @@ from tools.entitlement_issuer import (
     FEATURE_ID,
     ROOT,
     IssuerError,
+    _create_secret_service_passphrase,
     _ensure_secret_collection_unlocked,
+    _read_secret_service_passphrase,
     initialize_authority,
     issue_entitlement,
 )
@@ -199,6 +201,11 @@ class EntitlementIssuerTests(unittest.TestCase):
             self.issue(not_before=instant, expires_at=instant)
         with self.assertRaisesRegex(IssuerError, "timestamps must be UTC-aware"):
             self.issue(issued_at=instant.replace(tzinfo=None))
+        with self.assertRaisesRegex(IssuerError, "fractional seconds"):
+            self.issue(
+                not_before=instant.replace(microsecond=100_000),
+                expires_at=instant.replace(microsecond=900_000),
+            )
 
         self.issue()
         original = self.output.read_bytes()
@@ -260,6 +267,18 @@ class EntitlementIssuerTests(unittest.TestCase):
         still_locked.unlock.return_value = False
         with self.assertRaisesRegex(IssuerError, "collection is locked"):
             _ensure_secret_collection_unlocked(still_locked)
+
+    def test_secret_service_search_failures_use_stable_issuer_error(self):
+        collection = Mock()
+        collection.search_items.side_effect = RuntimeError("daemon disconnected")
+
+        with unittest.mock.patch(
+            "tools.entitlement_issuer._secret_collection", return_value=collection
+        ):
+            with self.assertRaisesRegex(IssuerError, "could not search"):
+                _create_secret_service_passphrase(self.key_id)
+            with self.assertRaisesRegex(IssuerError, "could not search"):
+                _read_secret_service_passphrase(self.key_id)
 
 
 if __name__ == "__main__":

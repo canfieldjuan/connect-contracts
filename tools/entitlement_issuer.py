@@ -291,12 +291,9 @@ def _parse_utc(value: str) -> datetime:
 def _format_utc(value: datetime) -> str:
     if value.tzinfo is None or value.utcoffset() != timezone.utc.utcoffset(value):
         raise IssuerError("issuer timestamps must be UTC-aware")
-    return (
-        value.astimezone(timezone.utc)
-        .replace(microsecond=0)
-        .isoformat()
-        .replace("+00:00", "Z")
-    )
+    if value.microsecond:
+        raise IssuerError("issuer timestamps must not contain fractional seconds")
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def issue_entitlement(
@@ -416,10 +413,17 @@ def _secret_attributes(key_id: str) -> dict[str, str]:
     return {**SECRET_ATTRIBUTES, "key_id": key_id}
 
 
+def _search_secret_service_items(collection: Any, key_id: str) -> list[Any]:
+    try:
+        return list(collection.search_items(_secret_attributes(key_id)))
+    except Exception as exc:
+        raise IssuerError("Secret Service could not search issuer passphrases") from exc
+
+
 def _create_secret_service_passphrase(key_id: str) -> tuple[bytes, Any]:
     collection = _secret_collection()
     attributes = _secret_attributes(key_id)
-    if list(collection.search_items(attributes)):
+    if _search_secret_service_items(collection, key_id):
         raise IssuerError("Secret Service already contains this issuer key ID")
     passphrase = secrets.token_urlsafe(48).encode("ascii")
     try:
@@ -437,7 +441,8 @@ def _create_secret_service_passphrase(key_id: str) -> tuple[bytes, Any]:
 
 
 def _read_secret_service_passphrase(key_id: str) -> bytes:
-    items = list(_secret_collection().search_items(_secret_attributes(key_id)))
+    collection = _secret_collection()
+    items = _search_secret_service_items(collection, key_id)
     if len(items) != 1:
         raise IssuerError(
             "Secret Service must contain exactly one matching issuer passphrase"
