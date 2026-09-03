@@ -81,8 +81,8 @@ the requested entitlement without replacing an existing file.
 
 Results:
 
-- `python3 -m unittest tests.test_entitlement_issuer` passed 7 tests.
-- `python3 -m unittest` passed 13 tests.
+- `python3 -m unittest tests.test_entitlement_issuer` passed 9 tests.
+- `python3 -m unittest` passed 15 tests.
 - Ruff lint passed, and both new Python files passed Ruff's format check.
 - `python3 -m compileall -q tools tests` passed.
 - `init --secret-service` created `local-connect-prod-2026-01` with an
@@ -92,6 +92,9 @@ Results:
   smoke entitlement; both completed without exposing the passphrase.
 - The release public key was compared with the canonical test fixture and is
   distinct.
+- Locked Secret Service collections now interpret the API's dismissal result
+  correctly and verify that the collection is unlocked before key access;
+  regression tests cover success, dismissal, and a still-locked collection.
 
 ## Estimated diff size
 

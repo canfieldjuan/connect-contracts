@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import Mock
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema import Draft202012Validator, FormatChecker
@@ -13,6 +14,7 @@ from tools.entitlement_issuer import (
     FEATURE_ID,
     ROOT,
     IssuerError,
+    _ensure_secret_collection_unlocked,
     initialize_authority,
     issue_entitlement,
 )
@@ -216,6 +218,28 @@ class EntitlementIssuerTests(unittest.TestCase):
 
         with self.assertRaisesRegex(IssuerError, "not present"):
             self.issue(key_id="local-connect-prod-2099-01")
+
+    def test_secret_collection_unlock_accepts_successful_prompt(self):
+        collection = Mock()
+        collection.is_locked.side_effect = [True, False]
+        collection.unlock.return_value = False
+
+        _ensure_secret_collection_unlocked(collection)
+
+        collection.unlock.assert_called_once_with()
+
+    def test_secret_collection_unlock_rejects_dismissal_or_still_locked(self):
+        dismissed = Mock()
+        dismissed.is_locked.return_value = True
+        dismissed.unlock.return_value = True
+        with self.assertRaisesRegex(IssuerError, "collection is locked"):
+            _ensure_secret_collection_unlocked(dismissed)
+
+        still_locked = Mock()
+        still_locked.is_locked.return_value = True
+        still_locked.unlock.return_value = False
+        with self.assertRaisesRegex(IssuerError, "collection is locked"):
+            _ensure_secret_collection_unlocked(still_locked)
 
 
 if __name__ == "__main__":

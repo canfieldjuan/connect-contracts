@@ -384,13 +384,20 @@ def issue_entitlement(
     }
 
 
+def _ensure_secret_collection_unlocked(collection: Any) -> None:
+    if not collection.is_locked():
+        return
+    prompt_dismissed = collection.unlock()
+    if prompt_dismissed or collection.is_locked():
+        raise IssuerError("default Secret Service collection is locked")
+
+
 def _secret_collection():
     try:
         import secretstorage
 
         collection = secretstorage.get_default_collection(secretstorage.dbus_init())
-        if collection.is_locked() and not collection.unlock():
-            raise IssuerError("default Secret Service collection is locked")
+        _ensure_secret_collection_unlocked(collection)
         return collection
     except ImportError as exc:
         raise IssuerError(
