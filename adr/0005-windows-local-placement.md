@@ -67,8 +67,8 @@ location.
 
 The current user's Local AppData profile ACL is the owner-private boundary.
 Implementations verify the effective DACL on that root and every Connect-owned
-directory, registration, entitlement, temporary, and lock file before trusting
-it. A null or unreadable DACL fails closed. The owner must be the current user,
+directory, published registration, installed entitlement, temporary, and lock
+file before trusting it. A null or unreadable DACL fails closed. The owner must be the current user,
 SYSTEM, or the built-in Administrators group. An access-allowed ACE that grants
 file content/list, mutation, deletion, DACL, ownership, generic-read,
 generic-write, or generic-all rights to any other principal fails closed;
@@ -76,6 +76,11 @@ inherit-only Creator Owner is permitted. Connect-owned descendants must remain
 inside that absolute root and must not be symlinks, junctions, or other reparse
 points. Protection from a hostile process already running as the same user
 remains deferred.
+
+A user-selected activation source may originate in Downloads or another
+non-private directory. It must still be a bounded regular non-reparse file and
+must pass signature, feature, and time admission; its ambient ACL is not used as
+authority and does not need to match the installed private destination.
 
 Implementations reject registration and entitlement candidates that are not
 bounded regular files or that are reparse points. Security checks apply again
