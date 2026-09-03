@@ -103,10 +103,19 @@ successful registration or activation.
 Readers keep registration and entitlement handles bounded and short-lived.
 Writers retry Windows sharing violations for a bounded interval before
 replacement or owned-file cleanup fails; they never wait indefinitely or report
-an uncommitted write as successful. A Windows v2 provider derives one
-collision-safe registration filename from its `app_id` and durable
-`instance_id`; restarting the same durable instance replaces that same path
-rather than publishing another candidate.
+an uncommitted write as successful. A Windows v2 provider publishes
+`local-connect-v2-<app_id>-<instance_id>.json` and holds an exclusive
+non-blocking lock on
+`.local-connect-v2-<app_id>-<instance_id>.lock` in the same
+protocol-specific providers directory. The fixed `local-connect-v2-` prefix,
+the identifier-constrained `app_id`, and the lowercase UUIDv4 `instance_id`
+produce non-reserved, collision-safe Windows filenames. The provider acquires
+that lock before it binds or publishes, holds it through its complete serving
+lifetime, removes the registration only when its current bearer token still
+matches the file, and releases the lock last. A second process advertising the
+same durable namespace fails Connect startup as busy; it does not replace the
+active registration. Restarting the same durable instance reuses those fixed
+paths rather than publishing another candidate.
 
 A Windows v1 provider permits exactly one active publisher for each `app_id`
 under the current Windows user. Because schema-valid IDs can equal reserved
