@@ -41,7 +41,10 @@ activation lock use the `LocalConnect` root. Connect-owned path components and
 files reject reparse points, registration and entitlement content remain
 bounded, and writes use same-directory temporary files followed by atomic
 replacement. Cross-process activation and provider ownership use non-blocking
-Windows file locks.
+Windows file locks. OWNER RIGHTS is admitted only as the already-validated
+concrete owner; Creator Owner remains inherit-only. V1 uses one registration
+filename per stable provider-installation slot, while v2 uses one per durable
+provider instance, so restart cycles replace rather than accumulate candidates.
 
 The current-user profile ACL is the Windows owner-private boundary. Connect
 must fail unavailable when it cannot establish that boundary or when the root
@@ -55,8 +58,8 @@ is missing or relative. Standalone application behavior remains available.
   authentication mechanism.
 - Administrators and SYSTEM are treated like Unix root; protection from a
   hostile process running as the same user remains outside this contract.
-- Persistent `LOCALAPPDATA` may retain stale registrations after a crash;
-  authenticated reachability still determines availability.
+- V1 and v2 restart cycles reuse stable registration slots; authenticated
+  reachability still determines availability if a crash leaves a stale slot.
 
 ## Deferred
 
