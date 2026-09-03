@@ -255,6 +255,19 @@ class EntitlementIssuerTests(unittest.TestCase):
         with self.assertRaisesRegex(IssuerError, "not present"):
             self.issue(key_id="local-connect-prod-2099-01")
 
+    def test_issue_normalizes_json_numeric_and_recursion_limits(self):
+        numeric = self.root / "numeric.json"
+        numeric.write_text('{"keys":' + "9" * 5_000 + "}", encoding="utf-8")
+        with self.assertRaisesRegex(IssuerError, "invalid JSON document"):
+            self.issue(keyring_path=numeric)
+
+        with unittest.mock.patch(
+            "tools.entitlement_issuer.json.loads",
+            side_effect=RecursionError("maximum recursion depth exceeded"),
+        ):
+            with self.assertRaisesRegex(IssuerError, "invalid JSON document"):
+                self.issue(keyring_path=numeric)
+
     @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO support is unavailable")
     def test_issue_input_reader_rejects_fifo_without_waiting_for_a_writer(self):
         fifo = self.root / "keyring.fifo"

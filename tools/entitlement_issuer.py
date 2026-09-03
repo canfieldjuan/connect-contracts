@@ -72,7 +72,7 @@ def _strict_json_object(content: bytes) -> dict[str, Any]:
 
     try:
         value = json.loads(content, object_pairs_hook=reject_duplicates)
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+    except (UnicodeDecodeError, ValueError, RecursionError) as exc:
         raise IssuerError("invalid JSON document") from exc
     if not isinstance(value, dict):
         raise IssuerError("JSON document must be an object")

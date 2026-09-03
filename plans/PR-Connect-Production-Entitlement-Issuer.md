@@ -81,8 +81,8 @@ the requested entitlement without replacing an existing file.
 
 Results:
 
-- `python3 -m unittest tests.test_entitlement_issuer` passed 11 tests.
-- `python3 -m unittest` passed 17 tests.
+- `python3 -m unittest tests.test_entitlement_issuer` passed 12 tests.
+- `python3 -m unittest` passed 18 tests.
 - Ruff lint passed, and both new Python files passed Ruff's format check.
 - `python3 -m compileall -q tools tests` passed.
 - `init --secret-service` created `local-connect-prod-2026-01` with an
@@ -104,7 +104,8 @@ Results:
   serialized second. FIFO inputs cannot block the issuer before regular-file
   validation, unsupported private-key algorithms remain inside the safe error
   contract, and Secret Service query failures are normalized on both command
-  paths.
+  paths. Numeric-limit and recursion failures during JSON decoding are also
+  normalized instead of escaping as raw tracebacks.
 
 ## Estimated diff size
 
