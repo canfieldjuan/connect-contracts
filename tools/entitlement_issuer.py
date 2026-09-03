@@ -14,6 +14,7 @@ import secrets
 import stat
 import sys
 import uuid
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -478,8 +479,16 @@ def _read_secret_service_passphrase(key_id: str) -> bytes:
 
 def _interactive_passphrase(prompt: str) -> bytes:
     try:
-        return getpass.getpass(prompt).encode("utf-8")
-    except (EOFError, KeyboardInterrupt, OSError, UnicodeError) as exc:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", getpass.GetPassWarning)
+            return getpass.getpass(prompt).encode("utf-8")
+    except (
+        EOFError,
+        KeyboardInterrupt,
+        OSError,
+        UnicodeError,
+        getpass.GetPassWarning,
+    ) as exc:
         raise IssuerError(
             "issuer passphrase prompt was cancelled or unavailable"
         ) from exc

@@ -1,9 +1,11 @@
 import base64
+import getpass
 import json
 import os
 import stat
 import tempfile
 import unittest
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import Mock
@@ -349,7 +351,14 @@ class EntitlementIssuerTests(unittest.TestCase):
             with self.assertRaisesRegex(IssuerError, "could not search"):
                 _read_secret_service_passphrase(self.key_id)
 
-    def test_interactive_prompt_failures_use_stable_issuer_error(self):
+    def test_interactive_prompt_accepts_no_echo_and_normalizes_failures(self):
+        with unittest.mock.patch(
+            "tools.entitlement_issuer.getpass.getpass", return_value="private phrase"
+        ):
+            self.assertEqual(
+                _interactive_passphrase("Issuer passphrase: "), b"private phrase"
+            )
+
         for failure in (EOFError(), KeyboardInterrupt(), OSError("no terminal")):
             with self.subTest(failure=type(failure).__name__):
                 with unittest.mock.patch(
@@ -362,6 +371,18 @@ class EntitlementIssuerTests(unittest.TestCase):
 
         with unittest.mock.patch(
             "tools.entitlement_issuer.getpass.getpass", return_value="\ud800"
+        ):
+            with self.assertRaisesRegex(IssuerError, "cancelled or unavailable"):
+                _interactive_passphrase("Issuer passphrase: ")
+
+        def echoed_fallback(_prompt):
+            warnings.warn(
+                "Can not control echo on the terminal.", getpass.GetPassWarning
+            )
+            return "exposed passphrase"
+
+        with unittest.mock.patch(
+            "tools.entitlement_issuer.getpass.getpass", side_effect=echoed_fallback
         ):
             with self.assertRaisesRegex(IssuerError, "cancelled or unavailable"):
                 _interactive_passphrase("Issuer passphrase: ")

@@ -108,8 +108,9 @@ Results:
   normalized instead of escaping as raw tracebacks. Passphrases are bounded at
   the backend limit on both init and issue paths, and key-generation backend
   failures use the same safe operator error contract.
-- Interactive passphrase EOF, cancellation, terminal failure, and encoding
-  errors are normalized through one prompt helper on both command paths.
+- Interactive passphrase EOF, cancellation, terminal failure, encoding errors,
+  and `getpass` echoed-input fallback warnings are rejected through one prompt
+  helper on both command paths.
 - Cancellation after output or Secret Service creation rolls back partial
   files, the private-key half of an interrupted key pair, and the newly created
   credential item; rollback failure is surfaced to the operator.
