@@ -102,9 +102,9 @@ behavior available.
 
 ### Atomic publication and serialization
 
-Windows registration and entitlement writers use one destination-specific
-same-directory temporary regular-file path, write and flush the complete
-bounded content, and atomically replace the fixed destination. The caller holds
+For a destination filename `<name>`, Windows registration and entitlement
+writers use the exact same-directory temporary filename `.<name>.tmp`, write
+and flush the complete bounded content, and atomically replace the fixed destination. The caller holds
 the applicable ownership or activation lock across stale-temp admission,
 publication, and cleanup. A registration becomes availability evidence only
 after publication. A failed write must not be reported as a successful
@@ -155,11 +155,12 @@ replace the active registration. A crash leaves fixed registration and
 lock-file paths for the next process to reuse even though the v1 registration
 document's process-scoped `instance_id` rotates.
 
-Registration publication temporaries use one fixed path derived from their
-fixed destination and end in `.tmp`, not `.json`, under an
-ASCII-case-insensitive comparison. While holding the destination's ownership
-lock, a writer rejects an unsafe stale temporary or removes a private regular
-non-reparse stale temporary before creating the next write. It removes its own
+Registration publication temporaries use the exact
+`.<destination-filename>.tmp` transformation above and therefore end in `.tmp`,
+not `.json`, under an ASCII-case-insensitive comparison. While holding the
+destination's ownership lock, a writer rejects an unsafe stale temporary or
+removes a private regular non-reparse stale temporary before creating the next
+write. It removes its own
 temporary after successful replacement or any handled failure. A process crash
 can therefore leave at most one non-candidate temporary per fixed registration
 destination, and the next serialized writer reclaims it. Consumers never parse
