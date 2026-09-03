@@ -44,13 +44,17 @@ replacement. Cross-process activation and provider ownership use non-blocking
 Windows file locks. OWNER RIGHTS is admitted only as the already-validated
 concrete owner; Creator Owner remains inherit-only. V1 permits one active
 publisher per `app_id`, holds the fixed
-`.local-connect-v1-<app_id>.lock` while serving, and publishes
+`.local-connect-v1-<app_id>.lock` in the sibling `locks` directory while
+serving, and publishes
 `local-connect-v1-<app_id>.json`; the fixed prefix prevents valid app IDs from
 becoming reserved Windows device basenames. V2 publishes
 `local-connect-v2-<app_id>-<instance_id>.json` and holds
 `.local-connect-v2-<instance_id>.lock` from before bind/publication through
-token-owned cleanup; the lock excludes `app_id` because the durable instance
-alone owns retained jobs. Registration temporaries end in `.tmp`, are removed
+token-owned cleanup in the sibling `locks` directory; the lock excludes
+`app_id` because the durable instance alone owns retained jobs. Consumers never
+enumerate these direct-addressed persistent lock directories, so retired
+durable identities cannot consume registration discovery slots. Registration
+temporaries end in `.tmp`, are removed
 on every handled path, and never become candidates after a crash, although they
 still consume the directory traversal budget. Restart cycles therefore replace
 rather than accumulate registration candidates. Consumers inspect at most 256

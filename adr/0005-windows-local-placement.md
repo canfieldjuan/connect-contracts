@@ -52,6 +52,14 @@ V1 and v2 runtime registrations are stored under:
 %LOCALAPPDATA%\LocalConnect\runtime\v2\providers\
 ```
 
+Their direct-addressed persistent ownership locks are stored outside those
+consumer-enumerated directories under:
+
+```text
+%LOCALAPPDATA%\LocalConnect\runtime\v1\locks\
+%LOCALAPPDATA%\LocalConnect\runtime\v2\locks\
+```
+
 The shared entitlement and persistent activation lock are stored at:
 
 ```text
@@ -106,7 +114,7 @@ replacement or owned-file cleanup fails; they never wait indefinitely or report
 an uncommitted write as successful. A Windows v2 provider publishes
 `local-connect-v2-<app_id>-<instance_id>.json` and holds an exclusive
 non-blocking lock on
-`.local-connect-v2-<instance_id>.lock` in the same protocol-specific providers
+`.local-connect-v2-<instance_id>.lock` in the protocol-specific `locks`
 directory. The lock deliberately excludes `app_id`: v2 `instance_id` alone
 names the durable state namespace, including across an application rename. The
 fixed `local-connect-v2-` prefix, identifier-constrained `app_id`, and lowercase
@@ -123,8 +131,8 @@ A Windows v1 provider permits exactly one active publisher for each `app_id`
 under the current Windows user. Because schema-valid IDs can equal reserved
 Windows device basenames, it publishes `local-connect-v1-<app_id>.json` and
 holds an exclusive non-blocking lock on
-`.local-connect-v1-<app_id>.lock` in the same protocol-specific providers
-directory. The fixed `local-connect-v1-` prefix plus the v1 `app_id` character
+`.local-connect-v1-<app_id>.lock` in the protocol-specific `locks` directory.
+The fixed `local-connect-v1-` prefix plus the v1 `app_id` character
 and length constraints produces a non-reserved, collision-safe Windows
 filename. The provider acquires that lock before it binds or publishes, holds
 it through its complete serving lifetime, removes the registration only when
@@ -150,6 +158,12 @@ candidates but still consume the traversal budget. Encountering a 257th child
 or an enumeration error fails discovery closed for that directory before any
 candidate endpoint is probed. These requirements do not change the registration
 document or bearer-token contract.
+
+Conforming providers never publish ownership locks inside a `providers`
+directory. Consumers do not enumerate a protocol's sibling `locks` directory;
+they open no ownership lock by discovery. Retained lock paths are addressed
+directly by the provider identity and therefore cannot consume registration
+discovery slots when a durable v2 identity is retired.
 
 Provider-state ownership and entitlement activation use non-blocking Windows
 file locks. Every shared Connect lock covers byte offset `0` for length `1`.
