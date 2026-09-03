@@ -47,8 +47,8 @@ def _base64url_encode(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).rstrip(b"=").decode("ascii")
 
 
-def _base64url_decode(value: str) -> bytes:
-    if "=" in value:
+def _base64url_decode(value: object) -> bytes:
+    if not isinstance(value, str) or "=" in value:
         raise IssuerError("base64url values must be unpadded")
     try:
         decoded = base64.b64decode(
@@ -325,6 +325,9 @@ def issue_entitlement(
         not _valid_identifier(value, FEATURE_PATTERN, 100) for value in feature_list
     ):
         raise IssuerError("entitlement contains an invalid feature ID")
+    issued_at_text = _format_utc(issued_at)
+    not_before_text = _format_utc(not_before)
+    expires_at_text = _format_utc(expires_at)
     if not issued_at <= not_before < expires_at:
         raise IssuerError(
             "entitlement validity must satisfy issued_at <= not_before < expires_at"
@@ -357,9 +360,9 @@ def issue_entitlement(
         "entitlement_id": entitlement_id,
         "subject": subject,
         "features": feature_list,
-        "issued_at": _format_utc(issued_at),
-        "not_before": _format_utc(not_before),
-        "expires_at": _format_utc(expires_at),
+        "issued_at": issued_at_text,
+        "not_before": not_before_text,
+        "expires_at": expires_at_text,
     }
     payload = json.dumps(claims, sort_keys=True, separators=(",", ":")).encode("utf-8")
     signature = loaded.sign(payload)

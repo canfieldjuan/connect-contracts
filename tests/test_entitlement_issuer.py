@@ -197,6 +197,8 @@ class EntitlementIssuerTests(unittest.TestCase):
             IssuerError, "issued_at <= not_before < expires_at"
         ):
             self.issue(not_before=instant, expires_at=instant)
+        with self.assertRaisesRegex(IssuerError, "timestamps must be UTC-aware"):
+            self.issue(issued_at=instant.replace(tzinfo=None))
 
         self.issue()
         original = self.output.read_bytes()
@@ -215,6 +217,24 @@ class EntitlementIssuerTests(unittest.TestCase):
         duplicate.write_text('{"keys":[],"keys":[]}', encoding="utf-8")
         with self.assertRaisesRegex(IssuerError, "duplicate JSON member"):
             self.issue(keyring_path=duplicate)
+
+        invalid_public_key = self.root / "invalid-public-key.json"
+        invalid_public_key.write_text(
+            json.dumps(
+                {
+                    "keys": [
+                        {
+                            "key_id": self.key_id,
+                            "algorithm": "Ed25519",
+                            "public_key_base64url": None,
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(IssuerError, "base64url"):
+            self.issue(keyring_path=invalid_public_key)
 
         with self.assertRaisesRegex(IssuerError, "not present"):
             self.issue(key_id="local-connect-prod-2099-01")

@@ -95,6 +95,11 @@ Results:
 - Locked Secret Service collections now interpret the API's dismissal result
   correctly and verify that the collection is unlocked before key access;
   regression tests cover success, dismissal, and a still-locked collection.
+- The operator guide distinguishes the already-completed production bootstrap
+  from issuance and points future `init` runs at new, non-existing staging
+  destinations.
+- Type-invalid public keys and non-UTC claim datetimes fail through the issuer's
+  stable `IssuerError` contract rather than escaping as raw Python exceptions.
 
 ## Estimated diff size
 
