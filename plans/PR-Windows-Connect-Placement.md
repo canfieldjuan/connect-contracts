@@ -39,8 +39,8 @@ On Windows, providers and consumers derive the shared root from an absolute
 `LocalConnect/runtime/v{n}/providers`; the entitlement and its persistent
 activation lock use the `LocalConnect` root. Connect-owned path components and
 files reject reparse points, registration and entitlement content remain
-bounded, and writes use same-directory temporary files followed by atomic
-replacement. Cross-process activation and provider ownership use non-blocking
+bounded, and serialized writes use one destination-specific same-directory
+temporary followed by atomic replacement. Cross-process activation and provider ownership use non-blocking
 Windows file locks. OWNER RIGHTS is admitted only as the already-validated
 concrete owner; Creator Owner remains inherit-only. V1 permits one active
 publisher per `app_id`, holds the fixed
@@ -54,19 +54,21 @@ token-owned cleanup in the sibling `locks` directory; the lock excludes
 `app_id` because the durable instance alone owns retained jobs. Consumers never
 enumerate these direct-addressed persistent lock directories, so retired
 durable identities cannot consume registration discovery slots. Registration
-temporaries end in `.tmp`, are removed
-on every handled path, and never become candidates after a crash, although they
-still consume the directory traversal budget. Restart cycles therefore replace
-rather than accumulate registration candidates. Consumers inspect at most 256
+temporaries end in `.tmp`, are removed on every handled path, and are safely
+reclaimed by the next owner after a crash, leaving at most one per fixed
+destination. They never become candidates, although they still consume the
+directory traversal budget. Restart cycles therefore replace rather than
+accumulate registration candidates. Consumers inspect at most 256
 total direct children in each protocol-specific providers directory, filter
 case-insensitive `.json` names only after counting, and fail closed before
 probing if a 257th child is encountered.
 
 A supported v2 durable-identity reset keeps the old identifier until it has
 stopped the old provider, acquired the old identity lock, and safely removed
-that exact old registration. It aborts rather than committing a new identity
-when the old lock is busy or cleanup fails. Application-external deletion of
-provider state is not a supported reset operation.
+that exact old registration plus its fixed temporary. It aborts rather than
+committing a new identity when the old lock is busy or cleanup fails.
+Application-external deletion of provider state is not a supported reset
+operation.
 
 The current-user profile ACL is the Windows owner-private boundary. Connect
 must fail unavailable when it cannot establish that boundary or when the root

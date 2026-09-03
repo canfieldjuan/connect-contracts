@@ -102,11 +102,13 @@ behavior available.
 
 ### Atomic publication and serialization
 
-Windows registration and entitlement writers create a unique same-directory
-temporary regular file, write and flush the complete bounded content, and
-atomically replace the fixed destination. A registration becomes availability
-evidence only after publication. A failed write must not be reported as a
-successful registration or activation.
+Windows registration and entitlement writers use one destination-specific
+same-directory temporary regular-file path, write and flush the complete
+bounded content, and atomically replace the fixed destination. The caller holds
+the applicable ownership or activation lock across stale-temp admission,
+publication, and cleanup. A registration becomes availability evidence only
+after publication. A failed write must not be reported as a successful
+registration or activation.
 
 Readers keep registration and entitlement handles bounded and short-lived.
 Writers retry Windows sharing violations for a bounded interval before
@@ -131,11 +133,12 @@ Changing a v2 durable `instance_id` is an explicit state transition, not an
 implicit fresh start. A conforming reset/replacement operation retains the old
 identifier until cleanup, requires the old provider process to be stopped,
 acquires the old identifier's ownership lock without waiting, validates and
-removes the exact old `local-connect-v2-<instance_id>.json` path, and only then
-commits the new durable identity. A busy old lock or failed safe removal aborts
-the transition without reporting success. Deleting provider state behind the
-application instead of using that transition is outside the supported
-lifecycle and may require operator repair.
+removes the exact old `local-connect-v2-<instance_id>.json` destination and its
+destination-specific temporary path, and only then commits the new durable
+identity. A busy old lock or failed safe removal aborts the transition without
+reporting success. Deleting provider state behind the application instead of
+using that transition is outside the supported lifecycle and may require
+operator repair.
 
 A Windows v1 provider permits exactly one active publisher for each `app_id`
 under the current Windows user. Because schema-valid IDs can equal reserved
@@ -152,12 +155,16 @@ replace the active registration. A crash leaves fixed registration and
 lock-file paths for the next process to reuse even though the v1 registration
 document's process-scoped `instance_id` rotates.
 
-Registration publication temporaries end in `.tmp`, not `.json`, under an
-ASCII-case-insensitive comparison. The writer removes its own temporary after
-successful replacement or any handled failure. A process crash may leave that
-non-candidate temporary behind. Consumers never parse or probe it as a
-registration, although it consumes the shared-directory traversal budget below;
-stale-temporary scavenging remains optional storage hygiene.
+Registration publication temporaries use one fixed path derived from their
+fixed destination and end in `.tmp`, not `.json`, under an
+ASCII-case-insensitive comparison. While holding the destination's ownership
+lock, a writer rejects an unsafe stale temporary or removes a private regular
+non-reparse stale temporary before creating the next write. It removes its own
+temporary after successful replacement or any handled failure. A process crash
+can therefore leave at most one non-candidate temporary per fixed registration
+destination, and the next serialized writer reclaims it. Consumers never parse
+or probe it as a registration, although it consumes the shared-directory
+traversal budget below.
 
 For each protocol-specific Windows providers directory, consumers examine at
 most 256 direct child entries total. Every child counts before name, file type,
