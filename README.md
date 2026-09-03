@@ -13,6 +13,7 @@ Current decisions:
 - [ADR-0002: Connect v2 generic capability participation](adr/0002-connect-v2-generic-capabilities.md)
 - [ADR-0003: Connect entitlement v1](adr/0003-connect-entitlement-v1.md)
 - [ADR-0004: Connect entitlement activation v1](adr/0004-connect-entitlement-activation-v1.md)
+- [ADR-0005: Windows Local Connect placement](adr/0005-windows-local-placement.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
@@ -71,6 +72,10 @@ an application's ADR-0004 activation adapter.
 Activation is an app-local operation governed by ADR-0004. Either application
 may securely install the same signed entitlement, but no application becomes
 the owner of another application's settings or private data.
+
+ADR-0005 extends discovery and entitlement placement to Windows without
+changing the wire transport: Windows uses exact-loopback HTTP and per-user
+files rooted under `%LOCALAPPDATA%\LocalConnect\`. Named pipes remain deferred.
 
 Both versions use the same intentionally small HTTP shape under their own
 versioned routes:

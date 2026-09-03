@@ -150,8 +150,9 @@ asynchronous job channel.
   code changes when it is the only compatible provider.
 - Providers must already be running in v0.
 - Same-user malicious-process impersonation is not prevented.
-- Multiple-provider selection, Windows packaging, and alternate transports
-  require later decisions.
+- Multiple-provider selection and alternate transports require later decisions.
+  Windows filesystem placement while retaining loopback HTTP is defined by
+  ADR-0005; Windows named pipes remain deferred.
 
 ## v1 contract freeze
 
