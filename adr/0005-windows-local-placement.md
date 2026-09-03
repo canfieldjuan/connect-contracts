@@ -137,16 +137,19 @@ document's process-scoped `instance_id` rotates.
 Registration publication temporaries end in `.tmp`, not `.json`, under an
 ASCII-case-insensitive comparison. The writer removes its own temporary after
 successful replacement or any handled failure. A process crash may leave that
-non-candidate temporary behind, but consumers never count, parse, or probe it as
-a registration; stale-temporary scavenging remains optional storage hygiene.
+non-candidate temporary behind. Consumers never parse or probe it as a
+registration, although it consumes the shared-directory traversal budget below;
+stale-temporary scavenging remains optional storage hygiene.
 
 For each protocol-specific Windows providers directory, consumers examine at
-most 256 direct child entries whose names end in `.json`, compared
-ASCII-case-insensitively. Every such name counts before file type, security, or
-content admission; other names, including persistent `.lock` files, do not
-count. Encountering a 257th candidate or an enumeration error fails discovery
-closed for that directory before any candidate endpoint is probed. These
-requirements do not change the registration document or bearer-token contract.
+most 256 direct child entries total. Every child counts before name, file type,
+security, or content admission. Names ending in `.json`, compared
+ASCII-case-insensitively, continue to registration admission; other names,
+including persistent `.lock` and abandoned `.tmp` files, are not registration
+candidates but still consume the traversal budget. Encountering a 257th child
+or an enumeration error fails discovery closed for that directory before any
+candidate endpoint is probed. These requirements do not change the registration
+document or bearer-token contract.
 
 Provider-state ownership and entitlement activation use non-blocking Windows
 file locks. Every shared Connect lock covers byte offset `0` for length `1`.
