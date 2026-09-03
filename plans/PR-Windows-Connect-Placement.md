@@ -43,9 +43,13 @@ bounded, and writes use same-directory temporary files followed by atomic
 replacement. Cross-process activation and provider ownership use non-blocking
 Windows file locks. OWNER RIGHTS is admitted only as the already-validated
 concrete owner; Creator Owner remains inherit-only. V1 permits one active
-publisher per `app_id`, holds the fixed `.<app_id>.lock` while serving, and
-publishes `<app_id>.json`; v2 uses one registration per durable provider
-instance. Restart cycles therefore replace rather than accumulate candidates.
+publisher per `app_id`, holds the fixed
+`.local-connect-v1-<app_id>.lock` while serving, and publishes
+`local-connect-v1-<app_id>.json`; the fixed prefix prevents valid app IDs from
+becoming reserved Windows device basenames. V2 uses one registration per
+durable provider instance. Registration temporaries end in `.tmp`, are removed
+on every handled path, and never count as candidates after a crash. Restart
+cycles therefore replace rather than accumulate registration candidates.
 Consumers inspect at most 256 case-insensitive `.json` names in each
 protocol-specific providers directory and fail closed before probing if a 257th
 is encountered.

@@ -109,15 +109,25 @@ collision-safe registration filename from its `app_id` and durable
 rather than publishing another candidate.
 
 A Windows v1 provider permits exactly one active publisher for each `app_id`
-under the current Windows user. It publishes `<app_id>.json` and holds an
-exclusive non-blocking lock on `.<app_id>.lock` in the same protocol-specific
-providers directory. The provider acquires that lock before it binds or
-publishes, holds it through its complete serving lifetime, removes the
-registration only when its current bearer token still matches the file, and
-releases the lock last. A second process for the same `app_id` fails Connect
-startup as busy; it does not replace the active registration. A crash leaves a
-fixed registration and lock-file path for the next process to reuse even though
-the v1 registration document's process-scoped `instance_id` rotates.
+under the current Windows user. Because schema-valid IDs can equal reserved
+Windows device basenames, it publishes `local-connect-v1-<app_id>.json` and
+holds an exclusive non-blocking lock on
+`.local-connect-v1-<app_id>.lock` in the same protocol-specific providers
+directory. The fixed `local-connect-v1-` prefix plus the v1 `app_id` character
+and length constraints produces a non-reserved, collision-safe Windows
+filename. The provider acquires that lock before it binds or publishes, holds
+it through its complete serving lifetime, removes the registration only when
+its current bearer token still matches the file, and releases the lock last. A
+second process for the same `app_id` fails Connect startup as busy; it does not
+replace the active registration. A crash leaves fixed registration and
+lock-file paths for the next process to reuse even though the v1 registration
+document's process-scoped `instance_id` rotates.
+
+Registration publication temporaries end in `.tmp`, not `.json`, under an
+ASCII-case-insensitive comparison. The writer removes its own temporary after
+successful replacement or any handled failure. A process crash may leave that
+non-candidate temporary behind, but consumers never count, parse, or probe it as
+a registration; stale-temporary scavenging remains optional storage hygiene.
 
 For each protocol-specific Windows providers directory, consumers examine at
 most 256 direct child entries whose names end in `.json`, compared
@@ -145,8 +155,8 @@ platform provides.
 
 Unlike `XDG_RUNTIME_DIR`, Local AppData survives reboot. Providers remove their
 own registration on graceful shutdown only after verifying its bearer token.
-V1 crash/restart cycles reuse the `app_id` slot's fixed registration and lock
-paths, and v2 cycles reuse the durable instance's fixed path. Consumers treat
+V1 crash/restart cycles reuse the prefixed `app_id` slot's fixed registration
+and lock paths, and v2 cycles reuse the durable instance's fixed path. Consumers treat
 registrations as candidates only, enforce the 256-entry Windows scan above, and
 ignore stale files whose exact endpoint is unreachable, whose bearer token
 fails, or whose manifest attribution differs. Therefore a stale file alone
