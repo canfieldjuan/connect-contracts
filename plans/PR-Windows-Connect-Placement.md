@@ -48,7 +48,7 @@ publisher per `app_id`, holds the fixed
 serving, and publishes
 `local-connect-v1-<app_id>.json`; the fixed prefix prevents valid app IDs from
 becoming reserved Windows device basenames. V2 publishes
-`local-connect-v2-<app_id>-<instance_id>.json` and holds
+`local-connect-v2-<instance_id>.json` and holds
 `.local-connect-v2-<instance_id>.lock` from before bind/publication through
 token-owned cleanup in the sibling `locks` directory; the lock excludes
 `app_id` because the durable instance alone owns retained jobs. Consumers never
@@ -61,6 +61,12 @@ rather than accumulate registration candidates. Consumers inspect at most 256
 total direct children in each protocol-specific providers directory, filter
 case-insensitive `.json` names only after counting, and fail closed before
 probing if a 257th child is encountered.
+
+A supported v2 durable-identity reset keeps the old identifier until it has
+stopped the old provider, acquired the old identity lock, and safely removed
+that exact old registration. It aborts rather than committing a new identity
+when the old lock is busy or cleanup fails. Application-external deletion of
+provider state is not a supported reset operation.
 
 The current-user profile ACL is the Windows owner-private boundary. Connect
 must fail unavailable when it cannot establish that boundary or when the root
