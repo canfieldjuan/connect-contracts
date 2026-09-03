@@ -66,11 +66,15 @@ location.
 ### Windows owner-private boundary
 
 The current user's Local AppData profile ACL is the owner-private boundary.
-Connect-owned descendants must remain inside that absolute root, must not be
-symlinks, junctions, or other reparse points, and must not deliberately grant
-ordinary users or broad principals access. Access by the current user, SYSTEM,
-or an administrator is consistent with the existing same-user/root threat
-boundary. Protection from a hostile process already running as the same user
+Implementations verify the effective DACL on that root and every Connect-owned
+directory, registration, entitlement, temporary, and lock file before trusting
+it. A null or unreadable DACL fails closed. The owner must be the current user,
+SYSTEM, or the built-in Administrators group. An access-allowed ACE that grants
+file content/list, mutation, deletion, DACL, ownership, generic-read,
+generic-write, or generic-all rights to any other principal fails closed;
+inherit-only Creator Owner is permitted. Connect-owned descendants must remain
+inside that absolute root and must not be symlinks, junctions, or other reparse
+points. Protection from a hostile process already running as the same user
 remains deferred.
 
 Implementations reject registration and entitlement candidates that are not
@@ -88,12 +92,13 @@ evidence only after publication. A failed write must not be reported as a
 successful registration or activation.
 
 Provider-state ownership and entitlement activation use non-blocking Windows
-file locks. The entitlement lock file and lock range are shared by every
-participating application. A held lock fails fast as busy; callers do not wait
-indefinitely. Candidate admission is repeated while the activation lock is held
-before replacement. The installed entitlement is re-read and verified before
-activation reports success. Expected pre-replacement failures leave the prior
-entitlement unchanged.
+file locks. Every shared Connect lock covers byte offset `0` for length `1`.
+Implementations initialize a zero-length lock file with one byte before taking
+that range; the persistent byte has no semantic value. A held lock fails fast
+as busy; callers do not wait indefinitely. Candidate admission is repeated
+while the activation lock is held before replacement. The installed entitlement
+is re-read and verified before activation reports success. Expected
+pre-replacement failures leave the prior entitlement unchanged.
 
 Windows has no portable directory-`fsync` equivalent. Implementations flush the
 temporary file before replacement and rely on the platform's same-volume atomic
