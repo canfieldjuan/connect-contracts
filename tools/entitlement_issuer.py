@@ -455,11 +455,19 @@ def _create_secret_service_passphrase(key_id: str) -> tuple[bytes, Any]:
             passphrase,
             replace=False,
         )
-    except Exception as exc:
-        raise IssuerError(
-            "Secret Service could not store the issuer passphrase"
-        ) from exc
-    return passphrase, item
+        return passphrase, item
+    except BaseException as exc:
+        try:
+            for candidate in _search_secret_service_items(collection, key_id):
+                if secrets.compare_digest(candidate.get_secret(), passphrase):
+                    _rollback_secret_service_item(candidate)
+        except BaseException as rollback_exc:
+            raise IssuerError("Secret Service issuer rollback failed") from rollback_exc
+        if isinstance(exc, Exception):
+            raise IssuerError(
+                "Secret Service could not store the issuer passphrase"
+            ) from exc
+        raise
 
 
 def _read_secret_service_passphrase(key_id: str) -> bytes:
@@ -538,11 +546,13 @@ def main(argv: list[str] | None = None) -> int:
     secret_item = None
     try:
         if args.command == "init":
-            if args.secret_service:
-                passphrase, secret_item = _create_secret_service_passphrase(args.key_id)
-            else:
-                passphrase = _interactive_new_passphrase()
             try:
+                if args.secret_service:
+                    passphrase, secret_item = _create_secret_service_passphrase(
+                        args.key_id
+                    )
+                else:
+                    passphrase = _interactive_new_passphrase()
                 result = initialize_authority(
                     key_id=args.key_id,
                     private_key_path=args.private_key,

@@ -388,6 +388,42 @@ class EntitlementIssuerTests(unittest.TestCase):
                 _interactive_passphrase("Issuer passphrase: ")
 
     def test_secret_service_initialization_interrupt_rolls_back_item(self):
+        uncertain_item = Mock()
+        uncertain_item.get_secret.return_value = b"generated-secret"
+        collection = Mock()
+        collection.search_items.side_effect = [[], [uncertain_item]]
+        collection.create_item.side_effect = KeyboardInterrupt()
+        with (
+            unittest.mock.patch(
+                "tools.entitlement_issuer._secret_collection", return_value=collection
+            ),
+            unittest.mock.patch(
+                "tools.entitlement_issuer.secrets.token_urlsafe",
+                return_value="generated-secret",
+            ),
+        ):
+            with self.assertRaises(KeyboardInterrupt):
+                _create_secret_service_passphrase(self.key_id)
+        uncertain_item.delete.assert_called_once_with()
+
+        foreign_item = Mock()
+        foreign_item.get_secret.return_value = b"another credential"
+        collection.reset_mock()
+        collection.search_items.side_effect = [[], [foreign_item]]
+        collection.create_item.side_effect = KeyboardInterrupt()
+        with (
+            unittest.mock.patch(
+                "tools.entitlement_issuer._secret_collection", return_value=collection
+            ),
+            unittest.mock.patch(
+                "tools.entitlement_issuer.secrets.token_urlsafe",
+                return_value="generated-secret",
+            ),
+        ):
+            with self.assertRaises(KeyboardInterrupt):
+                _create_secret_service_passphrase(self.key_id)
+        foreign_item.delete.assert_not_called()
+
         secret_item = Mock()
         arguments = [
             "init",
