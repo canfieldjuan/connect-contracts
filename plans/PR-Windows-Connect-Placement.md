@@ -42,9 +42,13 @@ files reject reparse points, registration and entitlement content remain
 bounded, and writes use same-directory temporary files followed by atomic
 replacement. Cross-process activation and provider ownership use non-blocking
 Windows file locks. OWNER RIGHTS is admitted only as the already-validated
-concrete owner; Creator Owner remains inherit-only. V1 uses one registration
-filename per stable provider-installation slot, while v2 uses one per durable
-provider instance, so restart cycles replace rather than accumulate candidates.
+concrete owner; Creator Owner remains inherit-only. V1 permits one active
+publisher per `app_id`, holds the fixed `.<app_id>.lock` while serving, and
+publishes `<app_id>.json`; v2 uses one registration per durable provider
+instance. Restart cycles therefore replace rather than accumulate candidates.
+Consumers inspect at most 256 case-insensitive `.json` names in each
+protocol-specific providers directory and fail closed before probing if a 257th
+is encountered.
 
 The current-user profile ACL is the Windows owner-private boundary. Connect
 must fail unavailable when it cannot establish that boundary or when the root
@@ -58,8 +62,9 @@ is missing or relative. Standalone application behavior remains available.
   authentication mechanism.
 - Administrators and SYSTEM are treated like Unix root; protection from a
   hostile process running as the same user remains outside this contract.
-- V1 and v2 restart cycles reuse stable registration slots; authenticated
-  reachability still determines availability if a crash leaves a stale slot.
+- V1 and v2 restart cycles reuse stable registration slots; a v1 slot admits
+  only one active process, and authenticated reachability still determines
+  availability if a crash leaves a stale slot.
 
 ## Deferred
 

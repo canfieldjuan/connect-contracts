@@ -106,12 +106,26 @@ replacement or owned-file cleanup fails; they never wait indefinitely or report
 an uncommitted write as successful. A Windows v2 provider derives one
 collision-safe registration filename from its `app_id` and durable
 `instance_id`; restarting the same durable instance replaces that same path
-rather than publishing another candidate. A Windows v1 provider likewise uses
-one collision-safe filename per stable provider-installation slot even though
-the v1 registration document's process-scoped `instance_id` rotates on every
-restart. Consumers bound Windows registration enumeration and fail closed when
-that bound is exceeded. These requirements do not change the registration
-document or bearer-token contract.
+rather than publishing another candidate.
+
+A Windows v1 provider permits exactly one active publisher for each `app_id`
+under the current Windows user. It publishes `<app_id>.json` and holds an
+exclusive non-blocking lock on `.<app_id>.lock` in the same protocol-specific
+providers directory. The provider acquires that lock before it binds or
+publishes, holds it through its complete serving lifetime, removes the
+registration only when its current bearer token still matches the file, and
+releases the lock last. A second process for the same `app_id` fails Connect
+startup as busy; it does not replace the active registration. A crash leaves a
+fixed registration and lock-file path for the next process to reuse even though
+the v1 registration document's process-scoped `instance_id` rotates.
+
+For each protocol-specific Windows providers directory, consumers examine at
+most 256 direct child entries whose names end in `.json`, compared
+ASCII-case-insensitively. Every such name counts before file type, security, or
+content admission; other names, including persistent `.lock` files, do not
+count. Encountering a 257th candidate or an enumeration error fails discovery
+closed for that directory before any candidate endpoint is probed. These
+requirements do not change the registration document or bearer-token contract.
 
 Provider-state ownership and entitlement activation use non-blocking Windows
 file locks. Every shared Connect lock covers byte offset `0` for length `1`.
@@ -130,13 +144,13 @@ platform provides.
 ### Persistent runtime directory
 
 Unlike `XDG_RUNTIME_DIR`, Local AppData survives reboot. Providers remove their
-own registration on graceful shutdown. V1 crash/restart cycles reuse the
-provider-installation slot's fixed path, and v2 cycles reuse the durable
-instance's fixed path. Consumers treat registrations as candidates only,
-enforce a bounded Windows scan, and ignore stale files whose exact endpoint is
-unreachable, whose bearer token fails, or whose manifest attribution differs.
-Therefore a stale file alone never proves availability or causes unbounded
-discovery work.
+own registration on graceful shutdown only after verifying its bearer token.
+V1 crash/restart cycles reuse the `app_id` slot's fixed registration and lock
+paths, and v2 cycles reuse the durable instance's fixed path. Consumers treat
+registrations as candidates only, enforce the 256-entry Windows scan above, and
+ignore stale files whose exact endpoint is unreachable, whose bearer token
+fails, or whose manifest attribution differs. Therefore a stale file alone
+never proves availability or causes unbounded discovery work.
 
 ## Security boundary
 
@@ -182,7 +196,8 @@ consumer model.
 - Windows packages must implement and test Windows-native locking, bounded
   regular-file handling, reparse-point refusal, and atomic replacement before
   claiming Connect support.
-- V1 and v2 crash/restart cycles cannot accumulate one registration per process,
-  and Windows consumers bound the remaining stale-candidate scan.
+- V1 and v2 crash/restart cycles cannot accumulate one registration per process;
+  v1 admits one active publisher per `app_id`, and Windows consumers apply the
+  common 256-entry stale-candidate scan.
 - Named pipes, brokered identity, code signing, installers, auto-update, and
   macOS placement remain deferred.
