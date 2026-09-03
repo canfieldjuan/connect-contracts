@@ -105,7 +105,9 @@ Results:
   validation, unsupported private-key algorithms remain inside the safe error
   contract, and Secret Service query failures are normalized on both command
   paths. Numeric-limit and recursion failures during JSON decoding are also
-  normalized instead of escaping as raw tracebacks.
+  normalized instead of escaping as raw tracebacks. Passphrases are bounded at
+  the backend limit on both init and issue paths, and key-generation backend
+  failures use the same safe operator error contract.
 
 ## Estimated diff size
 

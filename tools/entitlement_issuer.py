@@ -32,6 +32,7 @@ MAX_KEYRING_BYTES = 64 * 1024
 MAX_PRIVATE_KEY_BYTES = 64 * 1024
 MAX_KEYS = 16
 MAX_FEATURES = 32
+MAX_PASSPHRASE_BYTES = 1023
 KEY_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:[.-][a-z0-9]+)*$")
 FEATURE_PATTERN = re.compile(r"^[a-z0-9]+(?:[._-][a-z0-9]+)*$")
 UTC_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
@@ -242,19 +243,24 @@ def initialize_authority(
         raise IssuerError("production key ID must be explicitly production-shaped")
     if len(passphrase) < 16:
         raise IssuerError("issuer passphrase must contain at least sixteen bytes")
+    if len(passphrase) > MAX_PASSPHRASE_BYTES:
+        raise IssuerError("issuer passphrase must contain at most 1023 bytes")
     _require_private_destination(private_key_path)
     if not keyring_path.is_absolute():
         raise IssuerError("public keyring destination must be absolute")
 
-    private_key = Ed25519PrivateKey.generate()
-    private_bytes = private_key.private_bytes(
-        serialization.Encoding.PEM,
-        serialization.PrivateFormat.PKCS8,
-        serialization.BestAvailableEncryption(passphrase),
-    )
-    public_bytes = private_key.public_key().public_bytes(
-        serialization.Encoding.Raw, serialization.PublicFormat.Raw
-    )
+    try:
+        private_key = Ed25519PrivateKey.generate()
+        private_bytes = private_key.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.BestAvailableEncryption(passphrase),
+        )
+        public_bytes = private_key.public_key().public_bytes(
+            serialization.Encoding.Raw, serialization.PublicFormat.Raw
+        )
+    except (TypeError, ValueError, UnsupportedAlgorithm) as exc:
+        raise IssuerError("issuer key could not be generated safely") from exc
     keyring = {
         "keys": [
             {
@@ -333,6 +339,8 @@ def issue_entitlement(
         )
     if len(passphrase) < 16:
         raise IssuerError("issuer passphrase must contain at least sixteen bytes")
+    if len(passphrase) > MAX_PASSPHRASE_BYTES:
+        raise IssuerError("issuer passphrase must contain at most 1023 bytes")
 
     keys = _load_keyring(keyring_path)
     expected_public = keys.get(key_id)

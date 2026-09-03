@@ -159,6 +159,13 @@ class EntitlementIssuerTests(unittest.TestCase):
                 keyring_path=self.keyring,
                 passphrase=b"short",
             )
+        with self.assertRaisesRegex(IssuerError, "at most 1023"):
+            initialize_authority(
+                key_id=self.key_id,
+                private_key_path=self.private_key,
+                keyring_path=self.keyring,
+                passphrase=b"x" * 1_024,
+            )
 
         self.initialize()
         original_private = self.private_key.read_bytes()
@@ -172,6 +179,8 @@ class EntitlementIssuerTests(unittest.TestCase):
         self.initialize()
         with self.assertRaisesRegex(IssuerError, "key or passphrase is invalid"):
             self.issue(passphrase=b"wrong passphrase with length")
+        with self.assertRaisesRegex(IssuerError, "at most 1023"):
+            self.issue(passphrase=b"x" * 1_024)
 
         with unittest.mock.patch(
             "tools.entitlement_issuer.serialization.load_pem_private_key",
