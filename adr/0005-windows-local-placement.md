@@ -75,10 +75,11 @@ closed. The owner must be the current user,
 SYSTEM, or the built-in Administrators group. An access-allowed ACE that grants
 file content/list, mutation, deletion, DACL, ownership, generic-read,
 generic-write, or generic-all rights to any other principal fails closed;
-inherit-only Creator Owner is permitted. Connect-owned descendants must remain
-inside that absolute root and must not be symlinks, junctions, or other reparse
-points. Protection from a hostile process already running as the same user
-remains deferred.
+OWNER RIGHTS is treated as the already-validated concrete owner, while Creator
+Owner is permitted only on inherit-only ACEs. Connect-owned descendants must
+remain inside that absolute root and must not be symlinks, junctions, or other
+reparse points. Protection from a hostile process already running as the same
+user remains deferred.
 
 A user-selected activation source may originate in Downloads or another
 non-private directory. It must still be a bounded regular non-reparse file and
@@ -105,9 +106,12 @@ replacement or owned-file cleanup fails; they never wait indefinitely or report
 an uncommitted write as successful. A Windows v2 provider derives one
 collision-safe registration filename from its `app_id` and durable
 `instance_id`; restarting the same durable instance replaces that same path
-rather than publishing another candidate. Consumers bound Windows registration
-enumeration and fail closed when that bound is exceeded. These requirements do
-not change the registration document or bearer-token contract.
+rather than publishing another candidate. A Windows v1 provider likewise uses
+one collision-safe filename per stable provider-installation slot even though
+the v1 registration document's process-scoped `instance_id` rotates on every
+restart. Consumers bound Windows registration enumeration and fail closed when
+that bound is exceeded. These requirements do not change the registration
+document or bearer-token contract.
 
 Provider-state ownership and entitlement activation use non-blocking Windows
 file locks. Every shared Connect lock covers byte offset `0` for length `1`.
@@ -126,12 +130,13 @@ platform provides.
 ### Persistent runtime directory
 
 Unlike `XDG_RUNTIME_DIR`, Local AppData survives reboot. Providers remove their
-own registration on graceful shutdown, and v2 crash/restart cycles reuse the
-durable instance's fixed path. Consumers treat registrations as candidates
-only, enforce a bounded Windows scan, and ignore stale files whose exact
-endpoint is unreachable, whose bearer token fails, or whose manifest
-attribution differs. Therefore a stale file alone never proves availability or
-causes unbounded discovery work.
+own registration on graceful shutdown. V1 crash/restart cycles reuse the
+provider-installation slot's fixed path, and v2 cycles reuse the durable
+instance's fixed path. Consumers treat registrations as candidates only,
+enforce a bounded Windows scan, and ignore stale files whose exact endpoint is
+unreachable, whose bearer token fails, or whose manifest attribution differs.
+Therefore a stale file alone never proves availability or causes unbounded
+discovery work.
 
 ## Security boundary
 
@@ -177,7 +182,7 @@ consumer model.
 - Windows packages must implement and test Windows-native locking, bounded
   regular-file handling, reparse-point refusal, and atomic replacement before
   claiming Connect support.
-- V2 crash/restart cycles cannot accumulate one registration per process, and
-  Windows consumers bound the remaining stale-candidate scan.
+- V1 and v2 crash/restart cycles cannot accumulate one registration per process,
+  and Windows consumers bound the remaining stale-candidate scan.
 - Named pipes, brokered identity, code signing, installers, auto-update, and
   macOS placement remain deferred.
