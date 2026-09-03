@@ -95,7 +95,7 @@ Results:
 
 ## Estimated diff size
 
-Approximately 840 added lines across the issuer, boundary tests, plan, public
+Approximately 885 added lines across the issuer, boundary tests, plan, public
 keyring, and release documentation. The private-file admission and atomic
 creation code accounts for the larger-than-initially-estimated surface. The
 security-sensitive init/issue lifecycle is one indivisible slice; splitting it
