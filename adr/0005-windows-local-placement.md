@@ -99,13 +99,15 @@ atomically replace the fixed destination. A registration becomes availability
 evidence only after publication. A failed write must not be reported as a
 successful registration or activation.
 
-Readers open registration and entitlement candidates with delete sharing so a
-bounded read cannot block atomic replacement or owned-file cleanup. A Windows
-v2 provider derives one collision-safe registration filename from its `app_id`
-and durable `instance_id`; restarting the same durable instance replaces that
-same path rather than publishing another candidate. Consumers bound Windows
-registration enumeration and fail closed when that bound is exceeded. These
-requirements do not change the registration document or bearer-token contract.
+Readers keep registration and entitlement handles bounded and short-lived.
+Writers retry Windows sharing violations for a bounded interval before
+replacement or owned-file cleanup fails; they never wait indefinitely or report
+an uncommitted write as successful. A Windows v2 provider derives one
+collision-safe registration filename from its `app_id` and durable
+`instance_id`; restarting the same durable instance replaces that same path
+rather than publishing another candidate. Consumers bound Windows registration
+enumeration and fail closed when that bound is exceeded. These requirements do
+not change the registration document or bearer-token contract.
 
 Provider-state ownership and entitlement activation use non-blocking Windows
 file locks. Every shared Connect lock covers byte offset `0` for length `1`.
