@@ -134,5 +134,6 @@ that the two-application offline proof does not need.
 - License acquisition and production issuer-key custody remain release
   operations. App-local installation of an acquired license is defined by
   ADR-0004.
-- Billing checkout, account UI, renewal UI, revocation, machine binding,
-  Windows/macOS placement, and grace policy remain deferred.
+- Billing checkout, account UI, renewal UI, revocation, machine binding, macOS
+  placement, and grace policy remain deferred. Windows placement is defined by
+  ADR-0005 without changing entitlement format version 1.

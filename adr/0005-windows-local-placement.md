@@ -1,0 +1,158 @@
+# ADR-0005: Windows Local Connect placement
+
+**Status:** Accepted
+
+**Date:** 2026-09-03
+
+## Context
+
+ADR-0001 deliberately started with Ubuntu and deferred Windows transport and
+packaging. ADR-0003 and ADR-0004 likewise define only Unix placement and file
+handling for the shared entitlement. The wire contracts themselves do not rely
+on Unix: registrations advertise exact-loopback HTTP endpoints and bearer
+tokens, and all capability, job, artifact, and entitlement documents are
+language-neutral JSON.
+
+Participating applications now ship or are preparing Windows packages. Without
+one shared Windows placement decision, a provider can run but a consumer cannot
+discover it, and neither side can independently verify or activate the same
+commercial entitlement.
+
+## Decision
+
+### Preserve the existing transport
+
+Windows uses the existing `http-loopback-v1` and `http-loopback-v2` transports,
+including exact-loopback endpoint validation, per-process bearer-token rotation,
+authenticated manifest attribution, bounded requests and responses, and refusal
+of browser-Origin requests. No registration, manifest, job, artifact, or error
+schema changes.
+
+Named pipes remain deferred. They are not required to establish per-user
+discovery because the registration file carries the authentication secret and
+availability still requires a live authenticated loopback endpoint.
+
+### Shared Windows root
+
+Windows implementations derive the shared root from the process's absolute
+`LOCALAPPDATA` directory:
+
+```text
+%LOCALAPPDATA%\LocalConnect\
+```
+
+When `LOCALAPPDATA` is absent, relative, or unusable, Connect is unavailable.
+There is no fallback to the working directory, a machine-wide directory, or a
+shared temporary directory.
+
+V1 and v2 runtime registrations are stored under:
+
+```text
+%LOCALAPPDATA%\LocalConnect\runtime\v1\providers\
+%LOCALAPPDATA%\LocalConnect\runtime\v2\providers\
+```
+
+The shared entitlement and persistent activation lock are stored at:
+
+```text
+%LOCALAPPDATA%\LocalConnect\entitlement-v1.json
+%LOCALAPPDATA%\LocalConnect\.entitlement-v1.lock
+```
+
+Application-private databases, job artifacts, logs, and settings remain outside
+the interoperability contract and use each application's own per-user state
+location.
+
+### Windows owner-private boundary
+
+The current user's Local AppData profile ACL is the owner-private boundary.
+Connect-owned descendants must remain inside that absolute root, must not be
+symlinks, junctions, or other reparse points, and must not deliberately grant
+ordinary users or broad principals access. Access by the current user, SYSTEM,
+or an administrator is consistent with the existing same-user/root threat
+boundary. Protection from a hostile process already running as the same user
+remains deferred.
+
+Implementations reject registration and entitlement candidates that are not
+bounded regular files or that are reparse points. Security checks apply again
+to an opened candidate before its content is trusted. Failure to establish the
+per-user boundary fails Connect closed while leaving standalone application
+behavior available.
+
+### Atomic publication and serialization
+
+Windows registration and entitlement writers create a unique same-directory
+temporary regular file, write and flush the complete bounded content, and
+atomically replace the fixed destination. A registration becomes availability
+evidence only after publication. A failed write must not be reported as a
+successful registration or activation.
+
+Provider-state ownership and entitlement activation use non-blocking Windows
+file locks. The entitlement lock file and lock range are shared by every
+participating application. A held lock fails fast as busy; callers do not wait
+indefinitely. Candidate admission is repeated while the activation lock is held
+before replacement. The installed entitlement is re-read and verified before
+activation reports success. Expected pre-replacement failures leave the prior
+entitlement unchanged.
+
+Windows has no portable directory-`fsync` equivalent. Implementations flush the
+temporary file before replacement and rely on the platform's same-volume atomic
+replacement guarantee. They must not claim stronger crash durability than the
+platform provides.
+
+### Persistent runtime directory
+
+Unlike `XDG_RUNTIME_DIR`, Local AppData survives reboot. Providers remove their
+own registration on graceful shutdown. Consumers treat registrations as
+candidates only and ignore stale files whose exact endpoint is unreachable,
+whose bearer token fails, or whose manifest attribution differs. Therefore a
+stale file alone never proves availability.
+
+## Security boundary
+
+The Windows decision does not strengthen same-user process identity. A hostile
+process running as the user can read per-user registrations just as it can on
+the initial Unix trust model. A future trusted broker, package identity, or
+named-pipe ACL design would be a new transport decision.
+
+The shared entitlement remains a signed offline bearer license. Windows
+placement grants no mailbox, application database, generation-model, or general
+filesystem authority.
+
+## Rejected alternatives
+
+### Machine-wide ProgramData placement
+
+Rejected because it creates multi-user token and entitlement sharing and would
+require a service or broker to mediate ownership.
+
+### Shared temporary-directory fallback
+
+Rejected because a fallback can expose bearer tokens to other local users and
+makes discovery depend on ambient process state.
+
+### Windows named pipes in this slice
+
+Deferred because exact-loopback HTTP already supplies the bounded streaming job
+contract. Replacing the transport would add two implementations without fixing
+the missing shared placement and entitlement lifecycle.
+
+### Windows Registry discovery
+
+Rejected because runtime registrations are ephemeral process evidence, contain
+rotating secrets, and require atomic file-like cleanup and enumeration. A
+per-user filesystem directory keeps both applications aligned with the existing
+consumer model.
+
+## Consequences
+
+- Windows providers and consumers can share one deterministic registration and
+  entitlement location without a broker.
+- Existing v1/v2 wire documents and Linux behavior remain unchanged.
+- Windows packages must implement and test Windows-native locking, bounded
+  regular-file handling, reparse-point refusal, and atomic replacement before
+  claiming Connect support.
+- Stale registration cleanup remains an operational hygiene concern, not an
+  availability or authentication bypass.
+- Named pipes, brokered identity, code signing, installers, auto-update, and
+  macOS placement remain deferred.

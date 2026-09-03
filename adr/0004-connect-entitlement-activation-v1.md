@@ -163,4 +163,5 @@ renewal staging needs an explicit product policy for overlap and selection.
 - Both applications still function standalone when activation is absent or
   fails.
 - License acquisition, billing UI, production issuer custody, online
-  revocation, machine binding, and non-Unix placement remain deferred.
+  revocation, machine binding, and macOS placement remain deferred. Windows
+  placement and native locking are defined by ADR-0005.
