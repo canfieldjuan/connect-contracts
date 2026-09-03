@@ -99,6 +99,14 @@ atomically replace the fixed destination. A registration becomes availability
 evidence only after publication. A failed write must not be reported as a
 successful registration or activation.
 
+Readers open registration and entitlement candidates with delete sharing so a
+bounded read cannot block atomic replacement or owned-file cleanup. A Windows
+v2 provider derives one collision-safe registration filename from its `app_id`
+and durable `instance_id`; restarting the same durable instance replaces that
+same path rather than publishing another candidate. Consumers bound Windows
+registration enumeration and fail closed when that bound is exceeded. These
+requirements do not change the registration document or bearer-token contract.
+
 Provider-state ownership and entitlement activation use non-blocking Windows
 file locks. Every shared Connect lock covers byte offset `0` for length `1`.
 Implementations initialize a zero-length lock file with one byte before taking
@@ -116,10 +124,12 @@ platform provides.
 ### Persistent runtime directory
 
 Unlike `XDG_RUNTIME_DIR`, Local AppData survives reboot. Providers remove their
-own registration on graceful shutdown. Consumers treat registrations as
-candidates only and ignore stale files whose exact endpoint is unreachable,
-whose bearer token fails, or whose manifest attribution differs. Therefore a
-stale file alone never proves availability.
+own registration on graceful shutdown, and v2 crash/restart cycles reuse the
+durable instance's fixed path. Consumers treat registrations as candidates
+only, enforce a bounded Windows scan, and ignore stale files whose exact
+endpoint is unreachable, whose bearer token fails, or whose manifest
+attribution differs. Therefore a stale file alone never proves availability or
+causes unbounded discovery work.
 
 ## Security boundary
 
@@ -165,7 +175,7 @@ consumer model.
 - Windows packages must implement and test Windows-native locking, bounded
   regular-file handling, reparse-point refusal, and atomic replacement before
   claiming Connect support.
-- Stale registration cleanup remains an operational hygiene concern, not an
-  availability or authentication bypass.
+- V2 crash/restart cycles cannot accumulate one registration per process, and
+  Windows consumers bound the remaining stale-candidate scan.
 - Named pipes, brokered identity, code signing, installers, auto-update, and
   macOS placement remain deferred.
