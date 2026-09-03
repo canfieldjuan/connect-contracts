@@ -18,6 +18,7 @@ from tools.entitlement_issuer import (
     IssuerError,
     _create_secret_service_passphrase,
     _ensure_secret_collection_unlocked,
+    _interactive_passphrase,
     _read_secret_service_passphrase,
     initialize_authority,
     issue_entitlement,
@@ -318,6 +319,23 @@ class EntitlementIssuerTests(unittest.TestCase):
                 _create_secret_service_passphrase(self.key_id)
             with self.assertRaisesRegex(IssuerError, "could not search"):
                 _read_secret_service_passphrase(self.key_id)
+
+    def test_interactive_prompt_failures_use_stable_issuer_error(self):
+        for failure in (EOFError(), KeyboardInterrupt(), OSError("no terminal")):
+            with self.subTest(failure=type(failure).__name__):
+                with unittest.mock.patch(
+                    "tools.entitlement_issuer.getpass.getpass", side_effect=failure
+                ):
+                    with self.assertRaisesRegex(
+                        IssuerError, "cancelled or unavailable"
+                    ):
+                        _interactive_passphrase("Issuer passphrase: ")
+
+        with unittest.mock.patch(
+            "tools.entitlement_issuer.getpass.getpass", return_value="\ud800"
+        ):
+            with self.assertRaisesRegex(IssuerError, "cancelled or unavailable"):
+                _interactive_passphrase("Issuer passphrase: ")
 
 
 if __name__ == "__main__":

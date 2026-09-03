@@ -465,9 +465,18 @@ def _read_secret_service_passphrase(key_id: str) -> bytes:
         ) from exc
 
 
+def _interactive_passphrase(prompt: str) -> bytes:
+    try:
+        return getpass.getpass(prompt).encode("utf-8")
+    except (EOFError, KeyboardInterrupt, OSError, UnicodeError) as exc:
+        raise IssuerError(
+            "issuer passphrase prompt was cancelled or unavailable"
+        ) from exc
+
+
 def _interactive_new_passphrase() -> bytes:
-    first = getpass.getpass("New issuer passphrase: ").encode("utf-8")
-    second = getpass.getpass("Confirm issuer passphrase: ").encode("utf-8")
+    first = _interactive_passphrase("New issuer passphrase: ")
+    second = _interactive_passphrase("Confirm issuer passphrase: ")
     if first != second:
         raise IssuerError("issuer passphrases do not match")
     return first
@@ -528,7 +537,7 @@ def main(argv: list[str] | None = None) -> int:
             passphrase = (
                 _read_secret_service_passphrase(args.key_id)
                 if args.secret_service
-                else getpass.getpass("Issuer passphrase: ").encode("utf-8")
+                else _interactive_passphrase("Issuer passphrase: ")
             )
             result = issue_entitlement(
                 private_key_path=args.private_key,
