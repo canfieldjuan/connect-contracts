@@ -2,6 +2,7 @@ import base64
 import binascii
 import hashlib
 import json
+import re
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -182,7 +183,8 @@ def _job_status_errors(instance: dict, provider_manifest: dict) -> list[str]:
 
     errors: list[str] = []
     accepted_limits = {
-        accepted["media_type"]: accepted["max_bytes"] for accepted in capability["accepts"]
+        accepted["media_type"]: accepted["max_bytes"]
+        for accepted in capability["accepts"]
     }
     for input_artifact in instance["input_artifacts"]:
         limit = accepted_limits.get(input_artifact["media_type"])
@@ -283,7 +285,8 @@ def semantic_errors(
 
     if schema_name == "job-status.schema.json" and instance["status"] == "completed":
         artifact_ids = {
-            input_artifact["artifact_id"] for input_artifact in instance["input_artifacts"]
+            input_artifact["artifact_id"]
+            for input_artifact in instance["input_artifacts"]
         }
         for output in instance["result"]["outputs"]:
             artifact_id = output["artifact_id"]
@@ -305,13 +308,17 @@ def semantic_errors(
 
 
 class ConnectContractTests(unittest.TestCase):
-    def test_entitlement_v1_fixtures_match_schema_signature_and_time_contract(self) -> None:
+    def test_entitlement_v1_fixtures_match_schema_signature_and_time_contract(
+        self,
+    ) -> None:
         root = ENTITLEMENTS / "v1"
         envelope_schema = json.loads(
             (root / "envelope.schema.json").read_text(encoding="utf-8")
         )
         Draft202012Validator.check_schema(envelope_schema)
-        claims_schema = json.loads((root / "claims.schema.json").read_text(encoding="utf-8"))
+        claims_schema = json.loads(
+            (root / "claims.schema.json").read_text(encoding="utf-8")
+        )
         Draft202012Validator.check_schema(claims_schema)
         keyring_schema = json.loads(
             (root / "keyring.schema.json").read_text(encoding="utf-8")
@@ -353,9 +360,84 @@ class ConnectContractTests(unittest.TestCase):
                 self.assertEqual(signature_valid, case["signature_valid"])
                 self.assertEqual(entitled, case["entitled"])
 
-    def test_entitlement_v1_time_boundaries_are_exact_and_claims_are_strict(self) -> None:
+    def test_entitlement_v1_feature_registry_covers_every_fixture_licence(self) -> None:
         root = ENTITLEMENTS / "v1"
-        claims_schema = json.loads((root / "claims.schema.json").read_text(encoding="utf-8"))
+        registry = _strict_json_loads(
+            (root / "features.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(set(registry), {"format_version", "features"})
+        self.assertEqual(registry["format_version"], 1)
+        identifiers = [entry["id"] for entry in registry["features"]]
+        pattern = re.compile(r"^[a-z0-9]+(?:[._-][a-z0-9]+)*$")
+        for entry in registry["features"]:
+            self.assertEqual(set(entry), {"id", "meaning", "enforced_by", "defined_in"})
+            self.assertRegex(entry["id"], pattern)
+            self.assertLessEqual(len(entry["id"]), 100)
+            self.assertTrue((ROOT / entry["defined_in"]).is_file(), entry["defined_in"])
+            self.assertTrue(
+                set(entry["enforced_by"]) <= {"consumer", "provider"}
+                and entry["enforced_by"],
+                entry["id"],
+            )
+        self.assertEqual(len(identifiers), len(set(identifiers)))
+        self.assertEqual(set(identifiers), {ENTITLEMENT_FEATURE, "connect.automations"})
+        registered = set(identifiers)
+
+        index = json.loads((root / "fixtures/index.json").read_text(encoding="utf-8"))
+        checked = 0
+        for case in index["cases"]:
+            if not case["schema_valid"] or not case["signature_valid"]:
+                continue
+            envelope = _strict_json_loads(
+                (root / "fixtures" / case["fixture"]).read_text(encoding="utf-8")
+            )
+            try:
+                claims = _strict_json_loads(
+                    _base64url_decode(envelope["payload_base64url"])
+                )
+            except (json.JSONDecodeError, ValueError):
+                continue
+            with self.subTest(fixture=case["fixture"]):
+                if case["entitled"]:
+                    self.assertTrue(
+                        set(claims["features"]) <= registered, claims["features"]
+                    )
+                    checked += 1
+                if "features" in case:
+                    self.assertEqual(claims["features"], case["features"])
+        self.assertGreaterEqual(checked, 2)
+
+        both = _strict_json_loads(
+            (root / "fixtures/valid/active-automations.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        only = _strict_json_loads(
+            (root / "fixtures/valid/automations-only.json").read_text(encoding="utf-8")
+        )
+        keyring = _strict_json_loads(
+            (root / "fixtures/test-keyring.json").read_text(encoding="utf-8")
+        )
+        keys = {
+            key["key_id"]: _base64url_decode(key["public_key_base64url"])
+            for key in keyring["keys"]
+        }
+        now = _timestamp(index["evaluated_at"])
+        self.assertEqual(_verify_entitlement(both, keys=keys, now=now), (True, True))
+        self.assertEqual(_verify_entitlement(only, keys=keys, now=now), (True, False))
+        both_claims = _strict_json_loads(_base64url_decode(both["payload_base64url"]))
+        only_claims = _strict_json_loads(_base64url_decode(only["payload_base64url"]))
+        self.assertIn("connect.automations", both_claims["features"])
+        self.assertIn(ENTITLEMENT_FEATURE, both_claims["features"])
+        self.assertEqual(only_claims["features"], ["connect.automations"])
+
+    def test_entitlement_v1_time_boundaries_are_exact_and_claims_are_strict(
+        self,
+    ) -> None:
+        root = ENTITLEMENTS / "v1"
+        claims_schema = json.loads(
+            (root / "claims.schema.json").read_text(encoding="utf-8")
+        )
         envelope = _strict_json_loads(
             (root / "fixtures/valid/active.json").read_text(encoding="utf-8")
         )
@@ -418,7 +500,9 @@ class ConnectContractTests(unittest.TestCase):
         registration = json.loads(
             (fixture_dir / "registration.json").read_text(encoding="utf-8")
         )
-        manifest = json.loads((fixture_dir / "manifest.json").read_text(encoding="utf-8"))
+        manifest = json.loads(
+            (fixture_dir / "manifest.json").read_text(encoding="utf-8")
+        )
         self.assertEqual(_registration_manifest_errors(registration, manifest), [])
         registration["app_id"] = "different-app"
         self.assertEqual(
@@ -426,12 +510,20 @@ class ConnectContractTests(unittest.TestCase):
             ["registration app does not match the fetched manifest"],
         )
 
-        request = json.loads((fixture_dir / "job-request.json").read_text(encoding="utf-8"))
-        status = json.loads((fixture_dir / "job-completed.json").read_text(encoding="utf-8"))
+        request = json.loads(
+            (fixture_dir / "job-request.json").read_text(encoding="utf-8")
+        )
+        status = json.loads(
+            (fixture_dir / "job-completed.json").read_text(encoding="utf-8")
+        )
         self.assertEqual(_job_status_request_errors(status, request), [])
         for field, value, expected in (
             ("job_id", "99999999-9999-4999-8999-999999999999", "job status identity"),
-            ("capability", {"id": "document.translate", "version": "1.0"}, "capability"),
+            (
+                "capability",
+                {"id": "document.translate", "version": "1.0"},
+                "capability",
+            ),
             (
                 "input_artifacts",
                 [{**status["input_artifacts"][0], "sha256": "b" * 64}],
@@ -440,7 +532,10 @@ class ConnectContractTests(unittest.TestCase):
         ):
             changed = {**status, field: value}
             self.assertTrue(
-                any(expected in error for error in _job_status_request_errors(changed, request))
+                any(
+                    expected in error
+                    for error in _job_status_request_errors(changed, request)
+                )
             )
 
     def test_schemas_are_valid_and_fixtures_match_expectations(self) -> None:
@@ -471,12 +566,19 @@ class ConnectContractTests(unittest.TestCase):
                     for case in cases:
                         if case["valid"] and case["schema"] == "manifest.schema.json":
                             manifest = json.loads(
-                                (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
+                                (fixture_dir / case["fixture"]).read_text(
+                                    encoding="utf-8"
+                                )
                             )
                             provider_manifests[case["fixture"]] = manifest
-                        if case["valid"] and case["schema"] == "job-request.schema.json":
+                        if (
+                            case["valid"]
+                            and case["schema"] == "job-request.schema.json"
+                        ):
                             request = json.loads(
-                                (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
+                                (fixture_dir / case["fixture"]).read_text(
+                                    encoding="utf-8"
+                                )
                             )
                             job_requests[case["fixture"]] = request
 
@@ -490,21 +592,20 @@ class ConnectContractTests(unittest.TestCase):
                         )
                         schema_errors = list(validator.iter_errors(instance))
                         provider_manifest = None
-                        if (
-                            version == "v2"
-                            and case["schema"]
-                            in {
-                                "registration.schema.json",
-                                "job-request.schema.json",
-                                "job-status.schema.json",
-                            }
-                        ):
+                        if version == "v2" and case["schema"] in {
+                            "registration.schema.json",
+                            "job-request.schema.json",
+                            "job-status.schema.json",
+                        }:
                             provider_fixture = case.get("provider_manifest")
                             self.assertIsInstance(provider_fixture, str)
                             self.assertIn(provider_fixture, provider_manifests)
                             provider_manifest = provider_manifests[provider_fixture]
                         job_request = None
-                        if version == "v2" and case["schema"] == "job-status.schema.json":
+                        if (
+                            version == "v2"
+                            and case["schema"] == "job-status.schema.json"
+                        ):
                             request_fixture = case.get("request_fixture")
                             self.assertIsInstance(request_fixture, str)
                             self.assertIn(request_fixture, job_requests)
@@ -520,9 +621,9 @@ class ConnectContractTests(unittest.TestCase):
                                 job_request,
                             )
                         )
-                        errors = (
-                            [error.message for error in schema_errors] + contract_errors
-                        )
+                        errors = [
+                            error.message for error in schema_errors
+                        ] + contract_errors
                         if case["valid"]:
                             self.assertEqual(errors, [])
                         else:
@@ -537,7 +638,9 @@ class ConnectContractTests(unittest.TestCase):
         for case in cases:
             if not case["valid"] or case["schema"] != "manifest.schema.json":
                 continue
-            manifest = json.loads((fixture_dir / case["fixture"]).read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
+            )
             for capability in manifest["capabilities"]:
                 attribution = (
                     manifest["app"]["id"],
@@ -556,7 +659,9 @@ class ConnectContractTests(unittest.TestCase):
         for case in cases:
             if not case["valid"] or case["schema"] != "job-status.schema.json":
                 continue
-            status = json.loads((fixture_dir / case["fixture"]).read_text(encoding="utf-8"))
+            status = json.loads(
+                (fixture_dir / case["fixture"]).read_text(encoding="utf-8")
+            )
             attribution = (
                 status["provider"]["app_id"],
                 status["provider"]["instance_id"],
@@ -567,7 +672,9 @@ class ConnectContractTests(unittest.TestCase):
             accepted_limits = declarations[attribution]["accepts"]
             self.assertIsInstance(accepted_limits, dict)
             for input_artifact in status["input_artifacts"]:
-                self.assertIn(input_artifact["media_type"], accepted_limits, case["fixture"])
+                self.assertIn(
+                    input_artifact["media_type"], accepted_limits, case["fixture"]
+                )
                 self.assertLessEqual(
                     input_artifact["byte_size"],
                     accepted_limits[input_artifact["media_type"]],

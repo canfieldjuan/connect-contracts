@@ -29,6 +29,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 
 ROOT = Path(__file__).resolve().parents[1]
 FEATURE_ID = "connect.capability_exchange"
+FEATURE_REGISTRY_PATH = ROOT / "entitlements" / "v1" / "features.json"
+MAX_FEATURE_REGISTRY_BYTES = 64 * 1024
 MAX_KEYRING_BYTES = 64 * 1024
 MAX_PRIVATE_KEY_BYTES = 64 * 1024
 MAX_KEYS = 16
@@ -212,6 +214,44 @@ def _write_new(path: Path, content: bytes, mode: int) -> None:
         os.close(parent)
 
 
+def _load_feature_registry(path: Path = FEATURE_REGISTRY_PATH) -> frozenset[str]:
+    """Return the registered feature identifiers.
+
+    The registry is the shared vocabulary for the paid boundary; a feature
+    that is not listed cannot be issued, so a misspelled tier fails here
+    instead of installing as a licence that no application honours.
+    """
+    content = _read_regular_file(path, limit=MAX_FEATURE_REGISTRY_BYTES, private=False)
+    document = _strict_json_object(content)
+    _exact_keys(document, {"format_version", "features"}, "feature registry")
+    if document["format_version"] != 1:
+        raise IssuerError("feature registry format version is unsupported")
+    entries = document["features"]
+    if not isinstance(entries, list) or not 1 <= len(entries) <= MAX_FEATURES:
+        raise IssuerError(
+            "feature registry must list between one and thirty-two features"
+        )
+    registered: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise IssuerError("feature registry entries must be objects")
+        _exact_keys(
+            entry,
+            {"id", "meaning", "enforced_by", "defined_in"},
+            "feature registry entry",
+        )
+        feature_id = entry["id"]
+        if (
+            not _valid_identifier(feature_id, FEATURE_PATTERN, 100)
+            or feature_id in registered
+        ):
+            raise IssuerError(
+                "feature registry contains an invalid or duplicate feature ID"
+            )
+        registered.add(feature_id)
+    return frozenset(registered)
+
+
 def _load_keyring(path: Path) -> dict[str, bytes]:
     content = _read_regular_file(path, limit=MAX_KEYRING_BYTES, private=False)
     document = _strict_json_object(content)
@@ -328,6 +368,7 @@ def issue_entitlement(
     expires_at: datetime,
     output_path: Path,
     passphrase: bytes,
+    feature_registry_path: Path = FEATURE_REGISTRY_PATH,
 ) -> dict[str, str]:
     if not isinstance(subject, str) or not 1 <= len(subject) <= 200:
         raise IssuerError(
@@ -342,6 +383,9 @@ def issue_entitlement(
         not _valid_identifier(value, FEATURE_PATTERN, 100) for value in feature_list
     ):
         raise IssuerError("entitlement contains an invalid feature ID")
+    registered_features = _load_feature_registry(feature_registry_path)
+    if any(value not in registered_features for value in feature_list):
+        raise IssuerError("entitlement contains an unregistered feature ID")
     issued_at_text = _format_utc(issued_at)
     not_before_text = _format_utc(not_before)
     expires_at_text = _format_utc(expires_at)

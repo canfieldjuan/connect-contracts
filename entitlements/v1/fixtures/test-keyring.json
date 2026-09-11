@@ -9,6 +9,11 @@
       "key_id": "connect-test-duplicate-2026-01",
       "algorithm": "Ed25519",
       "public_key_base64url": "G19tPuTgXNpBpSRdzFXOfCzdXBz4pzGzcgESxJusId4"
+    },
+    {
+      "key_id": "connect-test-automations-2026-01",
+      "algorithm": "Ed25519",
+      "public_key_base64url": "Y-ygTYEFnHyN-1ujs4wx9nELNp00jAh78ABQYJjHxWU"
     }
   ]
 }

@@ -1,0 +1,6 @@
+{
+  "format_version": 1,
+  "key_id": "connect-test-automations-2026-01",
+  "payload_base64url": "eyJlbnRpdGxlbWVudF9pZCI6IjIyMjIyMjIyLTIyMjItNDIyMi04MjIyLTIyMjIyMjIyMjIyMiIsImV4cGlyZXNfYXQiOiIyMDI3LTAxLTAxVDAwOjAwOjAwWiIsImZlYXR1cmVzIjpbImNvbm5lY3QuY2FwYWJpbGl0eV9leGNoYW5nZSIsImNvbm5lY3QuYXV0b21hdGlvbnMiXSwiZm9ybWF0X3ZlcnNpb24iOjEsImlzc3VlZF9hdCI6IjIwMjYtMDEtMDFUMDA6MDA6MDBaIiwibm90X2JlZm9yZSI6IjIwMjYtMDEtMDFUMDA6MDA6MDBaIiwic3ViamVjdCI6ImZpeHR1cmUtY3VzdG9tZXIifQ",
+  "signature_base64url": "BEOFEfHx6ck6jMXP2rY27UPP9VB2fDcJw0S6i6hjaYKY3p1qQ_M8nDy1MJcEe7kwt6varyk2iFmlLvuppjl1Cw"
+}
