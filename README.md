@@ -14,6 +14,7 @@ Current decisions:
 - [ADR-0003: Connect entitlement v1](adr/0003-connect-entitlement-v1.md)
 - [ADR-0004: Connect entitlement activation v1](adr/0004-connect-entitlement-activation-v1.md)
 - [ADR-0005: Windows Local Connect placement](adr/0005-windows-local-placement.md)
+- [ADR-0006: Consumer-owned admission and the Automate feature](adr/0006-consumer-admission-and-automate-feature.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
@@ -28,7 +29,10 @@ Run `python3 -m unittest tests.test_contracts` after installing the development
 dependency in `requirements-dev.txt`.
 
 Commercial Connect authorization is a separate, signed local contract under
-`entitlements/v1/`. It does not add fields to either Connect wire protocol.
+`entitlements/v1/`. The feature identifiers a licence may carry are enumerated in
+`entitlements/v1/features.json`; the issuer refuses any feature not listed
+there, and `entitlements/v1/fixtures/valid/active-automations.json` is the
+shared signed fixture carrying both registered features. It does not add fields to either Connect wire protocol.
 The key and licenses under `entitlements/v1/fixtures/` are conformance fixtures
 only and must never be used as a production issuer. The separately named
 `entitlements/v1/release/keyring.json` is the publishable production public

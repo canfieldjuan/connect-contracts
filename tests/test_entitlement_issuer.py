@@ -122,6 +122,40 @@ class EntitlementIssuerTests(unittest.TestCase):
         self.assertEqual(claims["issued_at"], "2026-09-02T12:00:00Z")
         self.assertEqual(claims["expires_at"], "2027-09-02T12:00:00Z")
 
+    def test_issue_validates_features_against_the_shared_registry(self):
+        self.initialize()
+        registered = self.issue(
+            output_path=self.private_parent / "both.json",
+            features=[FEATURE_ID, "connect.automations"],
+        )
+        claims = json.loads(
+            decode_base64url(
+                json.loads(
+                    (self.private_parent / "both.json").read_text(encoding="utf-8")
+                )["payload_base64url"]
+            )
+        )
+        self.assertEqual(claims["features"], [FEATURE_ID, "connect.automations"])
+        self.assertEqual(registered["output"], str(self.private_parent / "both.json"))
+
+        unregistered = self.private_parent / "unregistered.json"
+        with self.assertRaisesRegex(IssuerError, "unregistered feature ID"):
+            self.issue(
+                output_path=unregistered, features=[FEATURE_ID, "connect.automation"]
+            )
+        self.assertFalse(unregistered.exists())
+
+        bad_registry = self.root / "features.json"
+        bad_registry.write_text(
+            json.dumps({"format_version": 1, "features": [{"id": FEATURE_ID}]}),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(IssuerError, "feature registry entry"):
+            self.issue(
+                output_path=self.private_parent / "bad-registry.json",
+                feature_registry_path=bad_registry,
+            )
+
     def test_private_key_destination_must_be_outside_repo_and_owner_private(self):
         with self.assertRaisesRegex(IssuerError, "cannot be stored in the repository"):
             initialize_authority(

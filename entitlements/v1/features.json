@@ -1,0 +1,22 @@
+{
+  "format_version": 1,
+  "features": [
+    {
+      "id": "connect.capability_exchange",
+      "meaning": "The local user is commercially entitled to Local Connect capability exchange: consumers discover and invoke, providers serve manifests and jobs.",
+      "enforced_by": [
+        "consumer",
+        "provider"
+      ],
+      "defined_in": "adr/0003-connect-entitlement-v1.md"
+    },
+    {
+      "id": "connect.automations",
+      "meaning": "The local user is entitled to unattended automations in a consumer: rule evaluation, admission of automation work, and its provider submission. Additive to connect.capability_exchange; grants no discovery or invocation on its own.",
+      "enforced_by": [
+        "consumer"
+      ],
+      "defined_in": "adr/0006-consumer-admission-and-automate-feature.md"
+    }
+  ]
+}
