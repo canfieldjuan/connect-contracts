@@ -5,6 +5,7 @@ import json
 import re
 import unittest
 from datetime import datetime
+from itertools import product
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -209,6 +210,38 @@ def _registration_manifest_errors(registration: dict, manifest: dict) -> list[st
     return errors
 
 
+def _registration_url_errors(base_url: str) -> list[str]:
+    if any(
+        ord(character) < 0x20 or 0x7F <= ord(character) <= 0x9F
+        for character in base_url
+    ):
+        return ["registration loopback URL contains a control character"]
+
+    try:
+        parsed = urlsplit(base_url)
+    except ValueError:
+        return ["registration URL is not canonical exact-loopback HTTP"]
+
+    try:
+        port = parsed.port
+    except ValueError:
+        return ["registration loopback port is out of range"]
+
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "::1"}
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path not in {"", "/"}
+        or parsed.query
+        or parsed.fragment
+    ):
+        return ["registration URL is not canonical exact-loopback HTTP"]
+    if port is None or not 1 <= port <= 65_535:
+        return ["registration loopback port is out of range"]
+    return []
+
+
 def _job_status_request_errors(status: dict, request: dict) -> list[str]:
     errors: list[str] = []
     if status["job_id"] != request["job_id"]:
@@ -234,19 +267,14 @@ def semantic_errors(
     provider_manifest: dict | None = None,
     job_request: dict | None = None,
 ) -> list[str]:
-    if version != "v2":
-        return []
-
     errors: list[str] = []
     if schema_name == "registration.schema.json":
-        try:
-            port = urlsplit(instance["transport"]["base_url"]).port
-        except ValueError:
-            port = None
-        if port is None or not 1 <= port <= 65_535:
-            errors.append("registration loopback port is out of range")
-        if provider_manifest is not None:
+        errors.extend(_registration_url_errors(instance["transport"]["base_url"]))
+        if version == "v2" and provider_manifest is not None:
             errors.extend(_registration_manifest_errors(instance, provider_manifest))
+
+    if version != "v2":
+        return errors
 
     if schema_name == "manifest.schema.json":
         capability_keys: set[tuple[str, str]] = set()
@@ -481,19 +509,92 @@ class ConnectContractTests(unittest.TestCase):
         errors = list(Draft202012Validator(claims_schema).iter_errors(offset_timestamp))
         self.assertTrue(errors)
 
-    def test_v2_registration_port_boundaries(self) -> None:
-        registration = json.loads(
-            (FIXTURES / "v2/valid/registration.json").read_text(encoding="utf-8")
-        )
-        registration["transport"]["base_url"] = "http://127.0.0.1:65535/"
-        self.assertEqual(
-            semantic_errors("v2", "registration.schema.json", registration), []
-        )
-        registration["transport"]["base_url"] = "http://127.0.0.1:65536/"
-        self.assertEqual(
-            semantic_errors("v2", "registration.schema.json", registration),
-            ["registration loopback port is out of range"],
-        )
+    def test_registration_url_semantics_cover_both_versions(self) -> None:
+        valid_urls = [
+            f"http://{host}:{port}{suffix}"
+            for host, port, suffix in product(
+                ("127.0.0.1", "[::1]"), (1, 65_535), ("", "/")
+            )
+        ]
+        structurally_invalid_urls = {
+            "http://127.0.0.1:0/": "registration loopback port is out of range",
+            "http://127.0.0.1:65536/": "registration loopback port is out of range",
+            "http://127.0.0.1/": "registration loopback port is out of range",
+            "https://127.0.0.1:41237/": "registration URL is not canonical exact-loopback HTTP",
+            "http://localhost:41237/": "registration URL is not canonical exact-loopback HTTP",
+            "http://127.1:41237/": "registration URL is not canonical exact-loopback HTTP",
+            "http://2130706433:41237/": "registration URL is not canonical exact-loopback HTTP",
+            "http://user@127.0.0.1:41237/": "registration URL is not canonical exact-loopback HTTP",
+            "http://127.0.0.1:41237/jobs": "registration URL is not canonical exact-loopback HTTP",
+            "http://127.0.0.1:41237/?q=1": "registration URL is not canonical exact-loopback HTTP",
+            "http://127.0.0.1:41237/#fragment": "registration URL is not canonical exact-loopback HTTP",
+        }
+        control_urls = {
+            template.format(control): "registration loopback URL contains a control character"
+            for control, template in product(
+                ("\x00", "\t", "\n", "\r", "\x1f", "\x7f", "\x85", "\x9f"),
+                (
+                    "{}http://127.0.0.1:41237/",
+                    "http://127.0.0.1:4{}1237/",
+                    "http://127.0.0.1:41237/{}",
+                ),
+            )
+        }
+        invalid_urls = {**structurally_invalid_urls, **control_urls}
+
+        for version in ("v1", "v2"):
+            schema = json.loads(
+                (SCHEMAS / version / "registration.schema.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            validator = Draft202012Validator(schema)
+            registration = json.loads(
+                (FIXTURES / version / "valid/registration.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            for base_url in valid_urls:
+                with self.subTest(version=version, base_url=repr(base_url)):
+                    registration["transport"]["base_url"] = base_url
+                    self.assertEqual(list(validator.iter_errors(registration)), [])
+                    self.assertEqual(
+                        semantic_errors(
+                            version, "registration.schema.json", registration
+                        ),
+                        [],
+                    )
+            for base_url, expected in invalid_urls.items():
+                with self.subTest(version=version, base_url=repr(base_url)):
+                    registration["transport"]["base_url"] = base_url
+                    schema_errors = list(validator.iter_errors(registration))
+                    runtime_errors = semantic_errors(
+                        version, "registration.schema.json", registration
+                    )
+                    self.assertTrue(schema_errors or runtime_errors)
+                    self.assertIn(
+                        expected,
+                        runtime_errors,
+                    )
+
+    def test_provider_busy_requires_retryable_true_in_both_versions(self) -> None:
+        for version in ("v1", "v2"):
+            schema = json.loads(
+                (SCHEMAS / version / "error.schema.json").read_text(encoding="utf-8")
+            )
+            validator = Draft202012Validator(schema)
+            busy = json.loads(
+                (FIXTURES / version / "valid/http-error.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(list(validator.iter_errors(busy)), [])
+
+            busy["error"]["retryable"] = False
+            self.assertTrue(list(validator.iter_errors(busy)))
+
+            busy["error"]["code"] = "PROVIDER_UNAVAILABLE"
+            self.assertEqual(list(validator.iter_errors(busy)), [])
 
     def test_v2_cross_document_identity_boundaries(self) -> None:
         fixture_dir = FIXTURES / "v2/valid"
