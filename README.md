@@ -100,8 +100,9 @@ before any URL parser can normalize them. They must then parse without
 credentials, query, or fragment; require exact HTTP host `127.0.0.1` or `::1`,
 an empty path or `/`, and a numeric TCP port in `1..65535`. Error validation
 must also enforce the cross-field rule that `PROVIDER_BUSY` always carries
-`retryable: true`; other error codes retain their explicitly declared retry
-policy.
+`retryable: true`. That code is valid only as a standalone pre-admission HTTP
+error and must be rejected inside a failed job status; other error codes retain
+their explicitly declared retry policy.
 
 V2 output payloads are base64-encoded bytes with declared size and SHA-256.
 Implementations must validate those integrity fields after decoding. Known

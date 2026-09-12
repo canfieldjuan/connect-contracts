@@ -596,6 +596,27 @@ class ConnectContractTests(unittest.TestCase):
             busy["error"]["code"] = "PROVIDER_UNAVAILABLE"
             self.assertEqual(list(validator.iter_errors(busy)), [])
 
+    def test_provider_busy_is_rejected_after_job_admission(self) -> None:
+        for version in ("v1", "v2"):
+            schema = json.loads(
+                (SCHEMAS / version / "job-status.schema.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            validator = Draft202012Validator(schema)
+            failed = json.loads(
+                (FIXTURES / version / "valid/job-failed.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(list(validator.iter_errors(failed)), [])
+
+            failed["error"]["code"] = "PROVIDER_BUSY"
+            for retryable in (False, True):
+                with self.subTest(version=version, retryable=retryable):
+                    failed["error"]["retryable"] = retryable
+                    self.assertTrue(list(validator.iter_errors(failed)))
+
     def test_v2_cross_document_identity_boundaries(self) -> None:
         fixture_dir = FIXTURES / "v2/valid"
         registration = json.loads(

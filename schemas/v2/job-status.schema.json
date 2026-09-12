@@ -119,6 +119,10 @@
         "code": { "type": "string", "pattern": "^[A-Z0-9_]+$", "maxLength": 100 },
         "message": { "type": "string", "minLength": 1, "maxLength": 1000 },
         "retryable": { "type": "boolean" }
+      },
+      "not": {
+        "properties": { "code": { "const": "PROVIDER_BUSY" } },
+        "required": ["code"]
       }
     }
   }
