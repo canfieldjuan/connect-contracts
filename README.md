@@ -93,6 +93,17 @@ All routes require the runtime-registration bearer token. The registration
 itself is an owner-only, atomic runtime file and is availability evidence only
 while its exact-loopback endpoint answers with the same instance ID.
 
+Schema validation is necessary but not sufficient for registration admission.
+For both protocol versions, implementations must reject raw URL strings
+containing control code points U+0000 through U+001F or U+007F through U+009F
+before any URL parser can normalize them. They must then parse without
+credentials, query, or fragment; require exact HTTP host `127.0.0.1` or `::1`,
+an empty path or `/`, and a numeric TCP port in `1..65535`. Error validation
+must also enforce the cross-field rule that `PROVIDER_BUSY` always carries
+`retryable: true`. That code is valid only as a standalone pre-admission HTTP
+error and must be rejected inside a failed job status; other error codes retain
+their explicitly declared retry policy.
+
 V2 output payloads are base64-encoded bytes with declared size and SHA-256.
 Implementations must validate those integrity fields after decoding. Known
 media types may be rendered by consumer-owned code; unknown types may only be

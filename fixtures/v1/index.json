@@ -5,9 +5,13 @@
   { "schema": "job-status.schema.json", "fixture": "valid/job-completed.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed.json", "valid": true },
   { "schema": "error.schema.json", "fixture": "valid/http-error.json", "valid": true },
+  { "schema": "error.schema.json", "fixture": "invalid/error-provider-busy-not-retryable.json", "valid": false },
   { "schema": "manifest.schema.json", "fixture": "invalid/manifest-protocol-mismatch.json", "valid": false },
   { "schema": "registration.schema.json", "fixture": "invalid/registration-remote-endpoint.json", "valid": false },
+  { "schema": "registration.schema.json", "fixture": "invalid/registration-port-out-of-range.json", "valid": false },
+  { "schema": "registration.schema.json", "fixture": "invalid/registration-terminal-line-feed.json", "valid": false },
   { "schema": "job-request.schema.json", "fixture": "invalid/job-request-with-path.json", "valid": false },
   { "schema": "job-request.schema.json", "fixture": "invalid/job-request-too-large.json", "valid": false },
-  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-without-result.json", "valid": false }
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-without-result.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-status-provider-busy.json", "valid": false }
 ]

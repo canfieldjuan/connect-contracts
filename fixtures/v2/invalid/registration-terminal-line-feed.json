@@ -1,0 +1,15 @@
+{
+  "protocol_version": 2,
+  "instance_id": "2e9e4281-8c7d-4d9a-8a20-917cbdd837c0",
+  "app_id": "document-summarizer",
+  "pid": 4242,
+  "started_at": "2026-08-30T12:00:00Z",
+  "transport": {
+    "kind": "http-loopback-v2",
+    "base_url": "http://127.0.0.1:41238/\n"
+  },
+  "auth": {
+    "scheme": "bearer",
+    "token": "LdWyXFiQR30E5l9rZWRxcpjyMH_FgBDEybZdfblQ7Qk"
+  }
+}
