@@ -171,11 +171,18 @@ authority after that startup commits; provider ownership and publication locks
 continue to guard steady-state serving.
 
 Before binding access, every shared acquisition also checks under control
-authority that no package-upgrade record exists. An incomplete, unreadable,
+authority that no package-operation record exists. An incomplete, unreadable,
 malformed, or wrong-target record is a durable barrier and fails closed before
 manager mutation, state recovery, endpoint binding, or publication. Only a
 package operation holding exclusive control authority may recover that record
-and resume or safely restart the recorded upgrade.
+and resume or safely restart the recorded operation.
+
+An existing package-operation record's kind, generation, and target are
+immutable. A requested upgrade that encounters a removal record, or a requested
+removal that encounters an upgrade record, fails before manager or package
+mutation. It cannot clear, overwrite, convert, or claim to repair the existing
+operation; an exclusive recovery must finish or safely restart the exact
+recorded kind and generation first.
 
 Startup failure removes any endpoint and exact registration created by that
 attempt before releasing provider ownership and then shared control authority.
@@ -253,13 +260,14 @@ ADR-0006 reconciliation rules.
 Package upgrade takes exclusive control authority before suppressing manager
 startup or changing launch artifacts. Before either mutation, it atomically and
 durably writes a bounded, owner-private, non-link regular-file record outside
-the installed package. The record contains a unique operation generation, the
-target package identity, the prior per-user enabled choice, and an incomplete
-state. While holding exclusive authority, the upgrader cancels every pending
-manager retry, prevents new shared acquisition, performs the bounded stop of
-the complete process tree, waits for provider ownership to end, and removes only the
-exact dead process registration. It keeps automatic manager launch suppressed
-while any launch artifact or executable may be incomplete.
+the installed package. The record names package upgrade and contains a unique
+operation generation, the target package identity, the prior per-user enabled
+choice, and an incomplete state. While holding exclusive authority, the
+upgrader cancels every pending manager retry, prevents new shared acquisition,
+performs the bounded stop of the complete process tree, waits for provider
+ownership to end, and removes only the exact dead process registration. It
+keeps automatic manager launch suppressed while any launch artifact or
+executable may be incomplete.
 
 An upgrade controller that starts with an incomplete record takes exclusive
 authority and recovers that exact generation before any provider can acquire
@@ -294,15 +302,36 @@ the durable admission barrier rather than an old or partial installation that a
 new provider entry point can start.
 
 Package removal takes exclusive control authority before disabling manager
-startup or changing launch artifacts. While holding it, the remover cancels any
-pending manager retry, prevents new shared acquisition, stops the complete
-provider process tree without the ordinary job drain, waits for ownership to
-end, and removes only the exact dead process registration. It removes launch
-artifacts and the executable only after no old process can serve or publish,
-then releases control authority. Durable job state and the prior per-user
-enabled choice remain available for a safely installed successor. A failed
-removal reports failure rather than leaving a discoverable old provider or
-releasing authority while a retry can still start.
+startup or changing launch artifacts. Before either mutation, it atomically and
+durably writes the same bounded, owner-private package-operation record, naming
+package removal, a unique operation generation, the target installed package,
+the prior per-user enabled choice, and an incomplete state. While holding
+exclusive authority, the remover cancels every pending manager retry, prevents
+new shared acquisition, stops the complete provider process tree without the
+ordinary job drain, waits for ownership to end, and removes only the exact dead
+process registration. It removes launch artifacts and the executable only
+after no old process can serve or publish.
+
+A removal controller that starts with an incomplete removal record takes
+exclusive authority and finishes that exact generation; it does not replace or
+clear the barrier based on absent or partially removed files alone. It clears
+only its exact generation, atomically and durably, after manager launch is
+suppressed, the complete process tree and provider ownership have ended, the
+exact registration is absent, and the target launch artifacts and executable
+are absent. Before that clear it leaves provider durable job state untouched
+and atomically and durably writes an owner-private removal receipt outside the
+removed package. The receipt binds the exact removal generation and preserves
+the prior per-user enabled choice for a later reinstall. A crash after the
+receipt but before the clear leaves the barrier in place and lets exact recovery
+reuse the receipt idempotently. The controller then clears the incomplete
+record and releases control authority.
+
+A crash before the clear leaves ordinary acquisition blocked until exclusive
+recovery completes removal. A failed removal keeps manager launch suppressed
+and the record incomplete, reports failure, and preserves durable job state and
+the prior per-user enabled choice. A later reinstall may restore that choice
+from the completed receipt only after the new package and provider state pass
+new-enable admission; it never treats the receipt itself as readiness.
 
 If an executable is removed or replaced outside that serialized package
 operation, a running provider still stops serving and removes its own
@@ -356,8 +385,15 @@ Each provider implementation must exercise both sides of these boundaries:
 11. package removal raced against manager backoff, binding access, recovery,
     endpoint binding, publication, and steady-state serving cancels every retry
     and leaves no live or late publisher before launch artifacts or the
-    executable are removed; reinstall can safely restore the prior enabled
-    choice and durable state; and
+    executable are removed; controller crashes after barrier persistence,
+    manager suppression, old-owner stop, partial removal, and artifact deletion
+    preserve the exact incomplete generation and block ordinary acquisition,
+    while a crash after the exact clear observes complete removal; generation A
+    cannot clear, overwrite, or repair generation B, and malformed or
+    wrong-target removal records remain fail-closed; a successful removal leaves
+    durable job state untouched and a generation-bound receipt from which an
+    admitted reinstall can restore the prior enabled choice; an upgrade request
+    cannot mutate or replace the incomplete removal operation; and
 12. package upgrade raced against manager backoff, binding access, recovery,
     endpoint binding, publication, and steady-state serving launches neither an
     old nor partial installation; an enabled installation restarts and proves
@@ -371,8 +407,9 @@ Each provider implementation must exercise both sides of these boundaries:
     restart it; after successor readiness, delegated coverage survives a crash
     before or after the exact clear and prevents an uncovered publisher before
     the shared-authority handoff or clean exit; generation A cannot clear,
-    overwrite, or repair generation B, and malformed or wrong-target records
-    remain fail-closed barriers; and
+    overwrite, or repair generation B, and malformed or wrong-target upgrade
+    records remain fail-closed barriers; a removal request cannot mutate or
+    replace the incomplete upgrade operation; and
 13. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
