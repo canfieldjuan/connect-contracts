@@ -51,11 +51,27 @@ manager alive after logout, but Connect does not require or enable that policy.
 The platform adapters are:
 
 - Linux: one packaged systemd user unit enabled for the current user and
-  started by that user's service manager. It is not a system service.
+  started by that user's service manager. It is not a system service. The unit
+  uses manager-owned restart-on-failure with bounded backoff and rate limiting.
 - Windows: one packaged per-user Task Scheduler task with an at-logon trigger.
   It runs only as the same user, stores no password, requests no elevation, and
   launches the package's exact background-provider entry point. It is not a
-  machine-wide service or startup task.
+  machine-wide service or startup task. The task uses manager-owned restart on
+  unexpected failure with bounded delay and a bounded retry rate.
+
+While background operation remains enabled, an unexpected provider exit asks
+the service manager to launch a recovering owner without requiring a desktop
+window. Each platform adapter declares a positive minimum retry delay, a finite
+maximum time to its first retry, and a finite attempt budget over a finite
+window so a persistent startup fault cannot spin. A successful authenticated
+serving interval resets that budget only after the adapter's declared stability
+period. Exhausting the budget leaves background operation enabled but visibly
+unavailable; the next platform session trigger or explicit control operation
+may start a new bounded retry sequence. Intentional disable, package removal,
+and a successful manager stop do not trigger a restart. Disable or rebind
+during backoff cancels a pending restart before binding access or publication.
+Every retry follows the same control-authority, provider-ownership, recovery,
+and publication requirements as an initial background start.
 
 The enabled choice survives application upgrades. Package removal must make a
 running provider stop and remove its registration. A later reinstall may
@@ -194,20 +210,31 @@ shared `%LOCALAPPDATA%\LocalConnect\runtime` registration tree in ADR-0005.
 ### Bounded stop and recovery
 
 On ordinary stop, a provider stops admitting new work while retaining
-authenticated status for its admitted job, and gives that job at most 30
-seconds to finish and commit a terminal status. It then removes only the
-registration it published and exits. At the deadline it cancels local work and
-first persists a recoverable nonterminal or explicit retryable failure
-according to the provider's existing durable-job contract.
+authenticated status for its admitted job. Its entire graceful-stop sequence
+has a 35-second maximum. Within that total budget it gives an admitted job at
+most 30 seconds to finish and commit a terminal status; at the job deadline it
+cancels local work and persists a recoverable nonterminal or explicit retryable
+failure according to the provider's existing durable-job contract. The
+remaining total budget covers cancellation-state persistence, endpoint
+shutdown, removal of only the registration this process published, release of
+provider ownership, and process exit. Implementations shorten the job drain as
+needed to preserve that cleanup budget; they do not begin a full 30-second
+drain after consuming earlier stop time.
 
-The service-manager stop deadline is at least 40 seconds and strictly longer
-than the provider drain. After that deadline it terminates the complete process
-tree. Manager actions and readiness probes are independently bounded; no
-desktop control waits indefinitely. When a newly started provider misses its
-readiness deadline, the controller stops its complete process tree and waits
-until startup activity and provider ownership have ended before releasing
-exclusive control authority or restoring a foreground provider. A timed-out
-child may not publish late.
+The service manager force-terminates the complete process tree 40 seconds after
+the stop request if the process has not exited, preserving five seconds beyond
+the complete 35-second graceful-stop budget. The controlling adapter then has
+until 45 seconds after the original stop request to observe termination, prove
+provider ownership ended, and safely remove only the exact dead process's
+registration. It leaves durable job state unchanged and recoverable by the next
+provider owner. If it cannot prove the old endpoint dead, ownership ended, and
+the exact registration absent by that deadline, the control operation fails and
+no foreground replacement starts. Manager actions and readiness probes are
+independently bounded; no desktop control waits indefinitely. When a newly
+started provider misses its readiness deadline, the controller stops its
+complete process tree and waits until startup activity and provider ownership
+have ended before releasing exclusive control authority or restoring a
+foreground provider. A timed-out child may not publish late.
 
 After a crash or forced stop, the next owner recovers the same durable v2 job
 state before publishing availability. It never converts an uncertain admitted
@@ -244,8 +271,13 @@ Each provider implementation must exercise both sides of these boundaries:
    readiness deadline restores the still-open window provider;
 5. disable drains or bounds the admitted job, removes the exact registration,
    and permits one foreground replacement;
-6. crash or forced-stop recovery reuses the v2 durable identity and reconciles
-   accepted work without duplicate submission;
+6. crashing an enabled provider causes the Linux or Windows user manager to
+   launch a recovering owner within the declared first-retry bound and without
+   an open window; that owner uses new process credentials, reuses the v2
+   durable identity, and reconciles accepted work without duplicate submission;
+   repeated failure exercises the delay, attempt/window ceiling, and stable
+   serving reset, while disable, rebind, package removal, and intentional stop
+   during backoff do not restart;
 7. a v1 provider proves the private state-binding and serving-generation
    correlation before state-specific readiness or takeover succeeds;
 8. malformed, linked, non-private, oversized, mismatched, and changed state
@@ -260,8 +292,16 @@ Each provider implementation must exercise both sides of these boundaries:
    control mutation, or foreground restoration before the child has stopped;
 11. package removal makes the old process undiscoverable, and reinstall can
    safely restore the prior enabled choice and durable state; and
-12. Linux systemd-user and Windows per-user-task artifacts preserve the stated
-    user, privilege, startup, stop, and process-tree bounds.
+12. a job consuming its maximum drain still leaves enough of the 35-second
+    graceful-stop budget for durable cancellation classification, endpoint
+    shutdown, exact-registration removal, ownership release, and exit before
+    force termination at 40 seconds; forced termination leaves durable job
+    state recoverable by the next owner and is followed by exact-registration
+    removal by the 45-second control deadline before success or replacement;
+    and
+13. Linux systemd-user and Windows per-user-task artifacts preserve the stated
+    user, privilege, automatic-restart, bounded-backoff, stop, and process-tree
+    bounds.
 
 Installed-artifact evidence is platform-specific. A Linux proof does not
 establish Windows behavior, and package construction alone does not establish
