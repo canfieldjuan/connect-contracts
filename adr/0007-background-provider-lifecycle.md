@@ -157,9 +157,10 @@ and background entry point, every supported protocol mode, and every durable
 state binding that the application may select. It is not keyed by process,
 process mode, protocol instance, or state path.
 
-An enable, disable, rebind, package-upgrade, or package-removal operation takes
-the authority exclusively from manager preflight through final authenticated
-state, complete failed-start cleanup, or completion of the package operation.
+An enable, disable, rebind, package-upgrade, package-removal, or
+package-reinstall operation takes the authority exclusively from manager
+preflight through final authenticated state, complete failed-start cleanup, or
+completion of the package operation.
 Foreground and independently started background provider acquisition take it
 in shared mode before reading or validating the selected binding and before
 their nonblocking provider-ownership attempt. A failed ownership attempt
@@ -178,8 +179,8 @@ package operation holding exclusive control authority may recover that record
 and resume or safely restart the recorded operation.
 
 An existing package-operation record's kind, generation, and target are
-immutable. A requested upgrade that encounters a removal record, or a requested
-removal that encounters an upgrade record, fails before manager or package
+immutable. A requested upgrade, removal, or reinstall that encounters a
+different recorded kind, generation, or target fails before manager or package
 mutation. It cannot clear, overwrite, convert, or claim to repair the existing
 operation; an exclusive recovery must finish or safely restart the exact
 recorded kind and generation first.
@@ -191,17 +192,17 @@ any protocol publication lock. A conflicting operation fails fast without
 manager mutation, binding access, state recovery, endpoint binding, or
 registration.
 
-The background entry point started inside an exclusive enable, rebind, or
-package-upgrade transition does not reacquire shared authority only while that
-same exclusive authority continuously covers its startup. The controller
-retains or delegates that authority without a gap through authenticated
-publication or complete failed-start cleanup and child exit. A controller
-return, crash, or readiness deadline does not authorize a surviving child to
-continue uncovered. Before exclusive coverage can end, the child must already
-retain delegated coverage, complete a gap-free handoff to shared authority, or
-exit before binding state access, recovery, endpoint binding, or publication.
-The child still takes the provider-ownership lock. This closes the
-check-then-start race without introducing a lifecycle queue.
+The background entry point started inside an exclusive enable, rebind,
+package-upgrade, or package-reinstall transition does not reacquire shared
+authority only while that same exclusive authority continuously covers its
+startup. The controller retains or delegates that authority without a gap
+through authenticated publication or complete failed-start cleanup and child
+exit. A controller return, crash, or readiness deadline does not authorize a
+surviving child to continue uncovered. Before exclusive coverage can end, the
+child must already retain delegated coverage, complete a gap-free handoff to
+shared authority, or exit before binding state access, recovery, endpoint
+binding, or publication. The child still takes the provider-ownership lock.
+This closes the check-then-start race without introducing a lifecycle queue.
 
 ### State binding and privacy
 
@@ -329,9 +330,45 @@ record and releases control authority.
 A crash before the clear leaves ordinary acquisition blocked until exclusive
 recovery completes removal. A failed removal keeps manager launch suppressed
 and the record incomplete, reports failure, and preserves durable job state and
-the prior per-user enabled choice. A later reinstall may restore that choice
-from the completed receipt only after the new package and provider state pass
-new-enable admission; it never treats the receipt itself as readiness.
+the prior per-user enabled choice.
+
+A reinstall takes exclusive control authority before it inspects or changes
+package files, launch artifacts, manager state, the operation record, or the
+removal receipt. If an incomplete removal record exists, the installer validates
+and completes that exact removal generation through its receipt and exact clear
+while manager launch remains suppressed. It does not overwrite the record,
+start a new package generation, or create any new package artifact first. A
+malformed, wrong-target, or conflicting receipt or record fails closed before
+mutation. A consumed receipt with no matching incomplete reinstall record also
+fails closed before mutation.
+
+After exact removal clear and proof that the old target artifacts are absent,
+but before creating the first new package artifact, the installer atomically
+and durably writes a new package-reinstall operation record outside the package.
+It has a unique generation, the new target package identity, the matching
+completed removal-receipt generation, the copied prior enabled choice, and an
+incomplete state. Failure to persist that new record leaves the package absent,
+the receipt unconsumed, and manager launch suppressed. A reinstall controller
+that starts with an incomplete reinstall record takes exclusive authority,
+validates and recovers that exact generation, and rolls it forward or safely
+restarts it without inferring completion from partial files. It accepts an
+already-consumed marker only when the receipt generation, package target, and
+incomplete reinstall record all match; it then uses the enabled choice copied
+into the record and does not consume the receipt again.
+
+The installer holds the same exclusive authority across removal recovery,
+reinstall-record persistence, new-package installation, and new-enable
+admission. The reinstall generation then follows the upgrade generation's
+enabled or disabled successor start, authenticated readiness, delegated
+coverage, exact clear, and shared-authority handoff ordering. Before the exact
+reinstall clear, it atomically and durably marks only the matching removal
+receipt consumed; after that mark, the still-incomplete reinstall record is the
+sole owner of the copied enabled choice. Installation or readiness failure keeps
+manager launch suppressed and the reinstall record incomplete for exact
+recovery. It never treats the receipt itself as readiness and never restores
+manager launch while the removal barrier remains incomplete or before the new
+package passes admission. The reinstall barrier remains until a disabled choice
+is settled or the enabled successor is authenticated under continuous coverage.
 
 If an executable is removed or replaced outside that serialized package
 operation, a running provider still stops serving and removes its own
@@ -393,7 +430,12 @@ Each provider implementation must exercise both sides of these boundaries:
     wrong-target removal records remain fail-closed; a successful removal leaves
     durable job state untouched and a generation-bound receipt from which an
     admitted reinstall can restore the prior enabled choice; an upgrade request
-    cannot mutate or replace the incomplete removal operation; and
+    cannot mutate or replace the incomplete removal operation; a reinstall that
+    encounters an incomplete removal takes exclusive authority, completes and
+    exactly clears that generation before creating a new package artifact,
+    retains manager suppression through new-package admission, and cannot let
+    old removal recovery delete the new installation or restore manager launch
+    while the barrier exists; and
 12. package upgrade raced against manager backoff, binding access, recovery,
     endpoint binding, publication, and steady-state serving launches neither an
     old nor partial installation; an enabled installation restarts and proves
@@ -410,14 +452,27 @@ Each provider implementation must exercise both sides of these boundaries:
     overwrite, or repair generation B, and malformed or wrong-target upgrade
     records remain fail-closed barriers; a removal request cannot mutate or
     replace the incomplete upgrade operation; and
-13. a job consuming its maximum drain still leaves enough of the 35-second
+13. package reinstall persists a new exact generation after removal clear and
+    before the first replacement artifact; crashes after removal clear, after
+    reinstall-record persistence, during partial installation, after package
+    admission, after receipt consumption, during manager restoration, and
+    before exact clear leave either no new artifact or the exact durable barrier,
+    never an acquirable partial installation; after exact clear they leave a
+    complete admitted package with either an authenticated successor under
+    continuous coverage or manager launch disabled; enabled and disabled choices
+    follow the upgrade successor ordering, an old removal generation cannot
+    delete the new package, malformed, wrong-target, and conflicting receipts or
+    reinstall records fail closed before mutation, a consumed receipt without a
+    matching incomplete reinstall record fails closed, and matching recovery
+    accepts the consumed marker idempotently from the copied enabled choice; and
+14. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
     force termination at 40 seconds; forced termination leaves durable job
     state recoverable by the next owner and is followed by exact-registration
     removal by the 45-second control deadline before success or replacement;
     and
-14. Linux systemd-user and Windows per-user-task artifacts preserve the stated
+15. Linux systemd-user and Windows per-user-task artifacts preserve the stated
     user, privilege, automatic-restart, bounded-backoff, stop, and process-tree
     bounds.
 
