@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "a1a1a1a1-1111-4111-8111-a1a1a1a1a1a1",
+  "capability": {
+    "id": "lead.estimate-booking",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "b1b1b1b1-1111-4111-8111-b1b1b1b1b1b1",
+      "media_type": "application/vnd.eom.estimate-booking+json",
+      "byte_size": 193,
+      "sha256": "562ede2611571413113e7a4c759a81a1751a56336656c699fb057068159cc989",
+      "display_name": "estimate-booking.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
