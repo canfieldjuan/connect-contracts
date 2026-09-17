@@ -61,6 +61,26 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "lead.estimate-booking",
+      "version": "1.0",
+      "action": {
+        "label": "Book estimate appointment",
+        "description": "Book an estimate appointment for a lead without converting it to a customer. Creates a durable booking and calendar event, and requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.estimate-booking+json",
+          "max_bytes": 8192
+        }
+      ],
+      "produces": ["application/vnd.eom.estimate-booking-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }
