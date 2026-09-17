@@ -78,6 +78,17 @@ and start time for every publisher process. V1 keeps its frozen per-process
 the one v1 `app_id` publication slot. The background contract does not change
 either registration schema.
 
+Because the frozen v1 wire has no durable-state identity, a v1 provider that
+supports background mode also exposes application-private lifecycle status to
+its own desktop host. That status correlates the current serving process with
+the exact durable-state binding and serving generation. It is bounded,
+authenticated or carried over same-application IPC, and never exposed through
+Connect discovery. A v1 implementation without this private correlation may
+report same-app availability, but it cannot claim state-specific readiness,
+automatic takeover, or mismatch recovery. V2 implementations correlate the
+expected state through their durable `instance_id` and may use the same private
+status seam for manager diagnostics.
+
 Exactly one process may own the provider state and publish a registration at a
 time. Every provider entry point takes the same application-private exclusive
 provider-ownership lock before it recovers jobs, binds an endpoint, or writes a
@@ -118,9 +129,10 @@ mode:
   the matching state through an application-owned operation.
 
 Provider selection uses a successful authenticated manifest whose attribution
-matches the registration and expected durable state. Service-manager states
-such as starting or active do not by themselves prove that a provider is
-serving.
+matches the registration. State-specific readiness additionally requires the
+expected v2 durable `instance_id` or the v1 application-private lifecycle
+correlation defined above. Service-manager states such as starting or active do
+not by themselves prove that a provider is serving.
 
 Background control and provider acquisition share one application-private
 control authority. An enable, disable, or rebind operation takes it exclusively
@@ -203,13 +215,15 @@ Each provider implementation must exercise both sides of these boundaries:
    and permits one foreground replacement;
 6. crash or forced-stop recovery reuses the v2 durable identity and reconciles
    accepted work without duplicate submission;
-7. malformed, linked, non-private, oversized, mismatched, and changed state
+7. a v1 provider proves the private state-binding and serving-generation
+   correlation before state-specific readiness or takeover succeeds;
+8. malformed, linked, non-private, oversized, mismatched, and changed state
    bindings fail closed before service start;
-8. concurrent control and provider-acquisition attempts prove both exclusion
+9. concurrent control and provider-acquisition attempts prove both exclusion
    directions and release after success, failure, and process exit;
-9. package removal makes the old process undiscoverable, and reinstall can
+10. package removal makes the old process undiscoverable, and reinstall can
    safely restore the prior enabled choice and durable state; and
-10. Linux systemd-user and Windows per-user-task artifacts preserve the stated
+11. Linux systemd-user and Windows per-user-task artifacts preserve the stated
     user, privilege, startup, stop, and process-tree bounds.
 
 Installed-artifact evidence is platform-specific. A Linux proof does not
