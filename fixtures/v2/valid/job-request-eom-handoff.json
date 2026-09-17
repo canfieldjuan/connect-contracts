@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "e1e1e1e1-1111-4111-8111-e1e1e1e1e1e1",
+  "capability": {
+    "id": "lead.customer-handoff",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "f1f1f1f1-1111-4111-8111-f1f1f1f1f1f1",
+      "media_type": "application/vnd.eom.customer-handoff+json",
+      "byte_size": 117,
+      "sha256": "6d0d5fe19f5157df4c7c35379db0806e2445395d2e1ca145cccaab01732ad7db",
+      "display_name": "customer-handoff.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
