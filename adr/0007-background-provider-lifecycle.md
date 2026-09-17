@@ -1,6 +1,6 @@
 # ADR-0007: Background provider lifecycle
 
-**Status:** Proposed (accepted when this decision merges)
+**Status:** Accepted
 
 **Date:** 2026-09-17
 
