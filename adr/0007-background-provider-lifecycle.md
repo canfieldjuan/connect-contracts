@@ -156,17 +156,18 @@ and background entry point, every supported protocol mode, and every durable
 state binding that the application may select. It is not keyed by process,
 process mode, protocol instance, or state path.
 
-An enable, disable, or rebind operation takes the authority exclusively from
-manager preflight through final authenticated state or complete failed-start
-cleanup. Foreground and independently started background provider acquisition
-take it in shared mode before reading or validating the selected binding and
-before their nonblocking provider-ownership attempt. A failed ownership attempt
-releases shared authority before any wait or backoff and reacquires it before a
-new attempt. A successful attempt retains shared authority through opened-state
-revalidation, job recovery, endpoint binding, atomic registration publication,
-and authenticated attribution to the selected state. It releases shared
-authority after that startup commits; provider ownership and publication locks
-continue to guard steady-state serving.
+An enable, disable, rebind, or package-removal operation takes the authority
+exclusively from manager preflight through final authenticated state, complete
+failed-start cleanup, or completion of removal. Foreground and independently
+started background provider acquisition take it in shared mode before reading
+or validating the selected binding and before their nonblocking
+provider-ownership attempt. A failed ownership attempt releases shared
+authority before any wait or backoff and reacquires it before a new attempt. A
+successful attempt retains shared authority through opened-state revalidation,
+job recovery, endpoint binding, atomic registration publication, and
+authenticated attribution to the selected state. It releases shared authority
+after that startup commits; provider ownership and publication locks continue
+to guard steady-state serving.
 
 Startup failure removes any endpoint and exact registration created by that
 attempt before releasing provider ownership and then shared control authority.
@@ -241,10 +242,21 @@ state before publishing availability. It never converts an uncertain admitted
 job into a fresh submission under the same identity. Consumers retain the
 ADR-0006 reconciliation rules.
 
-If the running package executable is removed or replaced, the provider stops
-serving and removes its own registration without waiting for the ordinary job
-drain. This prevents an uninstalled artifact from remaining discoverable. Its
-durable job state remains available for a safely installed successor.
+Package removal takes exclusive control authority before disabling manager
+startup or changing launch artifacts. While holding it, the remover cancels any
+pending manager retry, prevents new shared acquisition, stops the complete
+provider process tree without the ordinary job drain, waits for ownership to
+end, and removes only the exact dead process registration. It removes launch
+artifacts and the executable only after no old process can serve or publish,
+then releases control authority. Durable job state and the prior per-user
+enabled choice remain available for a safely installed successor. A failed
+removal reports failure rather than leaving a discoverable old provider or
+releasing authority while a retry can still start.
+
+If an executable is removed or replaced outside that serialized package
+operation, a running provider still stops serving and removes its own
+registration without waiting for the ordinary job drain. This is a defense
+against external replacement, not the package-removal synchronization path.
 
 ### User-visible state
 
@@ -290,8 +302,11 @@ Each provider implementation must exercise both sides of these boundaries:
 10. a controller return, crash, or readiness deadline during child startup
    leaves no uncovered publication interval, late publisher, overlapping
    control mutation, or foreground restoration before the child has stopped;
-11. package removal makes the old process undiscoverable, and reinstall can
-   safely restore the prior enabled choice and durable state; and
+11. package removal raced against manager backoff, binding access, recovery,
+    endpoint binding, publication, and steady-state serving cancels every retry
+    and leaves no live or late publisher before launch artifacts or the
+    executable are removed; reinstall can safely restore the prior enabled
+    choice and durable state; and
 12. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
