@@ -134,15 +134,42 @@ expected v2 durable `instance_id` or the v1 application-private lifecycle
 correlation defined above. Service-manager states such as starting or active do
 not by themselves prove that a provider is serving.
 
-Background control and provider acquisition share one application-private
-control authority. An enable, disable, or rebind operation takes it exclusively
-from manager preflight through final authenticated state. Foreground and
-external provider acquisition take it in shared mode around their nonblocking
-provider-ownership decision. A conflicting operation fails fast without
-manager mutation, state recovery, endpoint binding, or registration. The
-background entry point started inside an exclusive enable transition does not
-re-enter that control authority; it still takes the provider-ownership lock.
-This closes the check-then-start race without introducing a lifecycle queue.
+Background control and provider acquisition share one owner-private, per-user,
+per-application control authority. The same authority covers every foreground
+and background entry point, every supported protocol mode, and every durable
+state binding that the application may select. It is not keyed by process,
+process mode, protocol instance, or state path.
+
+An enable, disable, or rebind operation takes the authority exclusively from
+manager preflight through final authenticated state or complete failed-start
+cleanup. Foreground and independently started background provider acquisition
+take it in shared mode before reading or validating the selected binding and
+before their nonblocking provider-ownership attempt. A failed ownership attempt
+releases shared authority before any wait or backoff and reacquires it before a
+new attempt. A successful attempt retains shared authority through opened-state
+revalidation, job recovery, endpoint binding, atomic registration publication,
+and authenticated attribution to the selected state. It releases shared
+authority after that startup commits; provider ownership and publication locks
+continue to guard steady-state serving.
+
+Startup failure removes any endpoint and exact registration created by that
+attempt before releasing provider ownership and then shared control authority.
+The fixed acquisition order is control authority, provider-ownership lock, then
+any protocol publication lock. A conflicting operation fails fast without
+manager mutation, binding access, state recovery, endpoint binding, or
+registration.
+
+The background entry point started inside an exclusive enable or rebind
+transition does not reacquire shared authority only while that same exclusive
+authority continuously covers its startup. The controller retains or delegates
+that authority without a gap through authenticated publication or complete
+failed-start cleanup and child exit. A controller return, crash, or readiness
+deadline does not authorize a surviving child to continue uncovered. Before
+exclusive coverage can end, the child must already retain delegated coverage,
+complete a gap-free handoff to shared authority, or exit before binding state
+access, recovery, endpoint binding, or publication. The child still takes the
+provider-ownership lock. This closes the check-then-start race without
+introducing a lifecycle queue.
 
 ### State binding and privacy
 
@@ -176,7 +203,11 @@ according to the provider's existing durable-job contract.
 The service-manager stop deadline is at least 40 seconds and strictly longer
 than the provider drain. After that deadline it terminates the complete process
 tree. Manager actions and readiness probes are independently bounded; no
-desktop control waits indefinitely.
+desktop control waits indefinitely. When a newly started provider misses its
+readiness deadline, the controller stops its complete process tree and waits
+until startup activity and provider ownership have ended before releasing
+exclusive control authority or restoring a foreground provider. A timed-out
+child may not publish late.
 
 After a crash or forced stop, the next owner recovers the same durable v2 job
 state before publishing availability. It never converts an uncertain admitted
@@ -219,11 +250,17 @@ Each provider implementation must exercise both sides of these boundaries:
    correlation before state-specific readiness or takeover succeeds;
 8. malformed, linked, non-private, oversized, mismatched, and changed state
    bindings fail closed before service start;
-9. concurrent control and provider-acquisition attempts prove both exclusion
-   directions and release after success, failure, and process exit;
-10. package removal makes the old process undiscoverable, and reinstall can
+9. control and acquisition attempts raced before binding access, before and
+   after ownership, during recovery, and between endpoint binding and
+   authenticated registration prove both exclusion directions, clean unwind,
+   and release after success, failure, and process exit; an ownership waiter
+   releases shared authority before backoff;
+10. a controller return, crash, or readiness deadline during child startup
+   leaves no uncovered publication interval, late publisher, overlapping
+   control mutation, or foreground restoration before the child has stopped;
+11. package removal makes the old process undiscoverable, and reinstall can
    safely restore the prior enabled choice and durable state; and
-11. Linux systemd-user and Windows per-user-task artifacts preserve the stated
+12. Linux systemd-user and Windows per-user-task artifacts preserve the stated
     user, privilege, startup, stop, and process-tree bounds.
 
 Installed-artifact evidence is platform-specific. A Linux proof does not
