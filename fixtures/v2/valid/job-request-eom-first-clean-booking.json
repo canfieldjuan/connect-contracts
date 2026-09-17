@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "c1c1c1c1-1111-4111-8111-c1c1c1c1c1c1",
+  "capability": {
+    "id": "lead.first-clean-booking",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "d1d1d1d1-1111-4111-8111-d1d1d1d1d1d1",
+      "media_type": "application/vnd.eom.first-clean-booking+json",
+      "byte_size": 200,
+      "sha256": "7d5a7c5aa9f469babf675e892dc2c6b3583518bb995c756fafb956c714c8c8f8",
+      "display_name": "first-clean-booking.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

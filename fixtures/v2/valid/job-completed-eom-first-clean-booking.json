@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "c1c1c1c1-1111-4111-8111-c1c1c1c1c1c1",
+  "capability": {
+    "id": "lead.first-clean-booking",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-17T12:20:00Z",
+  "updated_at": "2026-09-17T12:20:05Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "d1d1d1d1-1111-4111-8111-d1d1d1d1d1d1",
+      "media_type": "application/vnd.eom.first-clean-booking+json",
+      "byte_size": 200,
+      "sha256": "7d5a7c5aa9f469babf675e892dc2c6b3583518bb995c756fafb956c714c8c8f8"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "d2d2d2d2-2222-4222-8222-d2d2d2d2d2d2",
+        "media_type": "application/vnd.eom.first-clean-booking-receipt+json",
+        "display_name": "first-clean-booking-receipt.json",
+        "byte_size": 316,
+        "sha256": "1924d63f122a435dd3ccaa506dc599713956be80c27f46c375c3a5d94c00246a",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwiYm9va2luZ19pZCI6ImM0ZDVlNmY3LTFhMmItNGMzZC04ZTRmLTVhNmI3YzhkOWUwZiIsImNvbnRhY3RfaWQiOiIxMTExMTExMS0xMTExLTQxMTEtODExMS0xMTExMTExMTExMTEiLCJjYWxlbmRhcl9ldmVudF9pZCI6ImNhbC1ldnQtNzczMDEiLCJvbmJvYXJkaW5nX2RyYWZ0X2lkIjoiZDFjMmIzYTQtNWU2Zi00YTdiLThjOWQtMGUxZjJhM2I0YzVkIiwic2NoZWR1bGVkX3N0YXJ0IjoiMjAyNi0wOS0yNVQxNDowMDowMFoiLCJzY2hlZHVsZWRfZW5kIjoiMjAyNi0wOS0yNVQxNjowMDowMFoifQ=="
+      }
+    ]
+  }
+}
