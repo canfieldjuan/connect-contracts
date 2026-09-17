@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "b2b2b2b2-2222-4222-8222-b2b2b2b2b2b2",
+  "capability": {
+    "id": "onboarding.public-link.revoke",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "c2c2c2c2-2222-4222-8222-c2c2c2c2c2c2",
+      "media_type": "application/vnd.eom.public-link-revocation+json",
+      "byte_size": 51,
+      "sha256": "2840f52de4ef3ee4d1bd57b64b4bc01df42aeb7eca8e466693abd7abd8b3fede",
+      "display_name": "public-link-revocation.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

@@ -121,6 +121,46 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "onboarding.public-link.revoke",
+      "version": "1.0",
+      "action": {
+        "label": "Revoke issued onboarding link",
+        "description": "Invalidate an issued customer onboarding link without changing sent-email evidence. Fences a still-live token when public issuance is disabled. Idempotent by the draft's link state: an already-revoked link replays without a second revocation, and a completed link cannot be revoked. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.public-link-revocation+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.public-link-revocation-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "onboarding.public-handoff.recover",
+      "version": "1.0",
+      "action": {
+        "label": "Recover public onboarding handoff",
+        "description": "Complete a durable tracker reservation after an ambiguous public-onboarding finalization, using the stored token and customer/site ids rather than a raw bearer. Idempotent by the token reservation: a reservation already finalized for the same target replays, and one finalized for a different target conflicts. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.public-handoff-recovery+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.public-handoff-recovery-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }

@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "b1b1b1b1-1111-4111-8111-b1b1b1b1b1b1",
+  "capability": {
+    "id": "onboarding.public-link.revoke",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-17T12:40:00Z",
+  "updated_at": "2026-09-17T12:40:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "c1c1c1c1-1111-4111-8111-c1c1c1c1c1c1",
+      "media_type": "application/vnd.eom.public-link-revocation+json",
+      "byte_size": 51,
+      "sha256": "5266f1e110c529aa1e68a06d61f7e1cbf58e21e759816aff09ebe556fb6307a2"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "d1d1d1d1-1111-4111-8111-d1d1d1d1d1d1",
+        "media_type": "application/vnd.eom.public-link-revocation-receipt+json",
+        "display_name": "public-link-revocation-receipt.json",
+        "byte_size": 156,
+        "sha256": "3f24bfdae9fe2c18bcff597c65b50bb3c64cb44b39055db13f3cc153bc4a90ff",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwidG9rZW5faWQiOiJhMWExYTFhMS0xMTExLTQxMTEtODExMS1hMWExYTFhMWExYTEiLCJjb250YWN0X2lkIjoiZTFlMWUxZTEtMTExMS00MTExLTgxMTEtZTFlMWUxZTFlMWUxIiwic3RhdHVzIjoicmV2b2tlZCJ9"
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "b4b4b4b4-4444-4444-8444-b4b4b4b4b4b4",
+  "capability": {
+    "id": "onboarding.public-handoff.recover",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "c4c4c4c4-4444-4444-8444-c4c4c4c4c4c4",
+      "media_type": "application/vnd.eom.public-handoff-recovery+json",
+      "byte_size": 153,
+      "sha256": "853d0d7880145baf62a0365e1471e54810c42d5c6b841f29a4db3bae3f67c2ba",
+      "display_name": "public-handoff-recovery.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

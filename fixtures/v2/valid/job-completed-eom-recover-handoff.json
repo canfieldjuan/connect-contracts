@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "b3b3b3b3-3333-4333-8333-b3b3b3b3b3b3",
+  "capability": {
+    "id": "onboarding.public-handoff.recover",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-17T12:40:00Z",
+  "updated_at": "2026-09-17T12:40:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "c3c3c3c3-3333-4333-8333-c3c3c3c3c3c3",
+      "media_type": "application/vnd.eom.public-handoff-recovery+json",
+      "byte_size": 153,
+      "sha256": "f812f8cffb8959c9c4ba7fad0d186340ed20acb874b0adf7cd5e37b23c9be6dd"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "d3d3d3d3-3333-4333-8333-d3d3d3d3d3d3",
+        "media_type": "application/vnd.eom.public-handoff-recovery-receipt+json",
+        "display_name": "public-handoff-recovery-receipt.json",
+        "byte_size": 106,
+        "sha256": "2c022c4e0f713a6f0919c3a9c7d6e98b60bcb88140da46bf1b72ca74eb6ef509",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJzdGF0dXMiOiJjb21wbGV0ZWQiLCJ0cmFja2VyX2N1c3RvbWVyX2lkIjo0MDIxLCJ0cmFja2VyX3NpdGVfaWQiOjc3ODgsImlkZW1wb3RlbnQiOmZhbHNlfQ=="
+      }
+    ]
+  }
+}
