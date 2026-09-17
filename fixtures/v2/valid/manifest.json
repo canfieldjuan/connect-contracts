@@ -23,7 +23,15 @@
       "produces": [
         "application/vnd.local-connect.document-summary+json"
       ],
-      "parameters": [],
+      "parameters": [
+        {
+          "name": "mode",
+          "value_type": "string",
+          "required": false,
+          "label": "Summary mode",
+          "description": "Choose general, story, or contract. Defaults to general."
+        }
+      ],
       "effects": {
         "external": false,
         "confirmation_required": false
