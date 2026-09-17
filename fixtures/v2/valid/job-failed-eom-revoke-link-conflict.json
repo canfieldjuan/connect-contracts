@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "b2b2b2b2-2222-4222-8222-b2b2b2b2b2b2",
+  "capability": {
+    "id": "onboarding.public-link.revoke",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-17T12:40:00Z",
+  "updated_at": "2026-09-17T12:40:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "c2c2c2c2-2222-4222-8222-c2c2c2c2c2c2",
+      "media_type": "application/vnd.eom.public-link-revocation+json",
+      "byte_size": 51,
+      "sha256": "2840f52de4ef3ee4d1bd57b64b4bc01df42aeb7eca8e466693abd7abd8b3fede"
+    }
+  ],
+  "error": {
+    "code": "EOM_LINK_NOT_REVOCABLE",
+    "message": "A completed public onboarding link cannot be revoked.",
+    "retryable": false
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "b4b4b4b4-4444-4444-8444-b4b4b4b4b4b4",
+  "capability": {
+    "id": "onboarding.public-handoff.recover",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-17T12:40:00Z",
+  "updated_at": "2026-09-17T12:40:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "c4c4c4c4-4444-4444-8444-c4c4c4c4c4c4",
+      "media_type": "application/vnd.eom.public-handoff-recovery+json",
+      "byte_size": 153,
+      "sha256": "853d0d7880145baf62a0365e1471e54810c42d5c6b841f29a4db3bae3f67c2ba"
+    }
+  ],
+  "error": {
+    "code": "EOM_HANDOFF_RECOVERY_CONFLICT",
+    "message": "The public onboarding recovery conflicts with a different finalized reservation for this token.",
+    "retryable": false
+  }
+}
