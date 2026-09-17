@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "e1e1e1e1-1111-4111-8111-e1e1e1e1e1e1",
+  "capability": {
+    "id": "lead.customer-handoff",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-17T12:00:00Z",
+  "updated_at": "2026-09-17T12:00:03Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "f1f1f1f1-1111-4111-8111-f1f1f1f1f1f1",
+      "media_type": "application/vnd.eom.customer-handoff+json",
+      "byte_size": 117,
+      "sha256": "6d0d5fe19f5157df4c7c35379db0806e2445395d2e1ca145cccaab01732ad7db"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "f2f2f2f2-2222-4222-8222-f2f2f2f2f2f2",
+        "media_type": "application/vnd.eom.customer-handoff-receipt+json",
+        "display_name": "customer-handoff-receipt.json",
+        "byte_size": 203,
+        "sha256": "706ca9e0e0673d6806e90c84c9824f323e6994ace65fdb7ef4ca7b416b2562a1",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwiaGFuZG9mZl9pZCI6IjlmMWMyZTc3LTBiM2EtNGQ1ZS04YTZiLTJjNGQ2ZThmMGExMiIsImNvbnRhY3RfaWQiOiIxMTExMTExMS0xMTExLTQxMTEtODExMS0xMTExMTExMTExMTEiLCJ0cmFja2VyX2N1c3RvbWVyX2lkIjoiY3VzdC04ODQyIiwidHJhY2tlcl9zaXRlX2lkIjoic2l0ZS0xMjA3In0="
+      }
+    ]
+  }
+}

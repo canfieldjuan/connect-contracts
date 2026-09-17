@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "e2e2e2e2-2222-4222-8222-e2e2e2e2e2e2",
+  "capability": {
+    "id": "lead.customer-handoff",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-17T12:05:00Z",
+  "updated_at": "2026-09-17T12:05:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "f3f3f3f3-3333-4333-8333-f3f3f3f3f3f3",
+      "media_type": "application/vnd.eom.customer-handoff+json",
+      "byte_size": 117,
+      "sha256": "6d0d5fe19f5157df4c7c35379db0806e2445395d2e1ca145cccaab01732ad7db"
+    }
+  ],
+  "error": {
+    "code": "EOM_HANDOFF_CONFLICT",
+    "message": "The approval key was already used to finalize a different customer handoff.",
+    "retryable": false
+  }
+}

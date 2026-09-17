@@ -41,6 +41,26 @@
         "external": false,
         "confirmation_required": false
       }
+    },
+    {
+      "id": "lead.customer-handoff",
+      "version": "1.0",
+      "action": {
+        "label": "Hand off customer",
+        "description": "Finalize exactly one tracker-created Customer/Site against an EOM lead. Creates durable CRM state and requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.customer-handoff+json",
+          "max_bytes": 8192
+        }
+      ],
+      "produces": ["application/vnd.eom.customer-handoff-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }
