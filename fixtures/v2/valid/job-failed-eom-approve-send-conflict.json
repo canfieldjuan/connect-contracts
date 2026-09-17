@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "e6e6e6e6-2222-4222-8222-e6e6e6e6e6e6",
+  "capability": {
+    "id": "onboarding.draft.approve-send",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-17T12:35:00Z",
+  "updated_at": "2026-09-17T12:35:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "f7f7f7f7-3333-4333-8333-f7f7f7f7f7f7",
+      "media_type": "application/vnd.eom.onboarding-draft-approval+json",
+      "byte_size": 51,
+      "sha256": "5266f1e110c529aa1e68a06d61f7e1cbf58e21e759816aff09ebe556fb6307a2"
+    }
+  ],
+  "error": {
+    "code": "EOM_DRAFT_NOT_APPROVABLE",
+    "message": "The onboarding draft is not in an approvable state: it was already sent, revoked, or claimed by a concurrent approval.",
+    "retryable": false
+  }
+}

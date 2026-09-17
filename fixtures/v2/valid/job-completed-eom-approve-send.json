@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "e5e5e5e5-1111-4111-8111-e5e5e5e5e5e5",
+  "capability": {
+    "id": "onboarding.draft.approve-send",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-17T12:30:00Z",
+  "updated_at": "2026-09-17T12:30:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "f5f5f5f5-1111-4111-8111-f5f5f5f5f5f5",
+      "media_type": "application/vnd.eom.onboarding-draft-approval+json",
+      "byte_size": 51,
+      "sha256": "5266f1e110c529aa1e68a06d61f7e1cbf58e21e759816aff09ebe556fb6307a2"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "f6f6f6f6-2222-4222-8222-f6f6f6f6f6f6",
+        "media_type": "application/vnd.eom.onboarding-draft-send-receipt+json",
+        "display_name": "onboarding-draft-send-receipt.json",
+        "byte_size": 162,
+        "sha256": "04729d661834c4264304f4881108894347148986356366eccebd82c8719660e9",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwiZHJhZnRfaWQiOiJkMWMyYjNhNC01ZTZmLTRhN2ItOGM5ZC0wZTFmMmEzYjRjNWQiLCJzdGF0dXMiOiJzZW50Iiwic2VudF9hdCI6IjIwMjYtMDktMTdUMTI6MzA6MDBaIiwibWVzc2FnZV9pZCI6ImVtbC05MGIxYzJkMyJ9"
+      }
+    ]
+  }
+}

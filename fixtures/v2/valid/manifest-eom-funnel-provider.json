@@ -101,6 +101,26 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "onboarding.draft.approve-send",
+      "version": "1.0",
+      "action": {
+        "label": "Approve and send onboarding draft",
+        "description": "Claim the pending onboarding draft, send it, and confirm delivery. The draft's status machine is the idempotency mechanism; an already-sent draft replays without a second send. This dispatches the onboarding email, so it requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.onboarding-draft-approval+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.onboarding-draft-send-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }
