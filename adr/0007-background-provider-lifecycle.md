@@ -68,8 +68,9 @@ serving interval resets that budget only after the adapter's declared stability
 period. Exhausting the budget leaves background operation enabled but visibly
 unavailable; the next platform session trigger or explicit control operation
 may start a new bounded retry sequence. Intentional disable, package removal,
-and a successful manager stop do not trigger a restart. Disable or rebind
-during backoff cancels a pending restart before binding access or publication.
+package upgrade, and a successful manager stop do not trigger a restart.
+Disable, rebind, or package upgrade during backoff cancels a pending restart
+before binding access or publication.
 Every retry follows the same control-authority, provider-ownership, recovery,
 and publication requirements as an initial background start.
 
@@ -156,18 +157,25 @@ and background entry point, every supported protocol mode, and every durable
 state binding that the application may select. It is not keyed by process,
 process mode, protocol instance, or state path.
 
-An enable, disable, rebind, or package-removal operation takes the authority
-exclusively from manager preflight through final authenticated state, complete
-failed-start cleanup, or completion of removal. Foreground and independently
-started background provider acquisition take it in shared mode before reading
-or validating the selected binding and before their nonblocking
-provider-ownership attempt. A failed ownership attempt releases shared
-authority before any wait or backoff and reacquires it before a new attempt. A
-successful attempt retains shared authority through opened-state revalidation,
-job recovery, endpoint binding, atomic registration publication, and
-authenticated attribution to the selected state. It releases shared authority
-after that startup commits; provider ownership and publication locks continue
-to guard steady-state serving.
+An enable, disable, rebind, package-upgrade, or package-removal operation takes
+the authority exclusively from manager preflight through final authenticated
+state, complete failed-start cleanup, or completion of the package operation.
+Foreground and independently started background provider acquisition take it
+in shared mode before reading or validating the selected binding and before
+their nonblocking provider-ownership attempt. A failed ownership attempt
+releases shared authority before any wait or backoff and reacquires it before a
+new attempt. A successful attempt retains shared authority through opened-state
+revalidation, job recovery, endpoint binding, atomic registration publication,
+and authenticated attribution to the selected state. It releases shared
+authority after that startup commits; provider ownership and publication locks
+continue to guard steady-state serving.
+
+Before binding access, every shared acquisition also checks under control
+authority that no package-upgrade record exists. An incomplete, unreadable,
+malformed, or wrong-target record is a durable barrier and fails closed before
+manager mutation, state recovery, endpoint binding, or publication. Only a
+package operation holding exclusive control authority may recover that record
+and resume or safely restart the recorded upgrade.
 
 Startup failure removes any endpoint and exact registration created by that
 attempt before releasing provider ownership and then shared control authority.
@@ -176,17 +184,17 @@ any protocol publication lock. A conflicting operation fails fast without
 manager mutation, binding access, state recovery, endpoint binding, or
 registration.
 
-The background entry point started inside an exclusive enable or rebind
-transition does not reacquire shared authority only while that same exclusive
-authority continuously covers its startup. The controller retains or delegates
-that authority without a gap through authenticated publication or complete
-failed-start cleanup and child exit. A controller return, crash, or readiness
-deadline does not authorize a surviving child to continue uncovered. Before
-exclusive coverage can end, the child must already retain delegated coverage,
-complete a gap-free handoff to shared authority, or exit before binding state
-access, recovery, endpoint binding, or publication. The child still takes the
-provider-ownership lock. This closes the check-then-start race without
-introducing a lifecycle queue.
+The background entry point started inside an exclusive enable, rebind, or
+package-upgrade transition does not reacquire shared authority only while that
+same exclusive authority continuously covers its startup. The controller
+retains or delegates that authority without a gap through authenticated
+publication or complete failed-start cleanup and child exit. A controller
+return, crash, or readiness deadline does not authorize a surviving child to
+continue uncovered. Before exclusive coverage can end, the child must already
+retain delegated coverage, complete a gap-free handoff to shared authority, or
+exit before binding state access, recovery, endpoint binding, or publication.
+The child still takes the provider-ownership lock. This closes the
+check-then-start race without introducing a lifecycle queue.
 
 ### State binding and privacy
 
@@ -242,6 +250,49 @@ state before publishing availability. It never converts an uncertain admitted
 job into a fresh submission under the same identity. Consumers retain the
 ADR-0006 reconciliation rules.
 
+Package upgrade takes exclusive control authority before suppressing manager
+startup or changing launch artifacts. Before either mutation, it atomically and
+durably writes a bounded, owner-private, non-link regular-file record outside
+the installed package. The record contains a unique operation generation, the
+target package identity, the prior per-user enabled choice, and an incomplete
+state. While holding exclusive authority, the upgrader cancels every pending
+manager retry, prevents new shared acquisition, performs the bounded stop of
+the complete process tree, waits for provider ownership to end, and removes only the
+exact dead process registration. It keeps automatic manager launch suppressed
+while any launch artifact or executable may be incomplete.
+
+An upgrade controller that starts with an incomplete record takes exclusive
+authority and recovers that exact generation before any provider can acquire
+shared authority. It verifies package state and rolls that operation forward or
+safely restarts it; it never infers completion merely from files being present.
+It does not replace or clear an existing record with a new operation generation,
+different target, or unverified state.
+Only after the complete installed package, selected durable-state binding, and
+background entry point pass the same admission checks as a new enable may it
+restore manager launch. If the recorded prior choice was enabled, it explicitly
+starts that generation's successor under the still-held exclusive authority and
+succeeds only after authenticated readiness for the expected durable state. If
+the choice was disabled, it leaves manager launch disabled and starts no
+provider.
+
+For an enabled upgrade, the ready successor must retain delegated control
+coverage that survives controller exit before the controller clears the record.
+The controller then clears only its exact upgrade generation, atomically and
+durably, and the successor completes a gap-free downgrade or handoff to shared
+authority before the controller releases its own coverage. A controller crash
+after the clear therefore leaves the complete, authenticated successor covered;
+that successor finishes the handoff or exits with normal exact-registration
+cleanup before another acquisition can proceed. For a disabled upgrade, the
+controller clears its exact generation only after the complete installation
+passes admission and manager launch remains disabled, then releases authority.
+
+An installation or readiness failure completes failed-start cleanup, keeps
+manager launch suppressed and the upgrade record incomplete, preserves durable
+job state and the prior enabled choice for a later successful repair, and
+reports the provider visibly unavailable. A crash before the exact clear leaves
+the durable admission barrier rather than an old or partial installation that a
+new provider entry point can start.
+
 Package removal takes exclusive control authority before disabling manager
 startup or changing launch artifacts. While holding it, the remover cancels any
 pending manager retry, prevents new shared acquisition, stops the complete
@@ -288,8 +339,8 @@ Each provider implementation must exercise both sides of these boundaries:
    an open window; that owner uses new process credentials, reuses the v2
    durable identity, and reconciles accepted work without duplicate submission;
    repeated failure exercises the delay, attempt/window ceiling, and stable
-   serving reset, while disable, rebind, package removal, and intentional stop
-   during backoff do not restart;
+   serving reset, while disable, rebind, package upgrade, package removal, and
+   intentional stop during backoff do not restart;
 7. a v1 provider proves the private state-binding and serving-generation
    correlation before state-specific readiness or takeover succeeds;
 8. malformed, linked, non-private, oversized, mismatched, and changed state
@@ -307,14 +358,29 @@ Each provider implementation must exercise both sides of these boundaries:
     and leaves no live or late publisher before launch artifacts or the
     executable are removed; reinstall can safely restore the prior enabled
     choice and durable state; and
-12. a job consuming its maximum drain still leaves enough of the 35-second
+12. package upgrade raced against manager backoff, binding access, recovery,
+    endpoint binding, publication, and steady-state serving launches neither an
+    old nor partial installation; an enabled installation restarts and proves
+    authenticated readiness only after the complete successor passes admission,
+    a disabled installation starts nothing, and a failed upgrade keeps manager
+    launch suppressed while preserving the prior enabled choice and recoverable
+    durable job state; controller crashes after marker persistence, manager
+    suppression, old-owner stop, partial replacement, package admission, and
+    manager restoration preserve the exact incomplete generation, block
+    ordinary acquisition, and let only an exclusive repair finish or safely
+    restart it; after successor readiness, delegated coverage survives a crash
+    before or after the exact clear and prevents an uncovered publisher before
+    the shared-authority handoff or clean exit; generation A cannot clear,
+    overwrite, or repair generation B, and malformed or wrong-target records
+    remain fail-closed barriers; and
+13. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
     force termination at 40 seconds; forced termination leaves durable job
     state recoverable by the next owner and is followed by exact-registration
     removal by the 45-second control deadline before success or replacement;
     and
-13. Linux systemd-user and Windows per-user-task artifacts preserve the stated
+14. Linux systemd-user and Windows per-user-task artifacts preserve the stated
     user, privilege, automatic-restart, bounded-backoff, stop, and process-tree
     bounds.
 
