@@ -81,6 +81,26 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "lead.first-clean-booking",
+      "version": "1.0",
+      "action": {
+        "label": "Book first cleaning",
+        "description": "Book the first cleaning for a lead: the lead becomes won and an onboarding email draft is enqueued for office approval. Nothing is sent. Creates durable CRM state and a calendar event, and requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.first-clean-booking+json",
+          "max_bytes": 8192
+        }
+      ],
+      "produces": ["application/vnd.eom.first-clean-booking-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }
