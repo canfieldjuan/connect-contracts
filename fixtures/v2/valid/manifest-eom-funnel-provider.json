@@ -1,0 +1,46 @@
+{
+  "protocol_version": 2,
+  "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "app": {
+    "id": "eom-funnel-provider",
+    "name": "EOM Funnel Local Connect Provider",
+    "version": "0.1.0"
+  },
+  "capabilities": [
+    {
+      "id": "onboarding.public-link.list",
+      "version": "1.0",
+      "action": {
+        "label": "List issued onboarding links",
+        "description": "List durable public-onboarding tokens that remain issued for office follow-up. Read-only projection; alters no handoff, delivery, or token state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.onboarding.issued-link-list+json"],
+      "parameters": [
+        {
+          "name": "limit",
+          "value_type": "integer",
+          "required": false,
+          "label": "Limit",
+          "description": "Maximum number of issued links to return in one page."
+        },
+        {
+          "name": "cursor",
+          "value_type": "string",
+          "required": false,
+          "label": "Cursor",
+          "description": "Opaque pagination cursor returned by a prior page."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    }
+  ]
+}
