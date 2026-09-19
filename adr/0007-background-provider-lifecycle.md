@@ -207,15 +207,15 @@ guard steady-state serving.
 Before binding or manager access, every shared acquisition and every enable,
 disable, rebind, or durable-state reset or replacement control operation checks
 under its required authority for both the package-operation and
-application-private background-mode-transition and durable-state-reset records.
-An incomplete, unreadable, malformed, or wrong-target record is a durable
-barrier and makes an unrelated request fail closed before manager mutation,
-state recovery, endpoint binding, or publication. It cannot clear, overwrite,
-or order itself around that record. Only the recorded lifecycle operation
-holding its required exclusive control authority may recover the record and
-resume or safely restart the exact operation, except after the explicit
-package-removal ownership handoff defined below makes that exact package
-generation the sole recovery authority.
+application-private background-mode-transition, state-rebind-transition, and
+durable-state-reset records. An incomplete, unreadable, malformed, or
+wrong-target record is a durable barrier and makes an unrelated request fail
+closed before manager mutation, state recovery, endpoint binding, or
+publication. It cannot clear, overwrite, or order itself around that record.
+Only the recorded lifecycle operation holding its required exclusive control
+authority may recover the record and resume or safely restart the exact
+operation, except after the explicit package-removal ownership handoff defined
+below makes that exact package generation the sole recovery authority.
 
 An existing package-operation record's kind, generation, and target are
 immutable. A requested upgrade, removal, or reinstall that encounters a
@@ -249,6 +249,55 @@ exit before binding state access, recovery, endpoint binding, or publication.
 The child still takes the provider-ownership lock. This closes the
 check-then-start race without introducing a lifecycle queue.
 
+Before a child may retain delegated shared authority, access a selected binding,
+bind an endpoint, or publish while covered by a background-mode-transition,
+state-rebind-transition, or durable-state-reset record, that lifecycle record
+durably appends one monotonic child-attempt entry. The entry binds the exact
+process credentials, complete process tree, serving generation, and original
+liveness and cleanup deadlines. On controller loss or liveness expiry, exact
+recovery CASes that exact record and attempt from `child-active` to absorbing,
+generation-owned `recovery-claimed` without first acquiring or waiting on
+package, per-user, provider-ownership, publication, or admission locks. This
+exact atomic CAS is the sole narrow exception to the normal lock order and
+arbitrates against any lifecycle-record clear that would leave that exact child
+serving: such a clear may commit only while the attempt remains `child-active`,
+and whichever durable mutation loses must re-read and stop. The claim revokes
+that child's handoff permission: every resumed route remains pre-admission
+`PROVIDER_BUSY`, and the child cannot publish authenticated availability,
+consume a handoff, or clear the record.
+
+While the lifecycle record exists, the child's registration and
+application-private readiness status bind the exact operation generation and
+child-attempt identity; discovery, attribution, and every route validate that
+the attempt remains `child-active` rather than trusting the registration file
+alone. `recovery-claimed` therefore invalidates the child's publication identity
+at its durable commit. A child paused after its last check may still atomically
+place its exact registration file, but that file is fail-closed stale evidence,
+never authenticated availability; its routes remain busy and exact recovery
+removes it after force-stop. A serving-child clear is the atomic authorization
+to treat that same serving generation and registration as an ordinary
+steady-state identity, and may commit only after the active child already holds
+every required shared authority through the gap-free handoff. A later ordinary
+route validates steady-state ownership and serving identity, not the deleted
+attempt. A no-child settlement instead clears only after every recorded attempt
+has exited normally or is `recovery-claimed` with its complete process tree
+stopped, and the controller has proved every endpoint dead, provider ownership
+released, and exact registration absent. Such cleanup proof permits clear while
+the absorbing attempt remains as inert evidence inside the record; no child
+survives that clear.
+
+The same or a later exact-generation recovery controller may validate and
+resume `recovery-claimed` without a second claim. It force-stops the named
+complete process tree within the attempt's original deadlines before trying to
+acquire package or per-user authority exclusively. After the stop releases any
+child-held shared authority, recovery acquires the required exclusive
+authorities, revalidates the claim, and proves endpoint death, provider
+ownership release, and exact-registration cleanup before resuming the recorded
+forward or rollback disposition. A later startup uses a new child-attempt
+entry; no attempt leaves `recovery-claimed`. Crashes after claim, force-stop,
+exclusive acquisition, cleanup proof, or immediately before resumption recover
+the same generation and never reset a deadline.
+
 ### Crash-recoverable background-mode transition
 
 Enable and disable are durable control transitions, not two unrelated service
@@ -267,9 +316,10 @@ wrong-state, or wrong-generation record fails closed before automatic mutation.
 
 Before writing a new transition record, the controller holds its required
 package and per-user authority and requires that no package-operation,
-background-mode-transition, or durable-state-reset record already exists. An
-existing record authorizes only its own exact recovery; a new control request
-cannot infer completion from partial manager, process, or registration state.
+background-mode-transition, state-rebind-transition, or durable-state-reset
+record already exists. An existing record authorizes only its own exact
+recovery; a new control request cannot infer completion from partial manager,
+process, or registration state.
 Durable record commit is also an admission barrier: every still-live publisher
 for the selected application/state checks it before each job creation and
 returns pre-admission `PROVIDER_BUSY` until exact clear. This prevents a crash
@@ -296,8 +346,12 @@ target, restore the immutable prior manager choice, and settle failure. A
 disable record advances monotonically through `intent-recorded`,
 `publisher-stopped`, and `manager-disabled`. Exact-generation recovery under the
 same package and per-user exclusive authority idempotently resumes only the
-recorded kind, target choice, phase, and disposition. An opposite toggle,
-rebind, reset, package operation, or ordinary provider acquisition cannot
+recorded kind, target choice, phase, and disposition. The sole additional
+transition is the explicit package-removal preflight below, whose lock-free
+exact-generation CAS advances an incomplete record to absorbing
+`removal-quiesce-claimed`; after that marker control recovery may only stop and
+clean every recorded publisher and child for the matching package handoff. An
+opposite toggle, rebind, reset, package operation, or ordinary provider acquisition cannot
 overwrite, clear, retarget, or order itself around the record; it must first let
 exact recovery settle and clear that generation, except for the explicit
 package-removal ownership transfer defined below.
@@ -333,8 +387,9 @@ lease. Loss of its controller before clear makes the child keep returning
 pre-admission `PROVIDER_BUSY`, remove only its exact registration, exit, and
 release provider ownership plus every delegated shared scope within the existing
 startup-cleanup bound. Exact recovery never waits behind a surviving pre-clear
-child. After clear, the same child may complete the ordinary gap-free handoff to
-steady-state shared authority.
+child. On success, the same child completes the ordinary gap-free handoff to
+steady-state shared authority before serving-child clear authorizes its existing
+identity to continue.
 
 For disable, the controller persists intent before its first stop or manager
 mutation. It cancels pending retry, stops every background publisher tree for
@@ -360,27 +415,91 @@ operation record.
 ### State binding and privacy
 
 The service entry point reads one application-owned, owner-private binding to
-the provider's durable state. Rebind takes exclusive control authority and
-validates the target while the old binding remains authoritative. It cancels
-pending manager retry, stops every possibly live publisher for the application
-across foreground and background modes, protocol modes, and durable-state
-bindings, then proves the old endpoint dead, its exact registration absent, and
-provider ownership released before replacing the binding. If a publisher cannot
-be stopped or those facts cannot be proved within the control deadline, rebind
-fails, preserves the old binding, and starts no target publisher.
+the provider's durable state. Rebind is one crash-recoverable lifecycle
+transition, not an unrecorded forward operation followed by an optional rollback
+record. It takes exclusive control authority and validates the target while the
+old binding remains authoritative. Under the transition-admission gate
+exclusively, it performs a final no-conflicting-record check and requires that
+the source has no accepted job still covered by its query, reconciliation, or
+retention contract. A source job that wins the shared gate aborts rebind before
+record commit or a stop request and remains queryable under the source identity.
 
-Only after that proof may rebind atomically and durably replace the binding,
-read back its opened identity, and start the target under continuous control
-coverage. Binding replacement is the crash commit point: a crash before it
-leaves the old binding authoritative; a crash after it leaves the target
-authoritative, and later acquisition may use only the complete binding that
-durably survived. If target readiness fails, the controller first stops the
-target process tree and proves its endpoint dead, exact registration absent,
-and ownership released. It then atomically and durably restores and rereads the
-old binding before any old-state publisher may restart. If rollback cannot be
-proved, it starts no publisher and reports the selected state unavailable. No
-path leaves a publisher for one binding live while another binding is committed
-or restored.
+With no retained work, the controller atomically and durably writes one
+owner-private, bounded, regular non-link state-rebind-transition record outside
+both states and the mutable package, then releases the admission gate before any
+process, ownership, or publication-lock wait. The record immutably binds its
+format version, unique operation generation, installed package identity and
+artifact scope, source and target bindings and opened state identities, their
+durable instance identifiers or v1 private lifecycle correlations, prior
+manager choice, bounded observed source publisher/process-tree and exact
+registration identities, and the original deadlines for every stop phase. It
+starts with `forward` disposition and advances monotonically through
+`intent-recorded`, `source-stopped`, `target-committed`, `target-ready`, and
+`settled`. Target failure may durably select irreversible `rollback`, which
+advances through `target-stopped`, `source-restored`, and `settled`; failed
+rollback may advance only to absorbing `removal-handoff` through the package
+transfer below.
+
+Record commit is a universal acquisition and admission barrier. Every source or
+target job-creation route holds the transition-admission gate shared from record
+check through accepted-job commit and returns pre-admission `PROVIDER_BUSY`
+while the record exists. Every provider acquisition, manager retry, background
+control, durable-state control, and package operation checks the record under
+normal package-first authority and fails closed unless it is exact-generation
+rebind recovery. Each target or restored-source child appends the common exact
+child-attempt entry before binding access, publication, or delegated authority,
+so a frozen child can be claimed and force-stopped before exclusive recovery.
+
+Forward rebind cancels pending manager retry, stops every possibly live source
+publisher across foreground and background modes, protocol modes, and
+durable-state bindings, and proves the old endpoint dead, its exact registration
+absent, and provider ownership released before recording `source-stopped`. A
+publisher that cannot be stopped or cleanup that cannot be proved within the
+recorded deadline makes exact recovery select rollback while the old binding
+remains authoritative. Only after source cleanup may recovery atomically and
+durably replace and reread the binding and record `target-committed`. Binding
+replacement is the state commit point: before it only the source may be
+restored; after it only the target may move forward unless rollback is durably
+selected.
+
+If serving is required, the controller starts the target under the common child
+attempt and continuous coverage. Its routes remain busy while authenticated
+readiness is established. After readiness, it records `target-ready`, completes
+the gap-free shared-authority handoff, and clears only its exact generation with
+a serving-child clear; that clear converts the same registration and serving
+generation to ordinary steady-state identity. A choice that requires no
+publisher uses the no-child clear after complete local target admission. A crash
+at any phase leaves the record as the only recovery authority; a child never
+receives delegated shared authority before its attempt is durable.
+
+If target readiness fails, the controller takes the admission gate exclusively,
+revalidates the same generation and absence of accepted work, and durably
+selects `rollback` before its first rollback stop request. Because every target
+route has been busy since initial record commit, rollback never abandons target
+work. Exact recovery stops the target tree, proves endpoint death, ownership
+release, and exact-registration absence, atomically restores and rereads the
+source binding, and records `source-restored`. If serving is required, it appends
+a distinct rollback-source child attempt and completes authenticated readiness
+plus the shared-authority handoff before serving-child clear; otherwise it uses
+the no-child clear. Restoration, disposition selection, and exact clear each
+hold the admission gate exclusively only across their durable commit.
+
+Recovery reuses every recorded stop attempt and deadline and never changes the
+source, target, or selected disposition. Crashes after initial record commit,
+either stop, target binding commit, either child attempt, readiness, rollback
+selection, source restoration, settlement, or immediately before or after clear
+resume or observe only that exact generation. If rollback cannot be proved, it
+starts no publisher, leaves the record as a barrier, and reports the selected
+state unavailable. No path leaves a publisher for one binding live while
+another binding is committed or restored.
+
+After rollback failure, an explicit package-removal request may ask exact
+rebind recovery to advance the record durably to `removal-handoff`. From that
+point the reset removal-handoff and package state-control-handoff rules below
+apply, treating the immutable source binding and state identity as the old side
+and the failed target binding and state identity as the new side, without
+allocating or changing either identity. No other operation may consume the
+handoff.
 
 Bindings must be bounded regular files, must not be links or reparse points,
 and must contain only the minimum application-private state locator. They are
@@ -406,10 +525,11 @@ also applies ADR-0005's placement-specific registration cleanup.
 Before writing its record or making its first state, identity, manager, or
 registration mutation, the controller requires under its package-shared and
 per-user-exclusive authority that no package-operation or
-background-mode-transition or durable-state-reset record exists. Any
-incomplete, unreadable, malformed, or conflicting record makes reset fail
-closed without writing a reset record or changing manager, state, identity, or
-registration data; reset cannot clear or advance that other operation.
+background-mode-transition, state-rebind-transition, or durable-state-reset
+record exists. Any incomplete, unreadable, malformed, or conflicting record
+makes reset fail closed without writing a reset record or changing manager,
+state, identity, or registration data; reset cannot clear or advance that other
+operation.
 The controller then writes an owner-private, bounded, regular non-link durable
 reset record outside both source and target state. Its operation generation,
 installed package identity and declared artifact scope, source binding and opened
@@ -417,13 +537,29 @@ identity, old `instance_id`, expected source registration identities, target
 identity, allocated new `instance_id`, and prior manager choice are immutable.
 Its phase advances only through `source`,
 `target-prepared`, `target-committed`, then either irreversible `forward-only`
-or `rollback`; rollback may advance to absorbing `removal-handoff`, while a
-successfully recovered side advances to `settled`. No later phase reverses. The
+or `rollback`; rollback may advance to absorbing `removal-handoff` with a
+`source-or-target` resolution constraint, and `forward-only` may advance there
+with a `target-only` constraint, while a successfully recovered side advances
+to `settled`. No later phase reverses. The
 record is the acquisition barrier described above. Only exact-generation
 recovery under the same exclusive authority may advance or clear it. Unreadable,
 malformed, wrong-package, wrong-scope, wrong-binding, wrong-state,
 wrong-registration, wrong-identity, or wrong-generation data fail closed before
 automatic mutation.
+
+The controller takes the transition-admission gate exclusively across its final
+barrier recheck and durable reset-record commit, then releases that gate before
+any stop, process-exit, provider-ownership, or publication-lock wait. Every
+source job-creation route across foreground and background publishers and every
+protocol mode holds the gate shared from checking for the reset record through
+accepted-job commit. While the reset record exists, every such source route
+returns pre-admission `PROVIDER_BUSY`. A source job that commits before reset
+wins the exclusive gate is handled by the retained-work boundary below; no
+source job can commit after the record. The target likewise holds the gate
+shared across its phase check and accepted-job commit and remains busy until
+durable `forward-only`. The controller commits `forward-only` and any exact
+record clear under the gate exclusively so neither side can split its barrier
+check from job commit across an admission boundary.
 
 While holding exclusive authority, reset cancels manager retry, suppresses
 manager launch, and stops every foreground and background publisher tree that
@@ -467,21 +603,35 @@ valid.
 
 After rollback failure, an explicit package-removal request may ask exact reset
 recovery to durably advance that generation to absorbing `removal-handoff`.
-This phase makes neither state authoritative, starts neither publisher, and
-permits only the matching package-removal barrier transfer below; it does not
-permit enable, rebind, another reset, upgrade, reinstall, or ordinary provider
-acquisition. A corrected source may repair rollback before this marker, but no
-state repair or forward recovery is allowed later in that reset generation or
-before package removal completes. After completed removal, only a new reinstall
-generation carrying this exact immutable predecessor may perform the explicit
+That transition immutably records `source-or-target` resolution. This phase
+makes neither state authoritative, starts neither publisher, and permits only
+the matching package-removal barrier transfer below; it does not permit enable,
+rebind, another reset, upgrade, reinstall, or ordinary provider acquisition. A
+corrected source may repair rollback before this marker, but no state repair or
+forward recovery is allowed later in that reset generation or before package
+removal completes. After completed removal, only a new reinstall generation
+carrying this exact immutable predecessor may perform the explicit permitted
 state resolution defined below; an upgrade or ordinary reinstall cannot.
 
 After authenticated target readiness, or complete local target admission for a
 disabled choice, the controller durably advances to irreversible
-`forward-only`. Only then may the target admit a job. Recovery after that marker
-may resume or finalize only the target and never select rollback or reactivate
-the source. A crash before the marker therefore cannot strand a target job, and
-a crash after it cannot abandon that job by restoring the old identity.
+`forward-only` under the transition-admission gate as defined above. Only then
+may the target admit a job. Recovery after that marker may resume or finalize
+only the target and never select rollback or reactivate the source. A crash
+before the marker therefore cannot strand a target job, and a crash after it
+cannot abandon that job by restoring the old identity.
+
+After `forward-only`, an explicit package-removal request may ask exact reset
+recovery to quiesce every target publisher through the common claim and stop
+rules and durably advance the same generation to absorbing
+`removal-handoff` with immutable `target-only` resolution. This is not rollback:
+the target binding, new identity, and every accepted target job remain the sole
+preserved state, while the source can never be selected or reactivated. The
+handoff starts no publisher and permits only the matching package-removal
+transfer. Package removal leaves target durable state and jobs untouched; only a
+reinstall carrying this predecessor may restore the exact target identity and
+recover those jobs. Crashes before or after quiescence or handoff persistence
+resume only target-side recovery or that target-only removal disposition.
 
 Crash recovery is exact-generation and monotonic. Before the reset commit it
 may complete forward or restore only the source; after commit but before
@@ -551,25 +701,48 @@ disabled choice remains disabled and starts nothing.
 Before any package upgrade, removal, or reinstall writes a package-operation
 record or mutates a manager or package artifact, its package-exclusive and
 participant-user-exclusive authority checks every participant's
-application-private background-mode-transition and durable-state-reset records.
-Any such record makes upgrade, reinstall, and unrelated removal fail closed
-without writing a package record or changing manager or artifact state. Those
-operations cannot clear, advance, or order themselves ahead of it; exact
-per-user recovery must settle and clear it first.
+application-private background-mode-transition, state-rebind-transition, and
+durable-state-reset records. Any such record makes upgrade, reinstall, and
+unrelated removal fail closed without writing a package record or changing
+manager or artifact state. Those operations cannot clear, advance, or order
+themselves ahead of it; exact per-user recovery must settle and clear it first.
+
+An explicit removal that intends to transfer rather than settle a lifecycle
+record first asks exact recovery for that record to quiesce its children before
+the remover waits for package-exclusive or participant-user-exclusive
+authority. For a background-mode transition, exact recovery lock-free CASes the
+unchanged generation to absorbing `removal-quiesce-claimed`; that record-level
+claim prevents a new child attempt, settlement, or clear. For an eligible state
+control operation, exact recovery uses its existing `removal-handoff` phase.
+Recovery then CASes every `child-active` attempt to `recovery-claimed`,
+and the record-level claim revokes every observed pre-existing publisher's
+right to serve or clear. Exact recovery force-stops every recorded child and
+publisher process tree, including a source or background publisher frozen while
+holding the admission gate, before any package/user-exclusive or
+admission-gate-exclusive wait. It then proves every endpoint dead, ownership
+released, and exact registration absent. If lifecycle clear wins before the
+record-level claim, removal re-enumerates that participant as ordinary; if
+quiescence wins, only the matching package-removal handoff may consume it. A
+malformed, mismatched, ineligible, or partly quiesced record stays fail closed.
+This preflight changes no manager or package artifact and writes no
+package-operation record.
 
 The sole exception is an explicit removal whose complete participant map names
 every matching predecessor as exactly one of `ordinary`,
-`background-control-handoff`, or `reset-handoff`. A control handoff may copy a
-valid incomplete background-mode-transition record. A reset handoff may copy
-only a valid record already in `removal-handoff`. Every predecessor must match
-the bounded exact package participant set, installed package, artifact scope,
-and participant identity. A participant with both record kinds, a missing or
-duplicate predecessor, a reset in another phase, or unreadable, malformed, or
-mismatched data blocks removal before mutation. For a control handoff, the
-canonical `preserved_manager_choice` is derived only from immutable choices and
-durable disposition: `disable` preserves disabled, a forward `enable` preserves
-enabled, and an enable record in irreversible `rollback` preserves its recorded
-prior choice. A reset handoff preserves its recorded prior choice; an ordinary
+`background-control-handoff`, or `state-control-handoff`. A background control
+handoff may copy only a valid background-mode-transition record in
+`removal-quiesce-claimed`. A state control handoff may copy only a valid
+durable-state-reset or
+state-rebind-transition record already in `removal-handoff`. Every predecessor
+must match the bounded exact package participant set, installed package,
+artifact scope, and participant identity. A participant with more than one
+record kind, a missing or duplicate predecessor, a state-control record in
+another phase, or unreadable, malformed, or mismatched data blocks removal
+before mutation. For a background control handoff, the canonical
+`preserved_manager_choice` is derived only from immutable choices and durable
+disposition: `disable` preserves disabled, a forward `enable` preserves enabled,
+and an enable record in irreversible `rollback` preserves its recorded prior
+choice. A state control handoff preserves its recorded prior choice; an ordinary
 participant preserves the stable manager choice observed with no per-user
 record. The package choice map, typed predecessor, removal receipt, and later
 reinstall choice map MUST all contain that same canonical value. A mismatch or
@@ -577,23 +750,27 @@ an attempt to use a transitional manager bit fails before mutation.
 
 Under package-exclusive and every affected participant's user-exclusive
 authority, the remover copies every matched handoff into its normal package
-removal record. For each reset handoff it copies the participant, type, reset
-generation and phase, package target and artifact scope, source binding and
-opened identity, old `instance_id`, expected source registration identities,
-target identity, new `instance_id`, and prior manager choice. For each control
-handoff it copies the participant, type, transition kind, generation, phase and
-disposition, package and scope, binding/opened/state identity, expected
-publisher/process-tree and registration identities, prior and target manager
-choices, canonical preserved choice, and the complete stop-attempt/deadline set.
+removal record. For each state control handoff it copies the participant,
+record subtype, generation and phase, package target and artifact scope, exact
+source and target bindings and opened identities, their old/new `instance_id`
+or v1 private lifecycle correlations, expected process-tree and registration
+identities, prior manager choice, immutable `source-or-target` or `target-only`
+resolution constraint, every child-attempt entry and claim state, and every
+recorded stop attempt and deadline.
+For each background control handoff it copies the participant, type, transition
+kind, generation, phase and disposition, package and scope,
+binding/opened/state identity, expected publisher/process-tree and registration
+identities, prior and target manager choices, canonical preserved choice, every
+child-attempt entry and claim state, and the complete stop-attempt/deadline set.
 It durably commits that complete typed predecessor set and canonical package
 choice map as the atomic ownership handoff under the transition-admission gate
 exclusively before it idempotently clears any matched per-user record.
 Before that commit, each per-user record is the sole recovery authority. After
 that commit, the exact package-removal generation is the sole recovery
 authority; any still-present matching per-user record is inert predecessor
-evidence that only this package generation may clear. Exact control or reset
-recovery encountering the matching committed package record exits without
-mutation. A crash before the package commit leaves only the per-user
+evidence that only this package generation may clear. Exact background or state
+control recovery encountering the matching committed package record exits
+without mutation. A crash before the package commit leaves only the per-user
 authorities; a crash after it leaves only package recovery authority regardless
 of how many inert predecessor files remain. No executable, manager, state,
 registration, or package artifact changes before every transferred record is
@@ -601,10 +778,10 @@ cleared under that ordered barrier transfer, and upgrade or reinstall cannot
 perform this transfer.
 
 From package-record commit until every inherited publisher tree has ended, the
-package barrier also inherits each transferred control record's pre-admission
+package barrier also inherits each transferred lifecycle record's pre-admission
 gate. Every job-creation route in such a publisher returns `PROVIDER_BUSY` even
-after its per-user transition record is cleared. The remover then cancels its
-coverage, stops the tree, and proves endpoint death, ownership release, and
+after its per-user record is cleared. The remover then cancels its coverage,
+stops the tree, and proves endpoint death, ownership release, and
 exact-registration absence before package mutation.
 
 Under that same authority and before writing a new package-operation record, a
@@ -743,8 +920,8 @@ operation generation, the target installed package, the canonical preserved
 manager choice map, the optional complete typed lifecycle-predecessor set
 transferred above, and an
 incomplete state. A transferred participant's preserved choice comes from its
-reset or background-mode-transition predecessor, never the already-suppressed
-manager. While holding exclusive authority, the remover cancels
+state-control or background-mode-transition predecessor, never the
+already-suppressed manager. While holding exclusive authority, the remover cancels
 every pending manager retry, prevents new shared acquisition, stops every
 complete provider process tree without the ordinary job drain, waits for every
 ownership to end, and removes only each exact dead process registration. It
@@ -763,11 +940,12 @@ receipt or a package-operation-protected bounded receipt set outside the removed
 package. Each receipt binds its participant and the exact package-operation kind
 and generation whose removal or absorbing removal disposition produced package
 absence, and copies that participant's canonical `preserved_manager_choice` for
-a later reinstall. For a participant with a transferred predecessor, the receipt also
-carries that participant's complete immutable typed predecessor copied into the
-package record. A reset predecessor leaves both state epochs and every durable
-job untouched; a background-control predecessor changes no provider state or
-job. That producer identity is the completed removal generation for
+a later reinstall. For a participant with a transferred predecessor, the
+receipt also carries that participant's complete immutable typed predecessor
+copied into the package record. A state-control predecessor leaves both state
+epochs and every durable job untouched; a background-control predecessor
+changes no provider state or job. That producer identity is the completed
+removal generation for
 receipt validation even when the immutable operation kind is upgrade or
 reinstall. A
 crash after any receipt but before the complete receipt set and exact clear
@@ -822,18 +1000,23 @@ infer a choice from manager state, or start a provider before complete-package
 admission. After admission it settles that enabled or disabled choice through
 the ordinary service-session rule.
 
-For each participant carrying a reset-handoff predecessor, installed package
-bits do not settle that participant. The reinstall controller keeps manager
-launch suppressed and provider acquisition blocked until an explicit
-state-resolution choice selects either the predecessor's exact source binding,
-opened identity, and old `instance_id`, or its exact target identity and new
-`instance_id`. Before binding mutation it durably records that immutable choice
-in the reinstall record, validates and admits the selected state without
+For each participant carrying a state-control-handoff predecessor, installed
+package bits do not settle that participant. The reinstall controller keeps
+manager launch suppressed and provider acquisition blocked until an explicit
+state-resolution choice selects an identity permitted by the predecessor's
+immutable constraint. `source-or-target` permits either the exact source
+binding, opened identity, and old `instance_id` or v1 correlation, or the exact
+target binding, opened identity, and new `instance_id` or v1 correlation;
+`target-only` permits only that exact target tuple and preserves its jobs. A
+forbidden source choice fails before binding, manager, state, or job mutation.
+Before binding mutation the controller durably records the permitted immutable
+choice in the reinstall record, validates and admits the selected state without
 reinterpreting or deleting durable jobs, and proves the opposing publisher and
 registrations absent. Only then may it apply the predecessor's recorded prior
 manager choice and perform ordinary disabled, deferred-enabled, or authenticated
-settlement. It cannot invent a new state, infer a choice from package presence or
-manager state, or clear, tombstone, or retire the predecessor while unresolved.
+settlement. It cannot invent a new state, infer a choice from package presence
+or manager state, or clear, tombstone, or retire the predecessor while
+unresolved.
 
 Installation or readiness failure keeps manager launch suppressed and the
 reinstall record incomplete for exact recovery. It never treats a receipt or
@@ -887,7 +1070,8 @@ removes the failed target and partial artifacts, and leaves durable jobs
 untouched. For each recorded participant, it atomically and durably pairs that
 participant's matching predecessor-receipt consumption with a replacement
 removal receipt outside the package, bound to this reinstall generation and
-preserving the exact choice and any unresolved reset-handoff predecessor.
+preserving the exact choice and any unresolved state-control-handoff
+predecessor.
 Completed participant pairs are idempotent under
 the still-incomplete reinstall record. Only after every target artifact is
 absent and the complete replacement receipt set is durable may recovery clear
@@ -934,9 +1118,19 @@ Each provider implementation must exercise both sides of these boundaries:
    window may restore its provider through ordinary acquisition. Success clears
    before the target admits work. Controller loss after target publication or
    readiness makes the pre-clear child remove its exact registration, exit, and
-   release delegated scopes before exclusive recovery proceeds. The source-stop
-   and rollback-target-stop phases use distinct persisted attempts and deadlines;
-   repeated crashes never reset either phase's clock;
+   release delegated scopes before exclusive recovery proceeds. Freeze the child
+   while it holds each delegated shared scope before and after readiness: exact
+   recovery CASes that attempt to `recovery-claimed` before an exclusive lock
+   wait, force-stops the exact recorded process tree, then acquires exclusive
+   authority and proves cleanup. Crashes after claim, force-stop, exclusive
+   acquisition, cleanup proof, and immediately before resumption recover the
+   same generation; a resumed child cannot admit work, publish authenticated
+   availability, hand off, or clear. Freeze immediately before and after atomic
+   registration publication: after the claim any late exact file fails
+   attribution, every route stays busy, and recovery removes it. Wrong or reused
+   process credentials fail closed. The source-stop and
+   rollback-target-stop phases use distinct persisted attempts and deadlines;
+   repeated crashes never reset any phase or child-attempt clock;
 5. disable durably records intent before its first stop or manager mutation,
    drains or bounds the admitted job, removes the exact registration, proves
    ownership released, and persists the manager's disabled choice before exact
@@ -969,17 +1163,29 @@ Each provider implementation must exercise both sides of these boundaries:
    then per-user-exclusive ordering, while an ownership waiter releases both
    shared scopes before backoff;
 10. a controller return, crash, or readiness deadline during child startup
-   leaves no uncovered package or per-user authority interval, late publisher,
-   overlapping control mutation, or foreground restoration before the child has
-   stopped;
+   leaves no uncovered package or per-user authority interval, late
+   authenticated publisher, overlapping control mutation, or foreground
+   restoration before the child has stopped;
 11. rebind raced against foreground and background publishers stops every
-    current publisher and proves its endpoint dead, exact registration absent,
-    and ownership released before committing the target binding; a stop timeout
-    preserves the old binding and starts no target, while crashes before and
-    after the binding commit recover only the binding that durably survived;
-    target-readiness failure stops and proves the target absent before restoring
-    the old binding, rollback failure starts neither state, and crashes during
-    rollback never produce readiness attributed to the wrong durable state;
+    current publisher under one durable transition written before the first
+    stop or binding mutation. Pause a source route after its barrier check: if
+    it commits first, retained work aborts rebind before record creation; if the
+    record commits first, every source and target route returns `PROVIDER_BUSY`
+    and persists nothing until exact clear. Rebind proves the source endpoint
+    dead, exact registration absent, and ownership released before committing
+    the target binding; a stop timeout selects rollback with the old binding
+    still authoritative. Crashes after initial record commit, source stop,
+    target-binding commit, target attempt, readiness, shared handoff, rollback
+    selection, target cleanup, source restoration, source attempt, and exact
+    clear resume only the recorded phase and deadlines. Freeze a forward target
+    during handoff or a rollback source before clear: recovery claims the exact
+    attempt without a lock wait, force-stops it before exclusive acquisition,
+    and a later controller resumes that same claim. A late registration remains
+    unauthenticated and busy until exact cleanup. Rollback failure starts neither
+    state and leaves its universal barrier; explicit removal transfers every
+    child attempt only in the matching `removal-handoff`, and unrelated
+    acquisition, retry, lifecycle control, or package mutation cannot consume
+    it or produce readiness attributed to the wrong durable state;
 12. durable-state reset or replacement raced against foreground and background
     acquisition, manager retry, source job recovery, endpoint binding,
     publication, and steady serving persists its exact reset record and cancels
@@ -988,6 +1194,19 @@ Each provider implementation must exercise both sides of these boundaries:
     publication lock, and registration absence is proved afterward on Linux and
     Windows. Any source job still inside its query, reconciliation, or retention
     contract aborts reset and remains queryable under the source identity.
+    Pause a source route after its record check: reset cannot commit until that
+    route commits or releases its shared admission gate. If the source wins, the
+    retained job aborts reset and remains queryable; if reset wins, every source
+    route across both publisher modes and all protocols returns `PROVIDER_BUSY`
+    and persists nothing. Crashes after reset-record commit but before source
+    stop preserve that result. The target remains busy immediately before
+    `forward-only` and may admit immediately after its gated commit; a restored
+    rollback source remains busy until gated exact clear.
+    Freeze the target child before and after readiness or immediately before
+    `forward-only`: exact reset recovery claims its recorded attempt before a
+    lock wait, force-stops it before exclusive acquisition, and either resumes
+    the same target generation or selects rollback only where the phase permits;
+    a late exact registration never authenticates or admits work.
     Crashes after record persistence, old cleanup, target and new-ID preparation,
     the atomic reset commit, target publication or readiness, immediately before
     and after `forward-only`, rollback selection or commit, and exact clear
@@ -999,17 +1218,22 @@ Each provider implementation must exercise both sides of these boundaries:
     and no old-ID publisher appears after forward settlement. Target failure
     before the marker proves it absent before restoring the source, rollback
     failure starts neither side, and exact recovery can retry the same rollback.
-    Explicit removal requests after rollback failure persist
-    `removal-handoff`; with two or more handoff participants and an ordinary
+    Explicit removal after rollback failure persists `removal-handoff` with
+    `source-or-target` resolution. Separately, after `forward-only`, let the
+    target accept a job and then make exact target readiness unrecoverable:
+    explicit removal quiesces the target and persists `removal-handoff` with
+    `target-only` resolution, preserves that job and new identity, and never
+    reactivates the source. With two or more handoff participants and an ordinary
     third participant, one matching package remover validates the complete
-    handoff set and durably copies every immutable state/identity field and prior
-    choice into its removal record before clearing any reset record. Crashes
-    before and after each clear retain a complete authority with no prior package
-    mutation, and every affected removal receipt retains its exact predecessor.
-    Upgrade, unrelated removal, ordinary acquisition, and state repair cannot
-    consume the handoff; reinstall copies it, keeps launch blocked, and requires
-    an explicit exact source-or-target resolution before settlement. A live
-    different-state owner is not displaced,
+    handoff set and durably copies every immutable state/identity field,
+    resolution constraint, and prior choice into its removal record before
+    clearing any reset record. Crashes before and after each clear retain a
+    complete authority with no prior package mutation, and every affected
+    removal receipt retains its exact predecessor. Upgrade, unrelated removal,
+    ordinary acquisition, and state repair cannot consume the handoff; reinstall
+    copies it, keeps launch blocked, permits either exact state only for
+    `source-or-target`, and rejects the source before mutation for `target-only`.
+    A live different-state owner is not displaced,
     and malformed or mismatched records remain barriers. After a reset
     controller crash, unrelated enable, disable, rebind, and package operations
     fail before mutation until exact reset recovery clears the record;
@@ -1079,10 +1303,12 @@ Each provider implementation must exercise both sides of these boundaries:
 16. package reinstall persists a new exact generation after removal clear and
     before the first replacement artifact, copies the exact participant and
     choice map plus every carried typed lifecycle predecessor, and consumes only
-    its matching receipt set. A participant with a reset predecessor remains
-    blocked after package admission until an explicit exact source-or-target choice is
-    durably recorded, admitted without deleting jobs, and authenticated to the
-    selected durable state;
+    its matching receipt set. A participant with a state-control predecessor
+    remains blocked after package admission until an explicit exact choice
+    permitted by its `source-or-target` or `target-only` constraint is durably
+    recorded, admitted without deleting jobs, and authenticated to the selected
+    durable state; a forbidden source choice for `target-only` fails before
+    mutation;
     package presence or manager state cannot select it. Crashes before and after
     that choice preserve the same unresolved or selected identity, and an
     absorbing removal carries an unresolved predecessor into the replacement
@@ -1149,22 +1375,32 @@ Each provider implementation must exercise both sides of these boundaries:
     user, privilege, automatic-restart, bounded-backoff, stop, and process-tree
     bounds; and
 19. a shared-scope explicit removal races mixed ordinary participants,
-    background-control handoffs, and reset handoffs across at least two users.
-    Durable commit of its complete typed predecessor and canonical choice maps
-    is the atomic ownership handoff: before commit the per-user record owns
-    recovery; after commit only the exact package generation owns it and any
-    uncleared predecessor is inert evidence. Crashes before and after commit and
-    each predecessor clear leave one complete recovery authority. A transferred
-    forward enable from prior-disabled reinstalls enabled, enable rollback
-    reinstalls the prior disabled choice, and disable from prior-enabled
-    reinstalls disabled; the package map, receipt, reinstall map, and typed
-    predecessor agree exactly. A ready enable child continues to return
-    `PROVIDER_BUSY` from package commit through process termination even after
-    its per-user record is cleared. Same-user duplicate or mixed predecessors,
-    missing participants, malformed data, and wrong package, scope, binding,
-    state, generation, or choice fail before manager or artifact mutation.
-    Reinstall consumes only matching receipts and retains the explicit
-    source-or-target resolution boundary for reset predecessors.
+    background-control handoffs, and reset or rebind state-control handoffs
+    across at least two users. Before waiting for package-exclusive authority,
+    freeze both a ready lifecycle child holding each shared scope and an
+    inherited foreground or background publisher while its job route holds the
+    admission gate shared. Exact record recovery first commits
+    `removal-quiesce-claimed` or validates `removal-handoff`, claims every child
+    attempt, force-stops every recorded child and publisher tree, and proves
+    cleanup before any exclusive gate or control-lock wait. The record-level
+    claim prevents a replacement publisher, child, or lifecycle clear from
+    racing the later exclusive acquisition. Durable commit
+    of the complete typed predecessor, child-attempt, claim-state, and canonical
+    choice maps is the atomic ownership handoff: before commit the per-user
+    record owns recovery; after commit only the exact package generation owns it
+    and any uncleared predecessor is inert evidence. Crashes before and after
+    quiescence, package commit, and each predecessor clear leave one complete
+    recovery authority. A transferred forward enable from prior-disabled
+    reinstalls enabled, enable rollback reinstalls the prior disabled choice,
+    and disable from prior-enabled reinstalls disabled; the package map, receipt,
+    reinstall map, and typed predecessor agree exactly. A late enable-child
+    registration remains unauthenticated and returns `PROVIDER_BUSY` from
+    quiescence through process termination even after its per-user record is
+    cleared. Same-user duplicate or mixed predecessors, missing participants,
+    malformed data, and wrong package, scope, binding, state, generation, or
+    choice fail before manager or artifact mutation. Reinstall consumes only
+    matching receipts and retains each state-control predecessor's explicit
+    `source-or-target` or `target-only` resolution boundary.
 
 Installed-artifact evidence is platform-specific. A Linux proof does not
 establish Windows behavior, and package construction alone does not establish
