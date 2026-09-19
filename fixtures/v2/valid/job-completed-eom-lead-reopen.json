@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "f3f3f3f3-3333-4333-8333-f3f3f3f3f3f3",
+  "capability": {
+    "id": "lead.reopen",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T09:00:00Z",
+  "updated_at": "2026-09-19T09:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "a7a7a7a7-3333-4333-8333-a7a7a7a7a7a7",
+      "media_type": "application/vnd.eom.lead-reopen+json",
+      "byte_size": 53,
+      "sha256": "5344f9c7270c7b3ac253fe5b1dc31fdddfc2fb4475931684cbc005a9f86cf54c"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "b7b7b7b7-3333-4333-8333-b7b7b7b7b7b7",
+        "media_type": "application/vnd.eom.lead-reopen-receipt+json",
+        "display_name": "lead-reopen-receipt.json",
+        "byte_size": 107,
+        "sha256": "c1226aeedf17ce2dc3c28777295b6858f3fe2a8f0f73cf32a60e5c3c9c02110a",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwiY29udGFjdF9pZCI6ImU3ZTdlN2U3LTMzMzMtNDMzMy04MzMzLWU3ZTdlN2U3ZTdlNyIsInN0YXR1cyI6InJlb3BlbmVkIn0="
+      }
+    ]
+  }
+}

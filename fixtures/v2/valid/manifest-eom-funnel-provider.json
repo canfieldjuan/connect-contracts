@@ -161,6 +161,46 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "lead.lost",
+      "version": "1.0",
+      "action": {
+        "label": "Mark lead lost",
+        "description": "Disposition a lead that will not convert with a reason code and optional note; it leaves the review queue. A won lead first cancels its persisted first-clean calendar event and revokes its unsent onboarding draft, so it is never reported lost after an uncertain teardown. Idempotent by the operation key. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.lead-loss+json",
+          "max_bytes": 2048
+        }
+      ],
+      "produces": ["application/vnd.eom.lead-loss-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "lead.reopen",
+      "version": "1.0",
+      "action": {
+        "label": "Reopen lost lead",
+        "description": "Return a previously-lost lead to its pre-loss active stage. Idempotent by the operation key; a lead that is not lost cannot be reopened. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.lead-reopen+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.lead-reopen-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }
