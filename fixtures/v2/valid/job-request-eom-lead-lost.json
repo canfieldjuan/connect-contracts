@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "f1f1f1f1-1111-4111-8111-f1f1f1f1f1f1",
+  "capability": {
+    "id": "lead.lost",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "a5a5a5a5-1111-4111-8111-a5a5a5a5a5a5",
+      "media_type": "application/vnd.eom.lead-loss+json",
+      "byte_size": 149,
+      "sha256": "721a5ed01302e6263be83295893b32221f97606a48729d33784b86e0bc042a7a",
+      "display_name": "lead-loss.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

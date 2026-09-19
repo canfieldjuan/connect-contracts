@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "f4f4f4f4-4444-4444-8444-f4f4f4f4f4f4",
+  "capability": {
+    "id": "lead.reopen",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-19T09:00:00Z",
+  "updated_at": "2026-09-19T09:00:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "a8a8a8a8-4444-4444-8444-a8a8a8a8a8a8",
+      "media_type": "application/vnd.eom.lead-reopen+json",
+      "byte_size": 53,
+      "sha256": "7143ac96edc5f4d0d7e39f171774be5093f5f136e9d980b24bd9dbee3b064cea"
+    }
+  ],
+  "error": {
+    "code": "EOM_LEAD_NOT_REOPENABLE",
+    "message": "The EOM lead is not lost and cannot be reopened.",
+    "retryable": false
+  }
+}

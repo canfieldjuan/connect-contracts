@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "f3f3f3f3-3333-4333-8333-f3f3f3f3f3f3",
+  "capability": {
+    "id": "lead.reopen",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "a7a7a7a7-3333-4333-8333-a7a7a7a7a7a7",
+      "media_type": "application/vnd.eom.lead-reopen+json",
+      "byte_size": 53,
+      "sha256": "5344f9c7270c7b3ac253fe5b1dc31fdddfc2fb4475931684cbc005a9f86cf54c",
+      "display_name": "lead-reopen.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
