@@ -1,0 +1,21 @@
+{
+  "protocol_version": 2,
+  "job_id": "ce903c54-aa2f-4a07-9608-515557e1a95b",
+  "capability": {
+    "id": "customer.post-clean-onboarding-candidate.list",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "f9f4edd6-f471-418f-9850-9fa2633c3df3",
+      "media_type": "application/json",
+      "byte_size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "display_name": "post-clean-onboarding-candidate-list-query.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {
+    "limit": 25
+  }
+}

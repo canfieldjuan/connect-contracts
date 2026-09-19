@@ -463,6 +463,101 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "customer.first-clean-completion.record",
+      "version": "1.0",
+      "action": {
+        "label": "Record first clean completion",
+        "description": "Record actual first-clean evidence for a customer and derive its non-sendable post-clean candidate. Idempotent by the operation key; a contact that is not an active customer is refused. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.first-clean-completion+json",
+          "max_bytes": 2048
+        }
+      ],
+      "produces": ["application/vnd.eom.first-clean-completion-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "customer.post-clean-onboarding-candidate.create",
+      "version": "1.0",
+      "action": {
+        "label": "Create post-clean onboarding candidate",
+        "description": "Atomically create or reuse the distinct non-sendable post-clean onboarding candidate for one first-clean completion. A semantic name on the same route as the completion record; the same operation-key idempotency and active-customer precondition apply. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.post-clean-onboarding-candidate-request+json",
+          "max_bytes": 2048
+        }
+      ],
+      "produces": ["application/vnd.eom.post-clean-onboarding-candidate+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "customer.post-clean-onboarding-candidate.list",
+      "version": "1.0",
+      "action": {
+        "label": "List post-clean onboarding candidates",
+        "description": "List pending non-sendable post-clean onboarding candidates. Read-only projection; reading creates no customer side effects."
+      },
+      "accepts": [
+        {
+          "media_type": "application/json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.post-clean-onboarding-candidate-list+json"],
+      "parameters": [
+        {
+          "name": "limit",
+          "value_type": "integer",
+          "required": false,
+          "label": "Limit",
+          "description": "Maximum number of candidates to return in one page."
+        },
+        {
+          "name": "cursor",
+          "value_type": "string",
+          "required": false,
+          "label": "Cursor",
+          "description": "Opaque pagination cursor returned by a prior page."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "customer.post-clean-service-commitment.decide",
+      "version": "1.0",
+      "action": {
+        "label": "Decide post-clean service commitment",
+        "description": "Record the one-time or recurring service-commitment decision for a post-clean candidate before card eligibility. Idempotent by the operation key; a candidate already decided differently is refused. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.post-clean-service-commitment+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.post-clean-service-commitment-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }

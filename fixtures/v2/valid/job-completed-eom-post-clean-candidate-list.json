@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "ce903c54-aa2f-4a07-9608-515557e1a95b",
+  "capability": {
+    "id": "customer.post-clean-onboarding-candidate.list",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T13:00:00Z",
+  "updated_at": "2026-09-19T13:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "f9f4edd6-f471-418f-9850-9fa2633c3df3",
+      "media_type": "application/json",
+      "byte_size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "4d6fd50b-ec75-43db-b9c3-4669f91d6a96",
+        "media_type": "application/vnd.eom.post-clean-onboarding-candidate-list+json",
+        "display_name": "post-clean-onboarding-candidate-list.json",
+        "byte_size": 421,
+        "sha256": "f6bcd66c969996481064ce8b0440957e975ae161e4aeeddd1aa3a80d5c29d231",
+        "payload_base64": "eyJjYW5kaWRhdGVzIjpbeyJjYW5kaWRhdGVJZCI6ImE4ODUwM2Y3LThlNGQtNGY0ZC04ZTVjLTlmNTA3NzNkZDUwYSIsImNvbXBsZXRpb25SZWNlaXB0SWQiOiI3YmM3MDNhYS1hMTRjLTRhMDEtYjQ2MC04MjczMDc4NjI0YWUiLCJjb250YWN0SWQiOiI1NzNmZWNlNi1lYWIyLTQ5N2MtYTRiNC1jNGVjOTJlYmE3ZWMiLCJoYW5kb2ZmSWQiOiJkMzgyZGI3Zi1jZmYxLTQ3YjAtOGFiMS1kZjJhMGQ4NjhiMTkiLCJzdGF0dXMiOiJwZW5kaW5nIiwiZnVsbE5hbWUiOiJKb3JkYW4gUml2ZXJhIiwicmVjaXBpZW50RW1haWwiOiJqb3JkYW5AZXhhbXBsZS5jb20iLCJibG9ja2VyIjpudWxsLCJ0cmFja2VyU2VydmljZUtpbmQiOiJqb2IifV0sImxpbWl0IjoyNSwiY3Vyc29yIjpudWxsLCJoYXNfbW9yZSI6ZmFsc2UsIm5leHRfY3Vyc29yIjpudWxsfQ=="
+      }
+    ]
+  }
+}

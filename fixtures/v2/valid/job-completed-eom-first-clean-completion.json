@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "91f4ebef-e52a-4bfb-8987-38f4ebf8f13e",
+  "capability": {
+    "id": "customer.first-clean-completion.record",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T13:00:00Z",
+  "updated_at": "2026-09-19T13:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "39112907-3618-4d63-91e0-4649edb0e2e7",
+      "media_type": "application/vnd.eom.first-clean-completion+json",
+      "byte_size": 197,
+      "sha256": "139cf2937c1ca65c7a506f0e19bb4d2f47da56ef845080abf59efd55262ec311"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "493af721-a774-4a47-a630-01b969469bc2",
+        "media_type": "application/vnd.eom.first-clean-completion-receipt+json",
+        "display_name": "first-clean-completion-receipt.json",
+        "byte_size": 224,
+        "sha256": "6c3ca4c23617c31ece1b34ed62b92dbcecfde55608873907bdbe54404a6a2b57",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwiY29udGFjdF9pZCI6IjNkMWRhMmI2LTNjZmYtNDNiZS05ODNkLTk4YzdmNGNiMjZkOCIsImNvbXBsZXRpb25fcmVjZWlwdF9pZCI6IjZhYWI3NWM0LTIxOGYtNGYzMy1hNzczLTM5ODMzMjU3OGQ5ZSIsImNhbmRpZGF0ZV9pZCI6ImU0Zjc1OTU1LWQ4MDgtNGFhZS1hZmFjLWIxOTQyNTNlNzU3MSIsInN0YXR1cyI6InJlY29yZGVkIn0="
+      }
+    ]
+  }
+}

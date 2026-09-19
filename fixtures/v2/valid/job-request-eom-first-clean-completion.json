@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "91f4ebef-e52a-4bfb-8987-38f4ebf8f13e",
+  "capability": {
+    "id": "customer.first-clean-completion.record",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "39112907-3618-4d63-91e0-4649edb0e2e7",
+      "media_type": "application/vnd.eom.first-clean-completion+json",
+      "byte_size": 197,
+      "sha256": "139cf2937c1ca65c7a506f0e19bb4d2f47da56ef845080abf59efd55262ec311",
+      "display_name": "first-clean-completion.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
