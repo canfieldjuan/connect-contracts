@@ -667,16 +667,67 @@ every recorded participant is disabled, deferred-enabled, or authenticated on
 the expected durable state.
 
 For every participant started in an available service session, the ready
-successor must retain delegated control coverage that survives controller exit
-before the controller clears the record. The controller then clears only its
-exact upgrade generation, atomically and durably, and every started successor
-completes a gap-free downgrade or handoff to shared authority before the
-controller releases its own coverage. A controller crash after the clear
-therefore leaves each complete, authenticated successor covered; each successor
-finishes the handoff or exits with normal exact-registration cleanup before
-another acquisition can proceed. Participants settled as disabled or
-deferred-enabled have no process to cover; their durable manager choices must
-already match the record before clear.
+successor remains covered by the controller's package and user authorities while
+the package record is incomplete. Pre-clear blocking authority is never
+inherited by or delegated to the child. Controller death therefore releases
+those process-scoped authorities without child cooperation. The child watches an
+authenticated controller-liveness channel; on loss before exact clear it stops
+serving, removes only its exact registration, releases provider ownership, and
+exits within the startup-cleanup bound. A hung child cannot block acquisition of
+exclusive control: exact recovery acquires the controller-owned authorities,
+force-stops that recorded process tree within the existing control deadlines,
+proves endpoint death, ownership release, and exact-registration cleanup, and
+then resumes the generation.
+
+The atomic durable commit that clears the exact package generation replaces
+controller coverage with one post-clear successor-handoff barrier per started
+participant. Each barrier is bound to the package generation, participant,
+exact child process credentials, durable state, binding, serving generation, and
+one persisted nonrenewable handoff attempt and deadline. Crashes never reset the
+deadline; uncertain remaining time is treated as expired. The barrier is
+universally checked by provider acquisition, background control, durable-state
+control, and every package operation under the normal package-first authority
+order. It is not a manager choice and grants no job admission by itself.
+
+The named, already-ready child first CASes `pending` to `child-claimed` before
+acquiring shared package/user authority. After acquisition it revalidates the
+same claim and deadline, then consumes the barrier while still holding shared
+authority; job admission remains `PROVIDER_BUSY` until that durable consumption
+commits. If consumption wins, shared authority covers the first instant without
+the barrier. If the child crashes or freezes after claiming or after acquiring
+shared authority, the still-durable barrier continues to block every competing
+path.
+
+The controller releases its own coverage only after the barrier commit. A crash
+after commit therefore leaves durable mutually exclusive coverage while the
+exact child finishes shared acquisition; a crash before commit leaves no barrier
+and recovery handles the pre-clear child as above. On child death, liveness loss,
+or handoff-deadline expiry, exact barrier recovery CASes `pending` or
+`child-claimed` to `recovery-claimed` before waiting on package/user authority.
+That durable claim revokes the child's handoff permission: every child route
+continues returning `PROVIDER_BUSY`, it cannot consume the barrier, and it must
+release shared authority and exit if it resumes.
+
+`recovery-claimed` is an absorbing phase owned by the immutable package/barrier
+generation, not by the process that won the CAS. It authorizes exact-generation
+recovery to force-stop the named complete process tree before exclusive lock
+acquisition. Any later recovery controller that validates the same package,
+generation, participant, child credentials, binding, durable state, and serving
+generation idempotently resumes that stop; it does not need or attempt a second
+claim transition.
+
+After the stop releases any child-held shared locks, recovery acquires exclusive
+package/user authority, revalidates the unchanged `recovery-claimed` barrier,
+proves endpoint death, ownership release, and exact-registration cleanup, and
+CAS-deletes only that barrier. Crashes after the recovery CAS, force-stop,
+exclusive acquisition, cleanup proof, or immediately before deletion resume the
+same phase; a crash after exact deletion observes no barrier and performs no
+stale cleanup. If barrier consumption beat the recovery CAS, no recovery claim
+exists and the child's already-held shared authority remains the ordinary
+coverage. Malformed, mismatched, duplicate, expired-but-unclaimed, or unowned
+barriers remain fail-closed. Participants settled as disabled or deferred-enabled
+have no child or handoff barrier; their durable manager choices must already
+match the record before clear.
 
 An installation or readiness failure completes failed-start cleanup, keeps
 manager launch suppressed and the upgrade record incomplete, preserves durable
@@ -1009,7 +1060,22 @@ Each provider implementation must exercise both sides of these boundaries:
     receipt, successor readiness, and before or after exact clear resume only the
     recorded disposition. A new upgrade cannot overwrite or retarget it, a user
     removal request can only advance its recovery to removal, and malformed,
-    wrong-scope, wrong-participant, or wrong-target records remain barriers;
+    wrong-scope, wrong-participant, or wrong-target records remain barriers.
+    Controller loss after successor readiness but before exact clear makes each
+    child remove its registration and release ownership, while controller-owned
+    package/user locks disappear without child cooperation and exclusive
+    recovery can force-stop a hung child. Loss after the atomic clear leaves the
+    exact universally checked successor-handoff barrier until the named child
+    completes shared acquisition and durable consumption or exact recovery CASes
+    `recovery-claimed`, force-stops it before exclusive acquisition, then proves
+    cleanup. Freeze/crash cuts at `pending`, `child-claimed`, after shared lock
+    acquisition but before consumption, `recovery-claimed`, and immediately
+    after consumption leave the barrier or shared lock as complete coverage. No
+    competing acquisition or package mutation crosses either cut. Recovery
+    crashes after its CAS, force-stop, exclusive acquisition, cleanup proof, and
+    immediately before or after exact barrier deletion are resumed by a new
+    controller from the same generation-owned phase without resetting the
+    deadline or requiring the prior recovery process;
 16. package reinstall persists a new exact generation after removal clear and
     before the first replacement artifact, copies the exact participant and
     choice map plus every carried typed lifecycle predecessor, and consumes only
@@ -1061,7 +1127,17 @@ Each provider implementation must exercise both sides of these boundaries:
     or wrong-target recovery remains a barrier. Active, disabled, and
     deferred-enabled participants preserve their exact choice without requiring
     a logged-out user to become ready, and retirement deletes only predecessor
-    receipts, never the replacement set;
+    receipts, never the replacement set. Reinstall successor children exercise
+    the same controller-loss cuts immediately before and after atomic clear:
+    controller-owned pre-clear scopes release without child cooperation and a
+    hung child is force-stopped, while only a child named by the committed
+    post-clear successor-handoff barrier may survive to finish shared
+    acquisition. Frozen-child races before shared acquisition and after shared
+    acquisition but before durable consumption prove recovery claims the barrier
+    before force-stop and that the barrier blocks every competing package,
+    control, and provider acquisition until exact consumption or cleanup. The
+    same recovery crash cuts after claim, stop, exclusive acquisition, cleanup,
+    and before/after deletion resume idempotently under the reinstall generation;
 17. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
