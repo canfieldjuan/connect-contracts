@@ -1101,7 +1101,9 @@ provider state after success or failure.
 
 ### Required acceptance evidence
 
-Each provider implementation must exercise both sides of these boundaries:
+Each provider implementation must exercise both sides of each applicable
+boundary for every protocol mode it supports and for the immutable artifact
+scope declared by each installed package under test:
 
 1. first install is disabled; explicit enable persists and serves after the
    window closes;
@@ -1237,12 +1239,16 @@ Each provider implementation must exercise both sides of these boundaries:
     and malformed or mismatched records remain barriers. After a reset
     controller crash, unrelated enable, disable, rebind, and package operations
     fail before mutation until exact reset recovery clears the record;
-13. two distinct OS users exercise both artifact scopes: per-user artifacts
-    operate independently, while a shared-artifact package mutation by user A
-    races user B's enable, disable, rebind, durable-state reset or replacement,
-    live provider, startup, backoff, login, and logout under package-first
-    authority and one package barrier; no new control or acquisition succeeds
-    after barrier persistence and every
+13. two distinct OS users exercise the package's declared artifact scope. For
+    a per-user-scope package, each user's executable, launch artifacts,
+    operation records, manager, control authority, provider process,
+    registration, and lifecycle mutations remain private and independent while
+    user A races user B's enable, disable, rebind, durable-state reset or
+    replacement, live provider, startup, backoff, login, and logout; neither
+    user can block, mutate, discover, or satisfy the other's lifecycle state.
+    For a shared-scope package, a package mutation by user A races those user B
+    operations under package-first authority and one package barrier; no new
+    control or acquisition succeeds after barrier persistence and every
     recorded participant's manager, process tree, ownership, and exact
     registration end before artifact mutation. Failure to enumerate, suppress,
     or quiesce user B leaves artifacts unchanged and the barrier incomplete. A
