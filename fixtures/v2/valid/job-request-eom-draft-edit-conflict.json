@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "47c955bd-1ab3-44c0-aef4-7cd7c84c91e1",
+  "capability": {
+    "id": "onboarding.draft.edit",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "ce5881a1-1144-4d7a-84c6-ea530664f341",
+      "media_type": "application/vnd.eom.onboarding-draft-edit+json",
+      "byte_size": 72,
+      "sha256": "73faf8b58053064ba3f91ccdfb94ef960f8af4b82cdc4e58d627329087517694",
+      "display_name": "onboarding-draft-edit.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
