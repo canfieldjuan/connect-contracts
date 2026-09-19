@@ -294,15 +294,18 @@ fail closed without writing a reset record or changing manager, state, identity,
 or registration data; reset cannot clear or advance that package operation.
 The controller then writes an owner-private, bounded, regular non-link durable
 reset record outside both source and target state. Its operation generation,
-source binding and opened identity, old `instance_id`, expected source registration
-identities, target identity, allocated new `instance_id`, and prior manager
-choice are immutable. Its phase advances only through `source`,
+installed package identity and declared artifact scope, source binding and opened
+identity, old `instance_id`, expected source registration identities, target
+identity, allocated new `instance_id`, and prior manager choice are immutable.
+Its phase advances only through `source`,
 `target-prepared`, `target-committed`, then either irreversible `forward-only`
-or `rollback`, and finally `settled`; no later phase reverses. The record is the
-acquisition barrier described above. Only exact-generation recovery under the
-same exclusive authority may advance or clear it. Unreadable, malformed,
-wrong-binding, wrong-state, wrong-registration, wrong-identity, or
-wrong-generation data fail closed before automatic mutation.
+or `rollback`; rollback may advance to absorbing `removal-handoff`, while a
+successfully recovered side advances to `settled`. No later phase reverses. The
+record is the acquisition barrier described above. Only exact-generation
+recovery under the same exclusive authority may advance or clear it. Unreadable,
+malformed, wrong-package, wrong-scope, wrong-binding, wrong-state,
+wrong-registration, wrong-identity, or wrong-generation data fail closed before
+automatic mutation.
 
 While holding exclusive authority, reset cancels manager retry, suppresses
 manager launch, and stops every foreground and background publisher tree that
@@ -340,7 +343,20 @@ disabled choice needs no child. Before forward becomes irreversible, target
 readiness failure stops the target, removes only its exact registrations, proves
 it absent, durably selects `rollback`, atomically restores and rereads the
 source binding and old identity, and only then may restart the source. Rollback
-failure starts neither side and leaves the record as a barrier.
+failure starts neither side and leaves the record as a barrier. Exact recovery
+may retry only the same rollback while its immutable source material remains
+valid.
+
+After rollback failure, an explicit package-removal request may ask exact reset
+recovery to durably advance that generation to absorbing `removal-handoff`.
+This phase makes neither state authoritative, starts neither publisher, and
+permits only the matching package-removal barrier transfer below; it does not
+permit enable, rebind, another reset, upgrade, reinstall, or ordinary provider
+acquisition. A corrected source may repair rollback before this marker, but no
+state repair or forward recovery is allowed later in that reset generation or
+before package removal completes. After completed removal, only a new reinstall
+generation carrying this exact immutable predecessor may perform the explicit
+state resolution defined below; an upgrade or ordinary reinstall cannot.
 
 After authenticated target readiness, or complete local target admission for a
 disabled choice, the controller durably advances to irreversible
@@ -421,7 +437,25 @@ application-private durable-state-reset record. Any incomplete, unreadable,
 malformed, or conflicting reset record makes the package request fail closed
 without writing a package record or changing manager or artifact state. A
 package operation cannot clear, advance, or order itself ahead of that record;
-exact reset recovery must settle and clear it first.
+exact reset recovery must settle and clear it first. The sole exception is an
+explicit removal whose complete nonempty set of `removal-handoff` reset records
+matches every such record in the bounded exact package participant set and the
+same installed package and artifact scope. A participant without a reset record
+remains an ordinary removal participant; any participant reset in another phase
+or with mismatched scope, package, or identity blocks the removal.
+
+Under package-exclusive and every affected participant's user-exclusive
+authority, the remover copies every matched handoff into its normal package
+removal record. For each it copies the participant, reset generation and phase,
+package target and artifact scope, source binding and opened identity, old
+`instance_id`, expected source registration identities, target identity, new
+`instance_id`, and the reset record's prior manager choice. It durably commits
+that complete predecessor set before it
+idempotently clears any matched reset record. A crash before a reset clear
+leaves both authorities; a crash after any clear leaves the package-removal
+record with the complete set. No executable, manager, state, registration, or
+package artifact changes before every reset record is cleared under that ordered
+barrier transfer, and upgrade or reinstall cannot perform this transfer.
 
 Under that same authority and before writing a new package-operation record, a
 package controller also recovers any completed reinstall receipt-retirement
@@ -505,7 +539,9 @@ Package removal takes exclusive control authority before disabling manager
 startup or changing launch artifacts. Before either mutation, it atomically and
 durably writes the package-operation record, naming package removal, a unique
 operation generation, the target installed package, every prior enabled choice,
-and an incomplete state. While holding exclusive authority, the remover cancels
+the optional complete reset-handoff predecessor set transferred above, and an
+incomplete state. A transferred participant's prior choice comes from its reset
+record, never the already-suppressed manager. While holding exclusive authority, the remover cancels
 every pending manager retry, prevents new shared acquisition, stops every
 complete provider process tree without the ordinary job drain, waits for every
 ownership to end, and removes only each exact dead process registration. It
@@ -524,7 +560,10 @@ receipt or a package-operation-protected bounded receipt set outside the removed
 package. Each receipt binds its participant and the exact package-operation kind
 and generation whose removal or absorbing removal disposition produced package
 absence, and preserves that participant's prior enabled choice for a later
-reinstall. That producer identity is the completed removal generation for
+reinstall. For a participant with a transferred reset handoff, the receipt also
+carries that participant's complete immutable reset predecessor copied into the
+package record; package removal leaves both state epochs and every durable job
+untouched. That producer identity is the completed removal generation for
 receipt validation even when the immutable operation kind is upgrade or
 reinstall. A
 crash after any receipt but before the complete receipt set and exact clear
@@ -554,7 +593,8 @@ but before creating the first new package artifact, the installer atomically
 and durably writes a new package-reinstall operation record outside the package.
 It has a unique generation, the new target package identity, the matching
 completed removal-receipt producer kind and generation and participant set,
-every copied prior enabled choice, and an incomplete state. Failure to persist
+every copied prior enabled choice, every carried reset-handoff predecessor, and
+an incomplete state. Failure to persist
 that new record leaves the package absent, every receipt unconsumed, and manager
 launch suppressed. A reinstall controller that starts with an incomplete reinstall
 record takes exclusive authority, validates and recovers that exact generation,
@@ -570,6 +610,19 @@ reinstall-record persistence, new-package installation, and new-enable
 admission. The reinstall generation then follows the upgrade generation's
 enabled or disabled successor start, authenticated readiness, delegated
 coverage, exact clear, and shared-authority handoff ordering.
+
+For each participant carrying a reset-handoff predecessor, installed package
+bits do not settle that participant. The reinstall controller keeps manager
+launch suppressed and provider acquisition blocked until an explicit
+state-resolution choice selects either the predecessor's exact source binding,
+opened identity, and old `instance_id`, or its exact target identity and new
+`instance_id`. Before binding mutation it durably records that immutable choice
+in the reinstall record, validates and admits the selected state without
+reinterpreting or deleting durable jobs, and proves the opposing publisher and
+registrations absent. Only then may it apply the predecessor's recorded prior
+manager choice and perform ordinary disabled, deferred-enabled, or authenticated
+settlement. It cannot invent a new state, infer a choice from package presence or
+manager state, or clear, tombstone, or retire the predecessor while unresolved.
 
 Installation or readiness failure keeps manager launch suppressed and the
 reinstall record incomplete for exact recovery. It never treats a receipt or
@@ -623,7 +676,8 @@ removes the failed target and partial artifacts, and leaves durable jobs
 untouched. For each recorded participant, it atomically and durably pairs that
 participant's matching predecessor-receipt consumption with a replacement
 removal receipt outside the package, bound to this reinstall generation and
-preserving the exact choice. Completed participant pairs are idempotent under
+preserving the exact choice and any unresolved reset-handoff predecessor.
+Completed participant pairs are idempotent under
 the still-incomplete reinstall record. Only after every target artifact is
 absent and the complete replacement receipt set is durable may recovery clear
 that exact reinstall generation. The package is then absent, manager launch
@@ -710,7 +764,17 @@ Each provider implementation must exercise both sides of these boundaries:
     submitted under the new identity; no new-ID publisher appears before commit
     and no old-ID publisher appears after forward settlement. Target failure
     before the marker proves it absent before restoring the source, rollback
-    failure starts neither side, a live different-state owner is not displaced,
+    failure starts neither side, and exact recovery can retry the same rollback.
+    Explicit removal requests after rollback failure persist
+    `removal-handoff`; with two or more handoff participants and an ordinary
+    third participant, one matching package remover validates the complete
+    handoff set and durably copies every immutable state/identity field and prior
+    choice into its removal record before clearing any reset record. Crashes
+    before and after each clear retain a complete authority with no prior package
+    mutation, and every affected removal receipt retains its exact predecessor.
+    Upgrade, unrelated removal, ordinary acquisition, and state repair cannot
+    consume the handoff; reinstall copies it, keeps launch blocked, and requires
+    an explicit exact source-or-target resolution before settlement. A live different-state owner is not displaced,
     and malformed or mismatched records remain barriers. After a reset
     controller crash, unrelated enable, disable, rebind, and package operations
     fail before mutation until exact reset recovery clears the record;
@@ -764,7 +828,15 @@ Each provider implementation must exercise both sides of these boundaries:
     wrong-scope, wrong-participant, or wrong-target records remain barriers;
 16. package reinstall persists a new exact generation after removal clear and
     before the first replacement artifact, copies the exact participant and
-    choice map, and consumes only its matching receipt set; crashes after removal
+    choice map plus every unresolved reset predecessor, and consumes only its
+    matching receipt set. A participant with that predecessor remains blocked
+    after package admission until an explicit exact source-or-target choice is
+    durably recorded, admitted without deleting jobs, and authenticated to the
+    selected durable state;
+    package presence or manager state cannot select it. Crashes before and after
+    that choice preserve the same unresolved or selected identity, and an
+    absorbing removal carries an unresolved predecessor into the replacement
+    receipt rather than retiring it. Other crashes after removal
     clear, record persistence, partial installation, package admission,
     forward participant settlement, atomic receipt-retirement tombstone
     publication, a subset of receipt consumption, exact clear, a subset of
