@@ -67,11 +67,12 @@ window so a persistent startup fault cannot spin. A successful authenticated
 serving interval resets that budget only after the adapter's declared stability
 period. Exhausting the budget leaves background operation enabled but visibly
 unavailable; the next platform session trigger or explicit control operation
-may start a new bounded retry sequence. Intentional disable, package removal,
-package upgrade, package reinstall, and a successful manager stop do not
-trigger a restart. Disable, rebind, package upgrade, package removal, or package
-reinstall during backoff cancels a pending restart before binding access or
-publication.
+may start a new bounded retry sequence. Intentional disable, rebind,
+durable-state reset or replacement, package removal, package upgrade, package
+reinstall, and a successful manager stop do not trigger a restart. Disable,
+rebind, durable-state reset or replacement, package upgrade, package removal,
+or package reinstall during backoff cancels a pending restart before binding
+access or publication.
 Every retry follows the same control-authority, provider-ownership, recovery,
 and publication requirements as an initial background start.
 
@@ -167,12 +168,13 @@ operation authority and durable barrier outside the mutable package. Every
 installer, launcher, foreground and background entry point, and affected user
 manager participates in that authority.
 
-For per-user artifacts, enable, disable, and rebind take the combined per-user
-and package authority exclusively once. For shared artifacts, each of those
-control operations first takes the package authority in shared mode and then
-takes its per-user authority exclusively. Package upgrade, removal, and
-reinstall take the package authority exclusively, then take every affected
-user's per-user authority exclusively in canonical user identity order. Before
+For per-user artifacts, enable, disable, rebind, and durable-state reset or
+replacement take the combined per-user and package authority exclusively once.
+For shared artifacts, each of those control operations first takes the package
+authority in shared mode and then takes its per-user authority exclusively.
+Package upgrade, removal, and reinstall take the package authority exclusively,
+then take every affected user's per-user authority exclusively in canonical user
+identity order. Before
 any manager or package mutation, a shared-scope package operation durably closes
 admission to new session launches, enumerates every affected user, records that
 participant set and each prior enabled choice, cancels every retry, suppresses
@@ -196,11 +198,12 @@ that startup commits; provider ownership and publication locks continue to
 guard steady-state serving.
 
 Before binding access, every shared acquisition also checks under control
-authority that no package-operation record exists. An incomplete, unreadable,
-malformed, or wrong-target record is a durable barrier and fails closed before
-manager mutation, state recovery, endpoint binding, or publication. Only a
-package operation holding exclusive control authority may recover that record
-and resume or safely restart the recorded operation.
+authority that no package-operation or application-private durable-state-reset
+record exists. An incomplete, unreadable, malformed, or wrong-target record is
+a durable barrier and fails closed before manager mutation, state recovery,
+endpoint binding, or publication. Only the recorded lifecycle operation holding
+its required exclusive control authority may recover that record and resume or
+safely restart the exact operation.
 
 An existing package-operation record's kind, generation, and target are
 immutable. A requested upgrade, removal, or reinstall that encounters a
@@ -216,13 +219,15 @@ provider-ownership lock, then any protocol publication lock. A conflicting
 operation fails fast without manager mutation, binding access, state recovery,
 endpoint binding, or registration.
 
-The background entry point started inside an enable, rebind, package-upgrade,
-or package-reinstall transition does not reacquire shared authority only while
+The background entry point started inside an enable, rebind, durable-state
+reset or replacement, package-upgrade, or package-reinstall transition does not
+reacquire shared authority only while
 the controller's correctly ordered package and per-user authority continuously
-covers its startup. In shared artifact scope, enable and rebind hold package
-shared plus that user exclusive; package upgrade and reinstall hold package
-exclusive plus every participant user exclusive. In per-user scope the combined
-authority is held exclusively once. The controller retains or delegates every
+covers its startup. In shared artifact scope, enable, rebind, and durable-state
+reset or replacement hold package shared plus that user exclusive; package
+upgrade and reinstall hold package exclusive plus every participant user
+exclusive. In per-user scope the combined authority is held exclusively once.
+The controller retains or delegates every
 required scope without a gap through authenticated publication or complete
 failed-start cleanup and child exit. A controller return, crash, or readiness
 deadline does not authorize a surviving child to continue uncovered. Before
@@ -267,6 +272,87 @@ look different.
 Linux bindings live in the application's private user configuration. Windows
 bindings live in the application's private Local AppData, separate from the
 shared `%LOCALAPPDATA%\LocalConnect\runtime` registration tree in ADR-0005.
+
+### Durable-state reset and replacement
+
+The explicit v2 durable-state reset or replacement operation governed by
+ADR-0002 takes the same package-shared then per-user-exclusive control authority
+as rebind for shared artifacts, or the combined authority exclusively for
+per-user artifacts. It validates that the selected binding and opened state
+carry the recorded old `instance_id`. A live publisher for a different durable
+state makes the operation fail before mutation and is not displaced. Windows
+also applies ADR-0005's placement-specific registration cleanup.
+
+Before writing its record or making its first state, identity, manager, or
+registration mutation, the controller requires under its package-shared and
+per-user-exclusive authority that no package-operation record exists. Any
+incomplete, unreadable, malformed, or conflicting package record makes reset
+fail closed without writing a reset record or changing manager, state, identity,
+or registration data; reset cannot clear or advance that package operation.
+The controller then writes an owner-private, bounded, regular non-link durable
+reset record outside both source and target state. Its operation generation,
+source binding and opened identity, old `instance_id`, expected source registration
+identities, target identity, allocated new `instance_id`, and prior manager
+choice are immutable. Its phase advances only through `source`,
+`target-prepared`, `target-committed`, then either irreversible `forward-only`
+or `rollback`, and finally `settled`; no later phase reverses. The record is the
+acquisition barrier described above. Only exact-generation recovery under the
+same exclusive authority may advance or clear it. Unreadable, malformed,
+wrong-binding, wrong-state, wrong-registration, wrong-identity, or
+wrong-generation data fail closed before automatic mutation.
+
+While holding exclusive authority, reset cancels manager retry, suppresses
+manager launch, and stops every foreground and background publisher tree that
+can serve the selected source across protocol modes. It first proves every old
+endpoint dead and provider ownership released. In the fixed acquisition order
+it then takes provider ownership and every applicable v1 and v2 publication
+lock, validates and removes only each exact dead publisher's registration and
+temporary, and only then proves those registrations absent. On Windows the old
+v2 destination and temporary use ADR-0005's exact cleanup; other platforms use
+their existing protocol publication and exact-registration rules.
+
+Reset does not proceed while the source retains any accepted job still covered
+by its existing query, reconciliation, or retention contract, including a
+terminal result that a consumer may still retrieve. It aborts before state or
+identity mutation, restores the prior manager choice and source publisher as
+applicable, and reports that retained work blocks reset. It never forces a
+terminal classification to bypass that boundary and never copies, reinterprets,
+or freshly submits an old accepted job under the new identity.
+
+The controller prepares and admits the complete target state and persisted new
+`instance_id` while retaining verified source rollback material, then records
+`target-prepared`. An atomic, durable application-private binding or
+state-descriptor replacement is the reset commit point and records
+`target-committed`. Before it, only the source and old identity are
+authoritative; after it, only the target and new identity are authoritative. An
+implementation may not destroy or mutate the source in place when a crash could
+pair one state epoch with the other identity.
+
+If the prior manager choice is enabled or a foreground host requires serving,
+the controller starts the target under continuous control coverage. The child
+takes provider ownership and every applicable publication lock, may publish for
+authenticated readiness, but returns only pre-admission `PROVIDER_BUSY` from
+every job-creation route while the record remains `target-committed`. A
+disabled choice needs no child. Before forward becomes irreversible, target
+readiness failure stops the target, removes only its exact registrations, proves
+it absent, durably selects `rollback`, atomically restores and rereads the
+source binding and old identity, and only then may restart the source. Rollback
+failure starts neither side and leaves the record as a barrier.
+
+After authenticated target readiness, or complete local target admission for a
+disabled choice, the controller durably advances to irreversible
+`forward-only`. Only then may the target admit a job. Recovery after that marker
+may resume or finalize only the target and never select rollback or reactivate
+the source. A crash before the marker therefore cannot strand a target job, and
+a crash after it cannot abandon that job by restoring the old identity.
+
+Crash recovery is exact-generation and monotonic. Before the reset commit it
+may complete forward or restore only the source; after commit but before
+`forward-only` it may resume the target or select rollback while verified source
+material remains. The controller clears only its exact record after one side is
+settled, every opposing endpoint and exact registration is absent, ownership
+matches that side, and the prior manager choice is restored. A controller crash,
+return, or deadline never leaves a child outside continuous authority coverage.
 
 ### Bounded stop and recovery
 
@@ -324,6 +410,15 @@ platform session trigger performs ordinary package-shared and per-user-shared
 acquisition after the package operation clears. Session absence is not failed
 package admission, failed rollback, or justification for removal. A recorded
 disabled choice remains disabled and starts nothing.
+
+Before any package upgrade, removal, or reinstall writes a package-operation
+record or mutates a manager or package artifact, its package-exclusive and
+participant-user-exclusive authority checks every participant's
+application-private durable-state-reset record. Any incomplete, unreadable,
+malformed, or conflicting reset record makes the package request fail closed
+without writing a package record or changing manager or artifact state. A
+package operation cannot clear, advance, or order itself ahead of that record;
+exact reset recovery must settle and clear it first.
 
 Package upgrade takes exclusive control authority before suppressing manager
 startup or changing launch artifacts. Before either mutation, it atomically and
@@ -530,8 +625,9 @@ Each provider implementation must exercise both sides of these boundaries:
    an open window; that owner uses new process credentials, reuses the v2
    durable identity, and reconciles accepted work without duplicate submission;
    repeated failure exercises the delay, attempt/window ceiling, and stable
-   serving reset, while disable, rebind, package upgrade, package removal, and
-   package reinstall or intentional stop during backoff do not restart;
+   serving reset, while disable, rebind, durable-state reset or replacement,
+   package upgrade, package removal, package reinstall, or intentional stop
+   during backoff do not restart;
 7. a v1 provider proves the private state-binding and serving-generation
    correlation before state-specific readiness or takeover succeeds;
 8. malformed, linked, non-private, oversized, mismatched, and changed state
@@ -540,8 +636,9 @@ Each provider implementation must exercise both sides of these boundaries:
    after ownership, during recovery, and between endpoint binding and
    authenticated registration prove both exclusion directions, clean unwind,
    and release after success, failure, and process exit; shared-scope enable,
-   disable, and rebind prove package-shared then per-user-exclusive ordering,
-   while an ownership waiter releases both shared scopes before backoff;
+   disable, rebind, and durable-state reset or replacement prove package-shared
+   then per-user-exclusive ordering, while an ownership waiter releases both
+   shared scopes before backoff;
 10. a controller return, crash, or readiness deadline during child startup
    leaves no uncovered package or per-user authority interval, late publisher,
    overlapping control mutation, or foreground restoration before the child has
@@ -554,14 +651,37 @@ Each provider implementation must exercise both sides of these boundaries:
     target-readiness failure stops and proves the target absent before restoring
     the old binding, rollback failure starts neither state, and crashes during
     rollback never produce readiness attributed to the wrong durable state;
-12. two distinct OS users exercise both artifact scopes: per-user artifacts
+12. durable-state reset or replacement raced against foreground and background
+    acquisition, manager retry, source job recovery, endpoint binding,
+    publication, and steady serving persists its exact reset record and cancels
+    retry before mutation. A forced-stop stale registration is cleaned only
+    after endpoint death and ownership release, under every applicable protocol
+    publication lock, and registration absence is proved afterward on Linux and
+    Windows. Any source job still inside its query, reconciliation, or retention
+    contract aborts reset and remains queryable under the source identity.
+    Crashes after record persistence, old cleanup, target and new-ID preparation,
+    the atomic reset commit, target publication or readiness, immediately before
+    and after `forward-only`, rollback selection or commit, and exact clear
+    recover exactly one paired state and identity with the prior manager choice.
+    A concurrent job creation before `forward-only` receives `PROVIDER_BUSY` and
+    persists no job; one after the marker may be accepted and recovery can no
+    longer roll back. No old accepted job is lost, duplicated, copied, or
+    submitted under the new identity; no new-ID publisher appears before commit
+    and no old-ID publisher appears after forward settlement. Target failure
+    before the marker proves it absent before restoring the source, rollback
+    failure starts neither side, a live different-state owner is not displaced,
+    and malformed or mismatched records remain barriers;
+13. two distinct OS users exercise both artifact scopes: per-user artifacts
     operate independently, while a shared-artifact package mutation by user A
-    races user B's enable, disable, rebind, live provider, startup, backoff,
-    login, and logout under package-first authority and one package barrier; no
-    new control or acquisition succeeds after barrier persistence and every
+    races user B's enable, disable, rebind, durable-state reset or replacement,
+    live provider, startup, backoff, login, and logout under package-first
+    authority and one package barrier; no new control or acquisition succeeds
+    after barrier persistence and every
     recorded participant's manager, process tree, ownership, and exact
     registration end before artifact mutation. Failure to enumerate, suppress,
-    or quiesce user B leaves artifacts unchanged and the barrier incomplete. An
+    or quiesce user B leaves artifacts unchanged and the barrier incomplete. A
+    crash-persisted reset record for user B prevents creation of a package record
+    and all manager or artifact mutation until exact reset recovery clears it. An
     enabled user B kept logged out through mutation and crash recovery settles
     as deferred-enabled after package admission, claims no readiness, does not
     force rollback or removal, and starts through ordinary acquisition only on
@@ -569,7 +689,7 @@ Each provider implementation must exercise both sides of these boundaries:
     manager stops, mutation, package admission, deferred settlement, active-user
     settlement, and exact clear preserve the exact participant and choice map;
     malformed scope or participant data fail closed before automatic mutation;
-13. package removal raced against manager backoff, binding access, recovery,
+14. package removal raced against manager backoff, binding access, recovery,
     endpoint binding, publication, and steady-state serving cancels every retry
     and leaves no live or late publisher before launch artifacts or the
     executable are removed; controller crashes after barrier persistence,
@@ -582,7 +702,7 @@ Each provider implementation must exercise both sides of these boundaries:
     prior enabled choice. Upgrade cannot replace an incomplete removal, and
     reinstall completes and exactly clears that removal before creating a new
     package artifact while retaining manager suppression through admission;
-14. package upgrade raced against manager backoff, binding access, recovery,
+15. package upgrade raced against manager backoff, binding access, recovery,
     endpoint binding, publication, and steady-state serving launches neither an
     old nor partial installation; enabled participants authenticate only after
     complete-package admission, disabled participants start nothing, and durable
@@ -599,7 +719,7 @@ Each provider implementation must exercise both sides of these boundaries:
     recorded disposition. A new upgrade cannot overwrite or retarget it, a user
     removal request can only advance its recovery to removal, and malformed,
     wrong-scope, wrong-participant, or wrong-target records remain barriers;
-15. package reinstall persists a new exact generation after removal clear and
+16. package reinstall persists a new exact generation after removal clear and
     before the first replacement artifact, copies the exact participant and
     choice map, and consumes only its matching receipt set; crashes after removal
     clear, record persistence, partial installation, package admission, a subset
@@ -628,14 +748,14 @@ Each provider implementation must exercise both sides of these boundaries:
     or wrong-target recovery remains a barrier. Active, disabled, and
     deferred-enabled participants preserve their exact choice without requiring
     a logged-out user to become ready;
-16. a job consuming its maximum drain still leaves enough of the 35-second
+17. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
     force termination at 40 seconds; forced termination leaves durable job
     state recoverable by the next owner and is followed by exact-registration
     removal by the 45-second control deadline before success or replacement;
     and
-17. Linux systemd-user and Windows per-user-task artifacts preserve the stated
+18. Linux systemd-user and Windows per-user-task artifacts preserve the stated
     user, privilege, automatic-restart, bounded-backoff, stop, and process-tree
     bounds.
 
