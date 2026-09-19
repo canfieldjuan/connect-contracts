@@ -201,6 +201,86 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "lead.missed-call-attempt.record",
+      "version": "1.0",
+      "action": {
+        "label": "Record missed call attempt",
+        "description": "Record a real office no-answer for a lead; Atlas alone then decides whether a recovery mail sequence starts. Idempotent by the operation key. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.missed-call-attempt+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.missed-call-attempt-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "lead.missed-call-recovery.status",
+      "version": "1.0",
+      "action": {
+        "label": "Read missed call recovery status",
+        "description": "Return bounded, non-PII recovery-sequence status for a set of leads already visible to the office. Read-only projection; alters no sequence, delivery, or lead state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.missed-call-recovery-status-query+json",
+          "max_bytes": 8192
+        }
+      ],
+      "produces": ["application/vnd.eom.missed-call-recovery-status+json"],
+      "parameters": [],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "lead.missed-call-recovery.resume",
+      "version": "1.0",
+      "action": {
+        "label": "Resume missed call recovery",
+        "description": "Explicitly resume one previously configuration-blocked recovery sequence. Idempotent by the operation key; a sequence that is not blocked cannot be resumed. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.missed-call-recovery-resume+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.missed-call-recovery-resume-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "lead.missed-call-recovery.cancel",
+      "version": "1.0",
+      "action": {
+        "label": "Cancel missed call recovery",
+        "description": "Persist a verified stop condition (callback recorded, response recorded, opt out, or manual) for a recovery sequence without altering lead history. Idempotent by the operation key; a sequence that is not active cannot be cancelled. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.missed-call-recovery-cancel+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.missed-call-recovery-cancel-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }

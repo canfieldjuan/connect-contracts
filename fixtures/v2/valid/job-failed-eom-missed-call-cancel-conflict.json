@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "77e46dfc-4cb1-4fa3-afb8-6e233e79bef3",
+  "capability": {
+    "id": "lead.missed-call-recovery.cancel",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-19T10:00:00Z",
+  "updated_at": "2026-09-19T10:00:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "eb61eef1-7237-4329-8f3b-997caaa7a352",
+      "media_type": "application/vnd.eom.missed-call-recovery-cancel+json",
+      "byte_size": 71,
+      "sha256": "eb666b1d333c9aa00fbe3f0d8e77472f725490b583db8e0fbb0f95a6c3e54a2c"
+    }
+  ],
+  "error": {
+    "code": "EOM_MISSED_CALL_RECOVERY_CONFLICT",
+    "message": "The missed-call recovery sequence is not active and cannot be cancelled.",
+    "retryable": false
+  }
+}

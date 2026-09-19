@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "a7a920b6-0eb5-4660-8849-2322d3d1019a",
+  "capability": {
+    "id": "lead.missed-call-attempt.record",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-19T10:00:00Z",
+  "updated_at": "2026-09-19T10:00:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "30e08ff0-5498-4393-b000-974af034a143",
+      "media_type": "application/vnd.eom.missed-call-attempt+json",
+      "byte_size": 53,
+      "sha256": "593eeba51247edab7d09541d333f7881e1188f3469168079d33cb80a45db31c1"
+    }
+  ],
+  "error": {
+    "code": "EOM_MISSED_CALL_RECOVERY_CONFLICT",
+    "message": "Missed-call recovery eligibility is incomplete for this lead.",
+    "retryable": false
+  }
+}

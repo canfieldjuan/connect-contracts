@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "6d5b298f-661f-418b-9165-5ac87f2e37e9",
+  "capability": {
+    "id": "lead.missed-call-recovery.status",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T10:00:00Z",
+  "updated_at": "2026-09-19T10:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "a2430be8-efc6-420c-a035-4c2abc7221e5",
+      "media_type": "application/vnd.eom.missed-call-recovery-status-query+json",
+      "byte_size": 95,
+      "sha256": "eef15086e11f4e7d21dd0164fbe784c162697529b7aad7cbca172156fe7ad901"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "e61c837b-f39a-4a68-9036-f304fb57f01a",
+        "media_type": "application/vnd.eom.missed-call-recovery-status+json",
+        "display_name": "missed-call-recovery-status.json",
+        "byte_size": 286,
+        "sha256": "a07f6ead130bd1b2500b230f1227bbafdcc36d0ec4f4db8d6678edfed8800659",
+        "payload_base64": "eyJzZXF1ZW5jZXMiOlt7ImNvbnRhY3RJZCI6IjBmMTc1MWY1LWI1YTktNDVjMS1iMjhiLTdiOTJlYjliOTkxNCIsInNlcXVlbmNlSWQiOiIxZTQ2Nzg5My03M2FhLTQ0ZGEtOWY5OC1iODU0ZDNlNWEwZDAiLCJzdGF0ZSI6ImFjdGl2ZSJ9LHsiY29udGFjdElkIjoiYzQzMzNkYjQtZWUzYy00M2YwLWJlNTYtNjMzNTVlMDBkNDI4Iiwic2VxdWVuY2VJZCI6IjYzZTc2ZmRkLWEzYjUtNGYxNC04Zjc3LTI0NTg1MjBlZjRmNiIsInN0YXRlIjoiY2FuY2VsbGVkIn1dLCJjaGVja2VkIjoyLCJsaW1pdCI6MjAwfQ=="
+      }
+    ]
+  }
+}
