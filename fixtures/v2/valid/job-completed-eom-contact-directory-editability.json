@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "a7a11737-b268-44be-b00a-b5fd6aad5279",
+  "capability": {
+    "id": "contact.directory.editability",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T14:00:00Z",
+  "updated_at": "2026-09-19T14:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "19c3877e-b10f-49ea-9186-2c33c95e2671",
+      "media_type": "application/json",
+      "byte_size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "1a4e3abd-837b-44bc-a56c-72842bcb8fb6",
+        "media_type": "application/vnd.eom.contact-directory+json",
+        "display_name": "contact-directory-editability.json",
+        "byte_size": 835,
+        "sha256": "814180d7b002d8de83a3c7916749c099eafa6dafc8e00461c52f281ff2c84e29",
+        "payload_base64": "eyJjb250YWN0cyI6W3siY29udGFjdElkIjoiMzhiMGUwN2UtOWQxNi00N2M4LTkzY2MtMGE3ODVkNmI3MjNkIiwiZnVsbE5hbWUiOiJKb3JkYW4gUml2ZXJhIiwiZW1haWwiOiJqb3JkYW5AZXhhbXBsZS5jb20iLCJwaG9uZSI6IisxIDU1NSAwMTAwIiwiYWRkcmVzcyI6IjEyIE1hcmtldCBTdCIsImNvbnRhY3RUeXBlIjoibGVhZCIsImN1c3RvbWVyVHlwZSI6InJlc2lkZW50aWFsIiwibGVhZFN0YWdlIjoibmV3Iiwic3RhdHVzIjoiYWN0aXZlIiwic291cmNlIjoibWFudWFsIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0xOFQwODowMDowMFoiLCJ1cGRhdGVkQXQiOiIyMDI2LTA5LTE5VDA5OjAwOjAwWiIsImVkaXRhYmxlIjp0cnVlLCJlZGl0QmxvY2tlZFJlYXNvbiI6bnVsbH0seyJjb250YWN0SWQiOiJhZTU5MjFlNy0yMjIxLTQxZDYtOWVjZi02YWE5YWVlYWJmYjQiLCJmdWxsTmFtZSI6IkpvcmRhbiBSaXZlcmEiLCJlbWFpbCI6ImpvcmRhbkBleGFtcGxlLmNvbSIsInBob25lIjoiKzEgNTU1IDAxMDAiLCJhZGRyZXNzIjoiMTIgTWFya2V0IFN0IiwiY29udGFjdFR5cGUiOiJsZWFkIiwiY3VzdG9tZXJUeXBlIjoicmVzaWRlbnRpYWwiLCJsZWFkU3RhZ2UiOiJsb3N0Iiwic3RhdHVzIjoiYWN0aXZlIiwic291cmNlIjoibWFudWFsIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0xOFQwODowMDowMFoiLCJ1cGRhdGVkQXQiOiIyMDI2LTA5LTE5VDA5OjAwOjAwWiIsImVkaXRhYmxlIjpmYWxzZSwiZWRpdEJsb2NrZWRSZWFzb24iOiJub3RfZWRpdGFibGVfc3RhZ2UifV0sImxpbWl0IjoyNSwiY3Vyc29yIjpudWxsLCJoYXNfbW9yZSI6ZmFsc2UsIm5leHRfY3Vyc29yIjpudWxsfQ=="
+      }
+    ]
+  }
+}

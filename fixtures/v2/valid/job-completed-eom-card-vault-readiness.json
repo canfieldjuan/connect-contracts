@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "c8a8960f-250b-4af2-a978-92ef22ced6c6",
+  "capability": {
+    "id": "card-vault.readiness.read",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T14:00:00Z",
+  "updated_at": "2026-09-19T14:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "d7720eb3-2645-449d-a6d2-3f7519f0589c",
+      "media_type": "application/vnd.eom.card-vault-readiness-query+json",
+      "byte_size": 53,
+      "sha256": "c77f94ff7acab7adb56dae69dccf84f0910e57fa742c57cae66e861b184328da"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "33b84c3f-da3d-4db9-ab21-326b44b52e8a",
+        "media_type": "application/vnd.eom.card-vault-readiness+json",
+        "display_name": "card-vault-readiness.json",
+        "byte_size": 283,
+        "sha256": "0452303b21e1102954b2998616ad94a720bdd38b2e003168c25dce4c70e78896",
+        "payload_base64": "eyJjb250YWN0SWQiOiIzYjJjNzRmNC05YTE3LTQxNTQtYTg3Mi04NDZkNmQ0ZGFiMTEiLCJhdWRpZW5jZSI6InJlc2lkZW50aWFsIiwiY2FyZFJlcXVpcmVkIjp0cnVlLCJjYXJkUmVhZHkiOnRydWUsInJlYXNvbiI6InJlYWR5IiwiY2FuZGlkYXRlSWQiOiIxYzc0ZDM1Yi03YmM0LTQzMDktOWJjNi05NjczMGIzMDI0NTMiLCJlbnJvbGxtZW50SWQiOiJjNWE0OWIzYi0yMTM4LTRiZTktODJkNy1jYzYzNjYyODFhYmQiLCJwcm92aWRlckNvbmZpcm1lZEF0IjoiMjAyNi0wOS0xOVQxMzo0NTowMFoifQ=="
+      }
+    ]
+  }
+}

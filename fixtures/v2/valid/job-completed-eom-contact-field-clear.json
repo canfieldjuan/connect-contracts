@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "ed92ab22-71b4-4b9a-8a1e-a7201ff91221",
+  "capability": {
+    "id": "contact.field-clear",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T14:00:00Z",
+  "updated_at": "2026-09-19T14:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "aa9a557a-01ed-4c28-9572-04d4a497b35b",
+      "media_type": "application/vnd.eom.operator-contact+json",
+      "byte_size": 141,
+      "sha256": "8f8f341190b0dac539ce00f0b92174a9642986891c294c410b77ecb5f4e8bb25"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "44030390-336e-4008-acfe-182c41b5448a",
+        "media_type": "application/vnd.eom.operator-contact-receipt+json",
+        "display_name": "operator-contact-field-clear-receipt.json",
+        "byte_size": 537,
+        "sha256": "3a8d8dcc4f0d3e6139cf31aabc749d4555004b10be4c2f73e373eafc63a34efc",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJjb250YWN0SWQiOiJjOTUxY2YyZi0yNGYzLTRlM2YtYjkyNy01NDdkZTllNTVhODAiLCJvcGVyYXRpb24iOiJlb21fb3BlcmF0b3JfY29udGFjdF91cGRhdGVkIiwiaWRlbXBvdGVudCI6ZmFsc2UsImNvbnRhY3QiOnsiY29udGFjdElkIjoiYjkzZDUxZjEtYzM5Zi00NzFkLWJmYzQtZDdhYmE1NjU1OGIyIiwiZnVsbE5hbWUiOiJKb3JkYW4gUml2ZXJhIiwiZW1haWwiOm51bGwsInBob25lIjpudWxsLCJhZGRyZXNzIjoiMTIgTWFya2V0IFN0IiwiY2l0eSI6IkVmZmluZ2hhbSIsInN0YXRlIjoiSUwiLCJ6aXAiOiI2MjQwMSIsIm5vdGVzIjpudWxsLCJjb250YWN0VHlwZSI6ImN1c3RvbWVyIiwiY3VzdG9tZXJUeXBlIjoicmVzaWRlbnRpYWwiLCJsZWFkU3RhZ2UiOm51bGwsInN0YXR1cyI6ImFjdGl2ZSIsInNvdXJjZSI6Im1hbnVhbCIsInNvdXJjZVJlZiI6Im9mZmljZS0yMDI2LTAwOTEiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTE4VDA4OjAwOjAwWiIsInVwZGF0ZWRBdCI6IjIwMjYtMDktMTlUMTQ6MDA6MDBaIn19"
+      }
+    ]
+  }
+}

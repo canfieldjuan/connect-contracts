@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "0c174caf-ab7a-4ec8-a313-197663cc99cd",
+  "capability": {
+    "id": "contact.link-verification",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "fc7c004f-6723-406f-a5cf-db2a25ac675a",
+      "media_type": "application/vnd.eom.known-contacts-query+json",
+      "byte_size": 134,
+      "sha256": "5678aff2a0d23a010461ea15da7ff81b36ffd9dc26ef77286ca7fb203a62c3ec",
+      "display_name": "known-contacts-query.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

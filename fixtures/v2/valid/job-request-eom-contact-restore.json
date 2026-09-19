@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "04709f09-3557-4578-be21-252c270fd033",
+  "capability": {
+    "id": "contact.restore",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "18f0cbdb-089f-4fff-9a9c-7df6b84504bd",
+      "media_type": "application/vnd.eom.contact-restoration+json",
+      "byte_size": 53,
+      "sha256": "e1e09b791f7d8b110a6756530317a85c58270946069f89829cab95afa03781d2",
+      "display_name": "contact-restoration.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

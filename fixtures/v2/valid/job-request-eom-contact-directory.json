@@ -1,0 +1,23 @@
+{
+  "protocol_version": 2,
+  "job_id": "14b54680-c35c-4c6a-ab37-5cb02bb4e152",
+  "capability": {
+    "id": "contact.directory",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "bfadab7d-01fa-4b04-a758-d3d72e0a28fa",
+      "media_type": "application/json",
+      "byte_size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "display_name": "contact-directory-query.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {
+    "kind": "all",
+    "lifecycle": "active",
+    "limit": 25
+  }
+}

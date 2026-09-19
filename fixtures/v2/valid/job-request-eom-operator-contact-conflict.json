@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "048bf1e9-931b-4b44-a967-4056cb6c929a",
+  "capability": {
+    "id": "contact.operator-mutation",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "ef243c23-3152-435c-b607-b2c94fdc4dad",
+      "media_type": "application/vnd.eom.operator-contact+json",
+      "byte_size": 145,
+      "sha256": "daeafd27c73045bd6ba1cd1427e1e63a6e8b012502a6a12bedb9faa8488d79f9",
+      "display_name": "operator-contact.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
