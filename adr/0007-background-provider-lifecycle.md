@@ -412,8 +412,12 @@ exact registration is absent, and the target launch artifacts and executable
 are absent. Before that clear it leaves provider durable job state untouched
 and atomically and durably writes either an owner-private per-user removal
 receipt or a package-operation-protected bounded receipt set outside the removed
-package. Each receipt binds the exact removal generation and participant and
-preserves that participant's prior enabled choice for a later reinstall. A
+package. Each receipt binds its participant and the exact package-operation kind
+and generation whose removal or absorbing removal disposition produced package
+absence, and preserves that participant's prior enabled choice for a later
+reinstall. That producer identity is the completed removal generation for
+receipt validation even when the immutable operation kind is upgrade or
+reinstall. A
 crash after any receipt but before the complete receipt set and exact clear
 leaves the barrier in place and lets exact recovery reuse completed receipts
 idempotently. The controller then clears the incomplete record and releases
@@ -438,17 +442,17 @@ After exact removal clear and proof that the old target artifacts are absent,
 but before creating the first new package artifact, the installer atomically
 and durably writes a new package-reinstall operation record outside the package.
 It has a unique generation, the new target package identity, the matching
-completed removal-receipt generation and participant set, every copied prior
-enabled choice, and an incomplete state. Failure to persist that new record
-leaves the package absent, every receipt unconsumed, and manager launch
-suppressed. A reinstall controller that starts with an incomplete reinstall
+completed removal-receipt producer kind and generation and participant set,
+every copied prior enabled choice, and an incomplete state. Failure to persist
+that new record leaves the package absent, every receipt unconsumed, and manager
+launch suppressed. A reinstall controller that starts with an incomplete reinstall
 record takes exclusive authority, validates and recovers that exact generation,
 and rolls it forward or safely
 restarts it without inferring completion from partial files. It accepts an
-already-consumed marker only when the receipt generation, package target,
-participant set, choice map, and incomplete reinstall record all match; it then
-uses the enabled choices copied into the record and does not consume a receipt
-again.
+already-consumed marker only when the receipt producer kind and generation,
+package target, participant set, choice map, and incomplete reinstall record all
+match; it then uses the enabled choices copied into the record and does not
+consume a receipt again.
 
 The installer holds the same exclusive authority across removal recovery,
 reinstall-record persistence, new-package installation, and new-enable
@@ -465,6 +469,31 @@ incomplete or before the new package passes admission. The reinstall barrier
 remains until every disabled choice is settled and every enabled choice is
 either served by an authenticated successor under continuous coverage or
 durably deferred because no capable service session exists.
+
+Exact-generation recovery may durably advance the same reinstall record only
+from forward to the absorbing removal disposition after either deterministic
+complete-package admission failure that exact recovery cannot repair without
+changing the recorded target or an explicit user package-removal request. A
+retryable installation or readiness failure, a readiness timeout, an unavailable
+service session, or a deferred-enabled participant does not authorize removal.
+Recovery never reverses that disposition or changes the record kind, generation,
+artifact scope, participant
+set, copied choice map, completed-removal predecessor, or failed target. A user
+removal request may ask the exclusive recovery controller to make that advance;
+a request for a corrected reinstall target cannot. The disposition is committed
+before its first removal mutation. Recovery then keeps every manager suppressed,
+proves all target process trees, ownership, and exact registrations ended,
+removes the failed target and partial artifacts, and leaves durable jobs
+untouched. For each recorded participant, it atomically and durably pairs that
+participant's matching predecessor-receipt consumption with a replacement
+removal receipt outside the package, bound to this reinstall generation and
+preserving the exact choice. Completed participant pairs are idempotent under
+the still-incomplete reinstall record. Only after every target artifact is
+absent and the complete replacement receipt set is durable may recovery clear
+that exact reinstall generation. The package is then absent, manager launch
+remains suppressed, and a corrected target requires a new reinstall generation
+that consumes only that replacement receipt set. A crash resumes only the
+recorded disposition; it cannot make the failed or corrected target acquirable.
 
 If an executable is removed or replaced outside that serialized package
 operation, a running provider still stops serving and removes its own
@@ -582,7 +611,23 @@ Each provider implementation must exercise both sides of these boundaries:
     and every disabled manager suppressed; an old removal generation cannot
     delete the new package, malformed or conflicting records fail closed, a
     consumed receipt without its matching incomplete reinstall fails closed,
-    and matching recovery reuses consumed markers idempotently;
+    and matching recovery reuses consumed markers idempotently. A permanently
+    invalid target advances that exact generation from forward to absorbing
+    removal before mutation, while retryable installation or readiness failure,
+    readiness timeout, and session absence remain forward-recoverable and never
+    authorize removal; the transition never retargets the record, stops any
+    target publisher, removes every target and partial artifact, preserves jobs
+    and choices, and
+    replaces the complete predecessor receipt set with reinstall-generation-bound
+    removal receipts before exact clear. Crashes after disposition persistence,
+    partial deletion, each predecessor-consumption/replacement-receipt pair,
+    and before or after exact clear resume only removal or observe a fully absent
+    package. A corrected target starts only as a new generation consuming the
+    replacement set; a new reinstall cannot overwrite the failed generation,
+    and malformed, wrong-scope, wrong-participant, wrong-choice, wrong-producer,
+    or wrong-target recovery remains a barrier. Active, disabled, and
+    deferred-enabled participants preserve their exact choice without requiring
+    a logged-out user to become ready;
 16. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
