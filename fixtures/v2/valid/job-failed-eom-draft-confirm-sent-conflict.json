@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "60730ddb-1dd5-4374-aac1-9c5d3bb1e232",
+  "capability": {
+    "id": "onboarding.draft.confirm-sent",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-19T12:00:00Z",
+  "updated_at": "2026-09-19T12:00:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "da40dae5-f668-440d-bc43-b2077ec31193",
+      "media_type": "application/vnd.eom.onboarding-draft-send-confirmation+json",
+      "byte_size": 51,
+      "sha256": "bcafc4ceb0a1cb5cda18540cade3365342bf17dd36138046807f8c3326045a15"
+    }
+  ],
+  "error": {
+    "code": "EOM_DRAFT_NOT_CONFIRMABLE",
+    "message": "The onboarding draft has not been claimed for sending, so its delivery cannot be confirmed.",
+    "retryable": false
+  }
+}

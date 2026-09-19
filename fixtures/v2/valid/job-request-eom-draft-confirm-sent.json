@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "8f457f71-fa84-4a10-b4dc-85cc3aef7095",
+  "capability": {
+    "id": "onboarding.draft.confirm-sent",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "007f4cb0-0ed9-4d0f-97eb-8b1d896a228b",
+      "media_type": "application/vnd.eom.onboarding-draft-send-confirmation+json",
+      "byte_size": 51,
+      "sha256": "39babb937a518c8d6d40516194485a70f05ec1434f30c7ef3f9b8acaea332f01",
+      "display_name": "onboarding-draft-send-confirmation.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

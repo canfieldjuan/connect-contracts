@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "da6a06bb-cc41-4aff-bf34-ffd2d47d948f",
+  "capability": {
+    "id": "onboarding.draft.edit",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T12:00:00Z",
+  "updated_at": "2026-09-19T12:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "66a47dd6-708d-4484-b63b-14ba33fee6c6",
+      "media_type": "application/vnd.eom.onboarding-draft-edit+json",
+      "byte_size": 157,
+      "sha256": "7dd03053351e649b5d7da91d01c4533fbb44c96909c19f422d4727c49f1f1924"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "1431a532-6966-43ab-9389-ace9c7b95daa",
+        "media_type": "application/vnd.eom.onboarding-draft+json",
+        "display_name": "onboarding-draft.json",
+        "byte_size": 154,
+        "sha256": "5baa26bc484d0f00133dd3c1619eb76a98ca3aa22bb85cc3a8b4029fb4f48c43",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJkcmFmdF9pZCI6Ijk5MDRiMzc0LWU0N2QtNGFlOC04ZDZlLTkzODc2ZjVlMTA0NCIsInN0YXR1cyI6InBlbmRpbmciLCJzdWJqZWN0IjoiV2VsY29tZSwgY29ycmVjdGVkIiwicmVjaXBpZW50X2VtYWlsIjoib3duZXJAZXhhbXBsZS5jb20ifQ=="
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "f1fec9a1-302c-49dc-a8ed-29074ff6377f",
+  "capability": {
+    "id": "onboarding.draft.revoke",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T12:00:00Z",
+  "updated_at": "2026-09-19T12:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "a6e77b4f-3362-4d59-ad99-d7068b9ee8d7",
+      "media_type": "application/vnd.eom.onboarding-draft-revocation+json",
+      "byte_size": 51,
+      "sha256": "a0a956e9de027d45b427677fd43f5f0b2776e1afeb189a741a22e3beeca5254f"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "0117e6d1-a753-4892-8479-48a737a6b6ff",
+        "media_type": "application/vnd.eom.onboarding-draft-revocation-receipt+json",
+        "display_name": "onboarding-draft-revocation-receipt.json",
+        "byte_size": 156,
+        "sha256": "babf18ad8ae9b701187f7f920fda602ab8e8b9a98a077cbff22fb99e0909cffb",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwiZHJhZnRfaWQiOiJjNGVkZDNlOS1jM2I1LTQ0YTItOTY0Yi05NTcwM2Q3ZDg0MjUiLCJjb250YWN0X2lkIjoiOWVlOTQ1MjUtNDA0OC00MjZjLWI2YzQtZjQzNjgwMmIzYjhjIiwic3RhdHVzIjoicmV2b2tlZCJ9"
+      }
+    ]
+  }
+}

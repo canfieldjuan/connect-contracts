@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "47c955bd-1ab3-44c0-aef4-7cd7c84c91e1",
+  "capability": {
+    "id": "onboarding.draft.edit",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-19T12:00:00Z",
+  "updated_at": "2026-09-19T12:00:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "ce5881a1-1144-4d7a-84c6-ea530664f341",
+      "media_type": "application/vnd.eom.onboarding-draft-edit+json",
+      "byte_size": 72,
+      "sha256": "73faf8b58053064ba3f91ccdfb94ef960f8af4b82cdc4e58d627329087517694"
+    }
+  ],
+  "error": {
+    "code": "EOM_DRAFT_NOT_EDITABLE",
+    "message": "The onboarding draft is not pending and cannot be edited.",
+    "retryable": false
+  }
+}

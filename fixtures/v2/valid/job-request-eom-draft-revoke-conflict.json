@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "d63c2b6c-90d7-44da-b318-0a156c3de490",
+  "capability": {
+    "id": "onboarding.draft.revoke",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "8f347b48-3a0c-445f-9761-489999f4d807",
+      "media_type": "application/vnd.eom.onboarding-draft-revocation+json",
+      "byte_size": 51,
+      "sha256": "9b52306c1c16c427c05a98e660bcdbbca319df67de3f7506123440e38b0e6df0",
+      "display_name": "onboarding-draft-revocation.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

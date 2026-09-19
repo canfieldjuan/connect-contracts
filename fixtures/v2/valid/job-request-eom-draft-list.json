@@ -1,0 +1,22 @@
+{
+  "protocol_version": 2,
+  "job_id": "bba92728-bd84-4540-a63f-80784af33305",
+  "capability": {
+    "id": "onboarding.draft.list",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "f985e145-69d4-4dc5-b4b3-626de4d04fc9",
+      "media_type": "application/json",
+      "byte_size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "display_name": "onboarding-draft-list-query.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {
+    "status": "pending",
+    "limit": 25
+  }
+}

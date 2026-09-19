@@ -361,6 +361,108 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "onboarding.draft.list",
+      "version": "1.0",
+      "action": {
+        "label": "List onboarding drafts",
+        "description": "List onboarding drafts for office review, filtered by status. Read-only projection; drafts advance only through the explicit edit, approve-send, revoke, and confirm-sent commands."
+      },
+      "accepts": [
+        {
+          "media_type": "application/json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.onboarding-draft-list+json"],
+      "parameters": [
+        {
+          "name": "status",
+          "value_type": "string",
+          "required": false,
+          "label": "Status",
+          "description": "Draft status to list: pending, sending, sent, or revoked."
+        },
+        {
+          "name": "limit",
+          "value_type": "integer",
+          "required": false,
+          "label": "Limit",
+          "description": "Maximum number of drafts to return in one page."
+        },
+        {
+          "name": "cursor",
+          "value_type": "string",
+          "required": false,
+          "label": "Cursor",
+          "description": "Opaque pagination cursor returned by a prior page."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "onboarding.draft.edit",
+      "version": "1.0",
+      "action": {
+        "label": "Edit onboarding draft",
+        "description": "Edit a still-pending onboarding draft's subject, body, or recipient; setting a recipient clears the no-email blocker. A draft that is not pending cannot be edited."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.onboarding-draft-edit+json",
+          "max_bytes": 32768
+        }
+      ],
+      "produces": ["application/vnd.eom.onboarding-draft+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "onboarding.draft.revoke",
+      "version": "1.0",
+      "action": {
+        "label": "Revoke onboarding draft",
+        "description": "Revoke a pending onboarding draft, or reconcile a stuck sending one. Idempotent by the draft's state; a sent draft is immutable and cannot be revoked. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.onboarding-draft-revocation+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.onboarding-draft-revocation-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "onboarding.draft.confirm-sent",
+      "version": "1.0",
+      "action": {
+        "label": "Confirm onboarding draft sent",
+        "description": "Operator reconciliation: mark a stale claimed onboarding draft as delivered after verifying the send in the transport log. A draft not claimed for sending cannot be confirmed. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.onboarding-draft-send-confirmation+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.onboarding-draft-send-confirmation-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }
