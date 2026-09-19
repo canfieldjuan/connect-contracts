@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "a0c4b035-a8e6-42b8-a1da-a787557c4b5a",
+  "capability": {
+    "id": "lead.missed-call-recovery.resume",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "4753b9e5-0071-445b-8257-795b4edee030",
+      "media_type": "application/vnd.eom.missed-call-recovery-resume+json",
+      "byte_size": 53,
+      "sha256": "eb23179176d5b473bc0afcef55916de0574050fb0a2374c4b5a5aaf846e093b3",
+      "display_name": "missed-call-recovery-resume.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

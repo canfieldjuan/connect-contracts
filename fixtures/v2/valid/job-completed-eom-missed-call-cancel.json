@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "c6adf6b1-e582-43b6-9f22-caa105af5ef1",
+  "capability": {
+    "id": "lead.missed-call-recovery.cancel",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T10:00:00Z",
+  "updated_at": "2026-09-19T10:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "ea34070d-39f5-4d31-87a4-035dbe816634",
+      "media_type": "application/vnd.eom.missed-call-recovery-cancel+json",
+      "byte_size": 82,
+      "sha256": "9e68bf6f7d09c9578411c342d5b6e46e1d2ad974da966f0f626073b053d51250"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "5dcab12f-4576-42e2-8d11-f06b9bcd8bdb",
+        "media_type": "application/vnd.eom.missed-call-recovery-cancel-receipt+json",
+        "display_name": "missed-call-recovery-cancel-receipt.json",
+        "byte_size": 189,
+        "sha256": "c562533871ec141a216bc7b618f385ec2e5086f9f3e36a5f10c9cc58e119922d",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJpZGVtcG90ZW50IjpmYWxzZSwiY29udGFjdF9pZCI6IjZlZjdiMGQ5LTdmNDYtNDE5My1iZTEwLWJkOWU1Y2M4YWYxYyIsInNlcXVlbmNlX2lkIjoiYjlhOWMxZmMtODg0NC00MTFhLTg0M2ItNjg0ZDVhZDJlOTVkIiwic3RhdGUiOiJjYW5jZWxsZWQiLCJyZWFzb24iOiJjYWxsYmFja19yZWNvcmRlZCJ9"
+      }
+    ]
+  }
+}

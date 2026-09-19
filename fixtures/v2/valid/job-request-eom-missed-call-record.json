@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "87454b7e-de78-4e52-86b9-349898ea08c2",
+  "capability": {
+    "id": "lead.missed-call-attempt.record",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "1294e0b6-4871-4551-8954-56ba18944980",
+      "media_type": "application/vnd.eom.missed-call-attempt+json",
+      "byte_size": 53,
+      "sha256": "9bbb006c64d2ac7c2454e212b778ddf1db8866e960c98246c2b7f0e581bc5eff",
+      "display_name": "missed-call-attempt.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
