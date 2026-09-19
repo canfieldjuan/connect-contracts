@@ -197,13 +197,16 @@ and authenticated attribution to the selected state. It releases them after
 that startup commits; provider ownership and publication locks continue to
 guard steady-state serving.
 
-Before binding access, every shared acquisition also checks under control
-authority that no package-operation or application-private durable-state-reset
-record exists. An incomplete, unreadable, malformed, or wrong-target record is
-a durable barrier and fails closed before manager mutation, state recovery,
-endpoint binding, or publication. Only the recorded lifecycle operation holding
-its required exclusive control authority may recover that record and resume or
-safely restart the exact operation.
+Before binding or manager access, every shared acquisition and every enable,
+disable, rebind, or durable-state reset or replacement control operation checks
+under its required authority for both the package-operation and
+application-private durable-state-reset records. An incomplete, unreadable,
+malformed, or wrong-target record is a durable barrier and makes an unrelated
+request fail closed before manager mutation, state recovery, endpoint binding,
+or publication. It cannot clear, overwrite, or order itself around that record.
+Only the recorded lifecycle operation holding its required exclusive control
+authority may recover the record and resume or safely restart the exact
+operation.
 
 An existing package-operation record's kind, generation, and target are
 immutable. A requested upgrade, removal, or reinstall that encounters a
@@ -388,11 +391,11 @@ state before publishing availability. It never converts an uncertain admitted
 job into a fresh submission under the same identity. Consumers retain the
 ADR-0006 reconciliation rules.
 
-Every package-operation record and removal receipt is a bounded, non-link
-regular file outside the mutable installed package. For per-user artifacts it
-is owner-private. For shared artifacts it is protected at package-operation
-scope and cannot be replaced, cleared, or consumed under only one participant's
-authority. Each shared-scope operation record binds the bounded exact
+Each package-operation record, removal receipt, and receipt-retirement
+tombstone is a bounded, non-link regular file outside the mutable installed
+package. A per-user artifact is owner-private. A shared artifact is protected
+at package-operation scope and cannot be replaced, cleared, or consumed under
+only one participant's authority. Each shared-scope operation record binds the bounded exact
 participant set and generation-bound prior enabled choice and settlement state
 for every affected user; singular user, choice, process, registration, and
 receipt language below applies to every recorded participant.
@@ -419,6 +422,17 @@ malformed, or conflicting reset record makes the package request fail closed
 without writing a package record or changing manager or artifact state. A
 package operation cannot clear, advance, or order itself ahead of that record;
 exact reset recovery must settle and clear it first.
+
+Under that same authority and before writing a new package-operation record, a
+package controller also recovers any completed reinstall receipt-retirement
+tombstone. A valid tombstone binds the exact completed reinstall generation,
+outcome, target, participant set, predecessor receipt producer identities, and
+predecessor receipt filenames. Recovery deletes only those bound consumed
+predecessor receipts idempotently and deletes the tombstone last. An unreadable,
+malformed, mismatched, or unbound consumed receipt fails closed before a new
+package record or artifact mutation. A valid completed tombstone is cleanup
+authority, not an incomplete lifecycle barrier, and does not block ordinary
+provider acquisition.
 
 Package upgrade takes exclusive control authority before suppressing manager
 startup or changing launch artifacts. Before either mutation, it atomically and
@@ -530,8 +544,10 @@ and completes that exact removal generation through its receipt and exact clear
 while manager launch remains suppressed. It does not overwrite the record,
 start a new package generation, or create any new package artifact first. A
 malformed, wrong-target, or conflicting receipt or record fails closed before
-mutation. A consumed receipt with no matching incomplete reinstall record also
-fails closed before mutation.
+mutation. A consumed receipt with neither its matching incomplete reinstall
+record nor its matching completed receipt-retirement tombstone fails closed
+before mutation; a matching tombstone is recovered through the cleanup rule
+above before any new reinstall generation begins.
 
 After exact removal clear and proof that the old target artifacts are absent,
 but before creating the first new package artifact, the installer atomically
@@ -553,22 +569,47 @@ The installer holds the same exclusive authority across removal recovery,
 reinstall-record persistence, new-package installation, and new-enable
 admission. The reinstall generation then follows the upgrade generation's
 enabled or disabled successor start, authenticated readiness, delegated
-coverage, exact clear, and shared-authority handoff ordering. Before the exact
-reinstall clear, it atomically and durably marks only every matching participant
-receipt consumed; after the complete matching receipt set is marked, the
-still-incomplete reinstall record is the sole owner of the copied enabled
-choices. Installation or readiness failure keeps manager launch suppressed and
-the reinstall record incomplete for exact recovery. It never treats a receipt
-as readiness and never restores manager launch while the removal barrier remains
-incomplete or before the new package passes admission. The reinstall barrier
-remains until every disabled choice is settled and every enabled choice is
-either served by an authenticated successor under continuous coverage or
-durably deferred because no capable service session exists.
+coverage, exact clear, and shared-authority handoff ordering.
+
+Installation or readiness failure keeps manager launch suppressed and the
+reinstall record incomplete for exact recovery. It never treats a receipt or
+tombstone as readiness and never restores manager launch while the removal
+barrier remains incomplete or before the new package passes admission. The
+reinstall barrier remains until every disabled choice is settled and every
+enabled choice is either served by an authenticated successor under continuous
+coverage or durably deferred because no capable service session exists.
+
+For a forward disposition, every participant settlement above completes before
+tombstone publication or predecessor receipt consumption. For an absorbing
+removal disposition, before the first predecessor-consumption/replacement pair
+described below, the controller atomically publishes and durably commits a
+completed receipt-retirement tombstone outside the package. The tombstone names
+this exact reinstall generation, its forward or removal outcome, target,
+participant set, and complete predecessor receipt set. The controller then
+atomically and durably marks only every matching participant receipt consumed.
+After the complete matching set is marked, the still-incomplete reinstall
+record is the sole owner of the copied enabled choices and the tombstone is the
+sole authority to retire those predecessor receipts after clear.
+
+Only after settlement and complete matching predecessor consumption may the
+controller clear that exact reinstall record. It then deletes the tombstone's
+bound predecessor receipts idempotently and durably commits every bound
+receipt's absence. Only after those absences are durable does it atomically
+remove and durably commit the tombstone's absence. A crash before clear resumes
+the active reinstall through its record; a crash after clear resumes only
+receipt retirement through the tombstone. No order can leave a consumed
+predecessor receipt without one of those two exact authorities, and no later
+package operation writes its own record until retirement completes.
 
 Exact-generation recovery may durably advance the same reinstall record only
-from forward to the absorbing removal disposition after either deterministic
+from forward to the absorbing removal disposition before any receipt-retirement
+tombstone for that generation is durable and after either deterministic
 complete-package admission failure that exact recovery cannot repair without
-changing the recorded target or an explicit user package-removal request. A
+changing the recorded target or an explicit user package-removal request. Once
+a tombstone is durable, its recorded disposition is frozen. A removal request
+after a forward tombstone must let that already-settled forward generation
+complete exact clear and predecessor receipt retirement; only then may normal
+package admission start a fresh removal generation. A
 retryable installation or readiness failure, a readiness timeout, an unavailable
 service session, or a deferred-enabled participant does not authorize removal.
 Recovery never reverses that disposition or changes the record kind, generation,
@@ -670,7 +711,9 @@ Each provider implementation must exercise both sides of these boundaries:
     and no old-ID publisher appears after forward settlement. Target failure
     before the marker proves it absent before restoring the source, rollback
     failure starts neither side, a live different-state owner is not displaced,
-    and malformed or mismatched records remain barriers;
+    and malformed or mismatched records remain barriers. After a reset
+    controller crash, unrelated enable, disable, rebind, and package operations
+    fail before mutation until exact reset recovery clears the record;
 13. two distinct OS users exercise both artifact scopes: per-user artifacts
     operate independently, while a shared-artifact package mutation by user A
     races user B's enable, disable, rebind, durable-state reset or replacement,
@@ -722,18 +765,32 @@ Each provider implementation must exercise both sides of these boundaries:
 16. package reinstall persists a new exact generation after removal clear and
     before the first replacement artifact, copies the exact participant and
     choice map, and consumes only its matching receipt set; crashes after removal
-    clear, record persistence, partial installation, package admission, a subset
-    of receipt consumption, participant settlement, and before exact clear leave
-    either no new artifact or the exact durable barrier, never an acquirable
-    partial installation. After exact clear they leave a complete admitted
-    package with each enabled active-session successor authenticated under
+    clear, record persistence, partial installation, package admission,
+    forward participant settlement, atomic receipt-retirement tombstone
+    publication, a subset of receipt consumption, exact clear, a subset of
+    predecessor receipt deletion, durable receipt absence, atomic tombstone
+    removal, and durable tombstone absence leave either the exact active barrier
+    or a recoverable completed-retirement authority, never an acquirable partial
+    installation or an unowned consumed receipt. Removal disposition publishes
+    its tombstone before its first predecessor-consumption/replacement pair.
+    After forward exact clear the generation leaves a complete admitted package
+    with each enabled active-session successor authenticated under
     continuous coverage, each enabled sessionless participant durably deferred,
     and every disabled manager suppressed; an old removal generation cannot
     delete the new package, malformed or conflicting records fail closed, a
-    consumed receipt without its matching incomplete reinstall fails closed,
-    and matching recovery reuses consumed markers idempotently. A permanently
-    invalid target advances that exact generation from forward to absorbing
-    removal before mutation, while retryable installation or readiness failure,
+    consumed receipt without its matching incomplete reinstall or completed
+    retirement tombstone fails closed, and matching recovery reuses consumed
+    markers and deletes predecessor receipts idempotently with the tombstone
+    last. A remove, reinstall, remove, reinstall cycle consumes only the current
+    producer's receipt set and is never blocked by or attached to the retired
+    predecessor generation. A removal request immediately before tombstone
+    persistence may advance the same generation to removal. The same request
+    immediately after a forward tombstone cannot change that generation: forward
+    settlement, exact clear, and retirement finish first, then a fresh removal
+    generation starts under normal package admission. Crashes on either side of
+    this boundary never create a tombstone/outcome mismatch. A permanently invalid
+    target advances that exact generation from forward to absorbing removal before
+    mutation, while retryable installation or readiness failure,
     readiness timeout, and session absence remain forward-recoverable and never
     authorize removal; the transition never retargets the record, stops any
     target publisher, removes every target and partial artifact, preserves jobs
@@ -747,7 +804,8 @@ Each provider implementation must exercise both sides of these boundaries:
     and malformed, wrong-scope, wrong-participant, wrong-choice, wrong-producer,
     or wrong-target recovery remains a barrier. Active, disabled, and
     deferred-enabled participants preserve their exact choice without requiring
-    a logged-out user to become ready;
+    a logged-out user to become ready, and retirement deletes only predecessor
+    receipts, never the replacement set;
 17. a job consuming its maximum drain still leaves enough of the 35-second
     graceful-stop budget for durable cancellation classification, endpoint
     shutdown, exact-registration removal, ownership release, and exit before
