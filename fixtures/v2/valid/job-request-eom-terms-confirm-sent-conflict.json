@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "0d069b7e-aa8a-41ea-88ae-7edff14f0a82",
+  "capability": {
+    "id": "terms.delivery.confirm-sent",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "cd12bae2-6293-4204-b36c-586999bce865",
+      "media_type": "application/vnd.eom.terms-delivery-confirmation+json",
+      "byte_size": 54,
+      "sha256": "3184b9c810284efb8edbfb1d98322ae7245d03d732d706c751e8e34ef1031942",
+      "display_name": "terms-delivery-confirmation.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

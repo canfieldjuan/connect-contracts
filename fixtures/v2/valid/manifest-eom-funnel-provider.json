@@ -281,6 +281,86 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "terms.invitation.issue",
+      "version": "1.0",
+      "action": {
+        "label": "Issue terms invitation",
+        "description": "Issue and deliver one actor-audited terms invitation for an existing classified EOM customer. Idempotent by the request key; a contact that is not an active classified customer is refused. Sends the invitation email, so it requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.terms-invitation-request+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.terms-invitation+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "terms.invitation.revoke",
+      "version": "1.0",
+      "action": {
+        "label": "Revoke terms invitation",
+        "description": "Make one unaccepted terms invitation permanently unusable. An accepted invitation cannot be revoked. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.terms-invitation-revocation+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.terms-invitation+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "terms.readiness.read",
+      "version": "1.0",
+      "action": {
+        "label": "Read terms readiness",
+        "description": "Report whether the customer has current material terms evidence under the published version chain. Read-only projection; alters no invitation, delivery, or acceptance state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.terms-readiness-query+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.terms-readiness+json"],
+      "parameters": [],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "terms.delivery.confirm-sent",
+      "version": "1.0",
+      "action": {
+        "label": "Confirm terms delivery sent",
+        "description": "Record an actor's external confirmation that an ambiguous terms delivery was sent, finalizing its terminal state. A pending delivery with no transport result cannot be confirmed. Requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.terms-delivery-confirmation+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.terms-delivery+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }

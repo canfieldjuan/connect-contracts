@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "cc3618d0-6576-43fe-a468-78d9ad696780",
+  "capability": {
+    "id": "terms.invitation.issue",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "db93a80f-96ce-4ffd-9db2-ec7e2499153f",
+      "media_type": "application/vnd.eom.terms-invitation-request+json",
+      "byte_size": 120,
+      "sha256": "c8d1377a7874126a8e95cdd9e465b377b272abc75fef6d60e1be03342082b1f0",
+      "display_name": "terms-invitation-request.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
