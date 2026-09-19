@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "fc9a06ff-072b-4a3e-86c7-c18ef9dfbe8f",
+  "capability": {
+    "id": "terms.readiness.read",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "4e8eae0d-97f1-4c30-9d99-627b0b4f2cb8",
+      "media_type": "application/vnd.eom.terms-readiness-query+json",
+      "byte_size": 53,
+      "sha256": "ab8c000338029550078db90a832353ba80fbc90a56b6ff149391aba9386f6bdc",
+      "display_name": "terms-readiness-query.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

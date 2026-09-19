@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "0d406c2f-86a4-49bb-ba66-52fb47c1f486",
+  "capability": {
+    "id": "terms.invitation.issue",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-19T11:00:00Z",
+  "updated_at": "2026-09-19T11:00:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "6f73a6c2-590b-4fb0-aa46-0ecf97b2f29d",
+      "media_type": "application/vnd.eom.terms-invitation-request+json",
+      "byte_size": 120,
+      "sha256": "a801de0ccae945088ef0645a3aab74d90c6e9cba1eaec7b00dc72ba1fa027682"
+    }
+  ],
+  "error": {
+    "code": "EOM_TERMS_CUSTOMER_NOT_ELIGIBLE",
+    "message": "The contact is not an active classified EOM customer.",
+    "retryable": false
+  }
+}

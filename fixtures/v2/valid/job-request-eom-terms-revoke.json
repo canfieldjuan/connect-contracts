@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "133f5ab8-57bd-4b2b-bb89-90eb9cc55baa",
+  "capability": {
+    "id": "terms.invitation.revoke",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "8317563c-7903-40b1-9049-96e06ff0ce56",
+      "media_type": "application/vnd.eom.terms-invitation-revocation+json",
+      "byte_size": 56,
+      "sha256": "524d6d01fab8e106d38cdbf71a541e78d131c441103921b382918e727daf7df5",
+      "display_name": "terms-invitation-revocation.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

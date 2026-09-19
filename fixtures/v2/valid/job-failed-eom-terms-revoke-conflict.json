@@ -1,0 +1,28 @@
+{
+  "protocol_version": 2,
+  "job_id": "47af531d-37fa-4ba7-8c25-414b56e7e6b0",
+  "capability": {
+    "id": "terms.invitation.revoke",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "failed",
+  "created_at": "2026-09-19T11:00:00Z",
+  "updated_at": "2026-09-19T11:00:01Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "b751e747-34ae-4eca-b08a-0e7d9200695a",
+      "media_type": "application/vnd.eom.terms-invitation-revocation+json",
+      "byte_size": 56,
+      "sha256": "8a1fbcb24ec3689c8fbfc0382d8b6309a7c007130443b53e87add7a6fdbf17a1"
+    }
+  ],
+  "error": {
+    "code": "EOM_TERMS_INVITATION_NOT_REVOCABLE",
+    "message": "An accepted terms invitation cannot be revoked.",
+    "retryable": false
+  }
+}
