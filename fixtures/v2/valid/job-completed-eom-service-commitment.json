@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "5cd09070-4f50-47aa-83ed-97429c218aab",
+  "capability": {
+    "id": "customer.post-clean-service-commitment.decide",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T13:00:00Z",
+  "updated_at": "2026-09-19T13:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "23f049bf-8210-46b2-91aa-94c59da4b15a",
+      "media_type": "application/vnd.eom.post-clean-service-commitment+json",
+      "byte_size": 88,
+      "sha256": "24bafca2177d7c4e508492c12bcd09d5451797e26cea97f09e05e0f24675159a"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "4c99bc89-5430-4825-a32f-4d2f7575ad07",
+        "media_type": "application/vnd.eom.post-clean-service-commitment-receipt+json",
+        "display_name": "post-clean-service-commitment-receipt.json",
+        "byte_size": 219,
+        "sha256": "58eecc13b50a5ccfa2963b6f2c748ec268f799971719a67b48fbd1b8282b3ef8",
+        "payload_base64": "eyJjYW5kaWRhdGVJZCI6ImEzMzhiNWU5LWI4MjAtNDM4ZS1hYjMyLWFlMDEwNjQ4YTg2OCIsImNvbnRhY3RJZCI6IjcxZDhhZTkwLWY2NTUtNDg2NS1hMDEzLTBkZDVmZDZkYzY5MiIsInNlcnZpY2VDb21taXRtZW50IjoicmVjdXJyaW5nIiwiZGVjaWRlZEJ5TmFtZSI6IkFsZXggQ2hlbiIsImRlY2lkZWRBdCI6IjIwMjYtMDktMTlUMTM6MDA6MDBaIiwiaWRlbXBvdGVudCI6ZmFsc2V9"
+      }
+    ]
+  }
+}

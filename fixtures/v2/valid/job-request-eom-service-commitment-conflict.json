@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "077d45ae-598f-4349-8ba2-161bef12d595",
+  "capability": {
+    "id": "customer.post-clean-service-commitment.decide",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "cd20e1a2-5970-4765-a12b-98638ea260db",
+      "media_type": "application/vnd.eom.post-clean-service-commitment+json",
+      "byte_size": 87,
+      "sha256": "dac2cdb656e009f6c819bafb806e4f2400f2b9342b23ef7a7a8eb3ef8a9bc8f6",
+      "display_name": "post-clean-service-commitment.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

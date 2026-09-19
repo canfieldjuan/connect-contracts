@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "2a515e35-8eeb-420c-9d3f-023368940e38",
+  "capability": {
+    "id": "customer.post-clean-onboarding-candidate.create",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "2e86ec6b-f3ad-44f3-a75d-9c28a9b3710d",
+      "media_type": "application/vnd.eom.post-clean-onboarding-candidate-request+json",
+      "byte_size": 197,
+      "sha256": "2225b9e4ee76b13b21a5c9f3ea4476717edd0895f3d1fa834372ddbf6e0bd836",
+      "display_name": "first-clean-completion.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}
