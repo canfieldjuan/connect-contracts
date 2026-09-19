@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "a6cb81e8-b928-4108-b1bb-5710d374132f",
+  "capability": {
+    "id": "contact.archive",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "386a3c1a-d937-43eb-bee8-04af02ede471",
+      "media_type": "application/vnd.eom.contact-archive+json",
+      "byte_size": 53,
+      "sha256": "d614b2ea156e6cd8369985cca60c0eaed6cb1858003477086ef1b28744afb4df",
+      "display_name": "contact-archive.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

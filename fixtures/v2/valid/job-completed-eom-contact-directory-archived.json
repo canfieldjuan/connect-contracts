@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "c12a8cd5-31e4-42fe-9b3e-7aa744970077",
+  "capability": {
+    "id": "contact.directory.archived",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T14:00:00Z",
+  "updated_at": "2026-09-19T14:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "83ceb2f3-7198-488d-bdd1-0445b0c8fb22",
+      "media_type": "application/json",
+      "byte_size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "5593f026-1f31-448a-8f5d-fd0e7fb71fa4",
+        "media_type": "application/vnd.eom.contact-directory+json",
+        "display_name": "contact-directory-archived.json",
+        "byte_size": 471,
+        "sha256": "d031b282dd7c4403118c22c1edd31d533cb198b853f74cef29b66fbe85ed03b8",
+        "payload_base64": "eyJjb250YWN0cyI6W3siY29udGFjdElkIjoiOTQyMzc5MjMtZDlhYi00OWY0LWJhMTktY2U3YzA3ZmZmYmNmIiwiZnVsbE5hbWUiOiJKb3JkYW4gUml2ZXJhIiwiZW1haWwiOiJqb3JkYW5AZXhhbXBsZS5jb20iLCJwaG9uZSI6IisxIDU1NSAwMTAwIiwiYWRkcmVzcyI6IjEyIE1hcmtldCBTdCIsImNvbnRhY3RUeXBlIjoiY3VzdG9tZXIiLCJjdXN0b21lclR5cGUiOiJyZXNpZGVudGlhbCIsImxlYWRTdGFnZSI6bnVsbCwic3RhdHVzIjoiYXJjaGl2ZWQiLCJzb3VyY2UiOiJtYW51YWwiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTE4VDA4OjAwOjAwWiIsInVwZGF0ZWRBdCI6IjIwMjYtMDktMTlUMDk6MDA6MDBaIiwiZWRpdGFibGUiOmZhbHNlLCJlZGl0QmxvY2tlZFJlYXNvbiI6Im5vdF9lZGl0YWJsZV9hcmNoaXZlZCJ9XSwibGltaXQiOjI1LCJjdXJzb3IiOm51bGwsImhhc19tb3JlIjpmYWxzZSwibmV4dF9jdXJzb3IiOm51bGx9"
+      }
+    ]
+  }
+}

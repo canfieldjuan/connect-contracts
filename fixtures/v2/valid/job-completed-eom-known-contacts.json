@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "0c174caf-ab7a-4ec8-a313-197663cc99cd",
+  "capability": {
+    "id": "contact.link-verification",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T14:00:00Z",
+  "updated_at": "2026-09-19T14:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "fc7c004f-6723-406f-a5cf-db2a25ac675a",
+      "media_type": "application/vnd.eom.known-contacts-query+json",
+      "byte_size": 134,
+      "sha256": "5678aff2a0d23a010461ea15da7ff81b36ffd9dc26ef77286ca7fb203a62c3ec"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "590caff2-9a9d-45e5-bb52-2bfb35128fc8",
+        "media_type": "application/vnd.eom.known-contacts+json",
+        "display_name": "known-contacts.json",
+        "byte_size": 354,
+        "sha256": "863af549375fc4bf1c08bff2135aed66ebd35601ff4e9d11c54d1cc7ff6122cc",
+        "payload_base64": "eyJrbm93bkNvbnRhY3RJZHMiOlsiZDQ4OWVjZTItMTM4NS00OWYwLWIzMjgtYWQxMzk1YzhkYjBiIiwiMzQyOTYzZjEtOGM5ZS00NTIzLWFlNzQtNDZlNTljMWJhNWFlIl0sImN1c3RvbWVyVHlwZXMiOnsiZDQ4OWVjZTItMTM4NS00OWYwLWIzMjgtYWQxMzk1YzhkYjBiIjoicmVzaWRlbnRpYWwiLCIzNDI5NjNmMS04YzllLTQ1MjMtYWU3NC00NmU1OWMxYmE1YWUiOiJjb21tZXJjaWFsIn0sImN1c3RvbWVyVHlwZVJldmlzaW9ucyI6eyJkNDg5ZWNlMi0xMzg1LTQ5ZjAtYjMyOC1hZDEzOTVjOGRiMGIiOjQsIjM0Mjk2M2YxLThjOWUtNDUyMy1hZTc0LTQ2ZTU5YzFiYTVhZSI6Mn0sImNoZWNrZWQiOjMsImxpbWl0IjoyMDB9"
+      }
+    ]
+  }
+}

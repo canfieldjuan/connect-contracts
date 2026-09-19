@@ -558,6 +558,294 @@
         "external": true,
         "confirmation_required": true
       }
+    },
+    {
+      "id": "contact.link-verification",
+      "version": "1.0",
+      "action": {
+        "label": "Verify contact links",
+        "description": "Report which submitted contact ids still name a live EOM contact, and each one's account type. Read-only projection that discloses no name, email, phone, or address and alters no CRM state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.known-contacts-query+json",
+          "max_bytes": 8192
+        }
+      ],
+      "produces": ["application/vnd.eom.known-contacts+json"],
+      "parameters": [],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "contact.directory",
+      "version": "1.0",
+      "action": {
+        "label": "List contact directory",
+        "description": "List active EOM lead and customer contacts for operator discovery. Read-only projection over canonical contact columns; alters no CRM state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.contact-directory+json"],
+      "parameters": [
+        {
+          "name": "limit",
+          "value_type": "integer",
+          "required": false,
+          "label": "Limit",
+          "description": "Maximum number of directory contacts to return in one page."
+        },
+        {
+          "name": "cursor",
+          "value_type": "string",
+          "required": false,
+          "label": "Cursor",
+          "description": "Opaque pagination cursor returned by a prior directory page."
+        },
+        {
+          "name": "search",
+          "value_type": "string",
+          "required": false,
+          "label": "Search",
+          "description": "Free-text match over the canonical contact name, email, or phone."
+        },
+        {
+          "name": "kind",
+          "value_type": "string",
+          "required": false,
+          "label": "Kind",
+          "description": "Contact kind filter: all, lead, or customer."
+        },
+        {
+          "name": "lifecycle",
+          "value_type": "string",
+          "required": false,
+          "label": "Lifecycle",
+          "description": "Lifecycle filter: active or archived contacts."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "contact.directory.editability",
+      "version": "1.0",
+      "action": {
+        "label": "List contact directory with editability verdict",
+        "description": "Same directory read whose response carries the per-contact editability verdict and closed edit-blocked reason code. Advertised only by a build that serves the verdict, so a stale deployment fails closed. Read-only; alters no CRM state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.contact-directory+json"],
+      "parameters": [
+        {
+          "name": "limit",
+          "value_type": "integer",
+          "required": false,
+          "label": "Limit",
+          "description": "Maximum number of directory contacts to return in one page."
+        },
+        {
+          "name": "cursor",
+          "value_type": "string",
+          "required": false,
+          "label": "Cursor",
+          "description": "Opaque pagination cursor returned by a prior directory page."
+        },
+        {
+          "name": "search",
+          "value_type": "string",
+          "required": false,
+          "label": "Search",
+          "description": "Free-text match over the canonical contact name, email, or phone."
+        },
+        {
+          "name": "kind",
+          "value_type": "string",
+          "required": false,
+          "label": "Kind",
+          "description": "Contact kind filter: all, lead, or customer."
+        },
+        {
+          "name": "lifecycle",
+          "value_type": "string",
+          "required": false,
+          "label": "Lifecycle",
+          "description": "Lifecycle filter: active or archived contacts."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "contact.directory.archived",
+      "version": "1.0",
+      "action": {
+        "label": "List archived contacts",
+        "description": "Same directory read that understands the closed lifecycle filter and returns archived contacts. Advertised only by a build that serves the filter, so a stale deployment fails closed. Read-only; alters no CRM state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.contact-directory+json"],
+      "parameters": [
+        {
+          "name": "limit",
+          "value_type": "integer",
+          "required": false,
+          "label": "Limit",
+          "description": "Maximum number of directory contacts to return in one page."
+        },
+        {
+          "name": "cursor",
+          "value_type": "string",
+          "required": false,
+          "label": "Cursor",
+          "description": "Opaque pagination cursor returned by a prior directory page."
+        },
+        {
+          "name": "search",
+          "value_type": "string",
+          "required": false,
+          "label": "Search",
+          "description": "Free-text match over the canonical contact name, email, or phone."
+        },
+        {
+          "name": "kind",
+          "value_type": "string",
+          "required": false,
+          "label": "Kind",
+          "description": "Contact kind filter: all, lead, or customer."
+        },
+        {
+          "name": "lifecycle",
+          "value_type": "string",
+          "required": false,
+          "label": "Lifecycle",
+          "description": "Lifecycle filter: active or archived contacts."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "card-vault.readiness.read",
+      "version": "1.0",
+      "action": {
+        "label": "Read card-vault readiness",
+        "description": "Read provider-confirmed card-on-file readiness for one customer without mutating onboarding. Card-only readiness, not an overall onboarding-completion flag. Read-only; alters no CRM state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.card-vault-readiness-query+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.card-vault-readiness+json"],
+      "parameters": [],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
+      "id": "contact.operator-mutation",
+      "version": "1.0",
+      "action": {
+        "label": "Create or edit contact",
+        "description": "Create or edit one EOM contact through the authenticated operator mutation boundary. Creates or amends durable CRM state and requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.operator-contact+json",
+          "max_bytes": 8192
+        }
+      ],
+      "produces": ["application/vnd.eom.operator-contact-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "contact.field-clear",
+      "version": "1.0",
+      "action": {
+        "label": "Clear contact fields",
+        "description": "Clear a contact's email or phone through the operator mutation boundary using present-null semantics. Amends durable CRM state and records the cleared fields; requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.operator-contact+json",
+          "max_bytes": 8192
+        }
+      ],
+      "produces": ["application/vnd.eom.operator-contact-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "contact.archive",
+      "version": "1.0",
+      "action": {
+        "label": "Archive contact",
+        "description": "Reversibly park one EOM contact out of the active directory. A status-axis soft archive, never a delete; a won-stage lead is refused toward the lost flow. Creates durable lifecycle state and requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.contact-archive+json",
+          "max_bytes": 2048
+        }
+      ],
+      "produces": ["application/vnd.eom.contact-archive-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
+      "id": "contact.restore",
+      "version": "1.0",
+      "action": {
+        "label": "Restore contact",
+        "description": "Return one archived EOM contact to the active directory, exactly as it was. A pure status flip on the status axis. Creates durable lifecycle state and requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.contact-restoration+json",
+          "max_bytes": 2048
+        }
+      ],
+      "produces": ["application/vnd.eom.contact-restoration-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
     }
   ]
 }

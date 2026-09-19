@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "14b54680-c35c-4c6a-ab37-5cb02bb4e152",
+  "capability": {
+    "id": "contact.directory",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T14:00:00Z",
+  "updated_at": "2026-09-19T14:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "bfadab7d-01fa-4b04-a758-d3d72e0a28fa",
+      "media_type": "application/json",
+      "byte_size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "9da4b1ca-ed64-4338-a9d3-db85dc66e324",
+        "media_type": "application/vnd.eom.contact-directory+json",
+        "display_name": "contact-directory.json",
+        "byte_size": 820,
+        "sha256": "b1d1dcd924de18dfd88c889c2818a90cf8ee8398c5acc3da1884f4d185db26cf",
+        "payload_base64": "eyJjb250YWN0cyI6W3siY29udGFjdElkIjoiZjYyOWQ5NWQtODYwOC00ZTdmLTlhZTEtYWY4YjQ3YzhjYmIxIiwiZnVsbE5hbWUiOiJKb3JkYW4gUml2ZXJhIiwiZW1haWwiOiJqb3JkYW5AZXhhbXBsZS5jb20iLCJwaG9uZSI6IisxIDU1NSAwMTAwIiwiYWRkcmVzcyI6IjEyIE1hcmtldCBTdCIsImNvbnRhY3RUeXBlIjoiY3VzdG9tZXIiLCJjdXN0b21lclR5cGUiOiJyZXNpZGVudGlhbCIsImxlYWRTdGFnZSI6bnVsbCwic3RhdHVzIjoiYWN0aXZlIiwic291cmNlIjoibWFudWFsIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0xOFQwODowMDowMFoiLCJ1cGRhdGVkQXQiOiIyMDI2LTA5LTE5VDA5OjAwOjAwWiIsImVkaXRhYmxlIjp0cnVlLCJlZGl0QmxvY2tlZFJlYXNvbiI6bnVsbH0seyJjb250YWN0SWQiOiIwNGY4MzExMi05ZWJiLTRiNDEtYjcyZS1lYWIxM2NjN2I1ZjIiLCJmdWxsTmFtZSI6IkpvcmRhbiBSaXZlcmEiLCJlbWFpbCI6ImpvcmRhbkBleGFtcGxlLmNvbSIsInBob25lIjoiKzEgNTU1IDAxMDAiLCJhZGRyZXNzIjoiMTIgTWFya2V0IFN0IiwiY29udGFjdFR5cGUiOiJsZWFkIiwiY3VzdG9tZXJUeXBlIjoicmVzaWRlbnRpYWwiLCJsZWFkU3RhZ2UiOiJuZXciLCJzdGF0dXMiOiJhY3RpdmUiLCJzb3VyY2UiOiJtYW51YWwiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTE4VDA4OjAwOjAwWiIsInVwZGF0ZWRBdCI6IjIwMjYtMDktMTlUMDk6MDA6MDBaIiwiZWRpdGFibGUiOnRydWUsImVkaXRCbG9ja2VkUmVhc29uIjpudWxsfV0sImxpbWl0IjoyNSwiY3Vyc29yIjpudWxsLCJoYXNfbW9yZSI6ZmFsc2UsIm5leHRfY3Vyc29yIjpudWxsfQ=="
+      }
+    ]
+  }
+}

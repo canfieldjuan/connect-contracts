@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "c8a8960f-250b-4af2-a978-92ef22ced6c6",
+  "capability": {
+    "id": "card-vault.readiness.read",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "d7720eb3-2645-449d-a6d2-3f7519f0589c",
+      "media_type": "application/vnd.eom.card-vault-readiness-query+json",
+      "byte_size": 53,
+      "sha256": "c77f94ff7acab7adb56dae69dccf84f0910e57fa742c57cae66e861b184328da",
+      "display_name": "card-vault-readiness-query.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

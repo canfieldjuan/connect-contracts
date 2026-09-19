@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "99534533-498b-4b4a-b05c-21945e9370f2",
+  "capability": {
+    "id": "contact.field-clear",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "5831063d-542e-44b8-a17f-bdbc435530ee",
+      "media_type": "application/vnd.eom.operator-contact+json",
+      "byte_size": 128,
+      "sha256": "5756971740d5abbf2a24e15bb059d8e17928d40f5fc0289daeab9cc93d20d66f",
+      "display_name": "operator-contact-field-clear.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

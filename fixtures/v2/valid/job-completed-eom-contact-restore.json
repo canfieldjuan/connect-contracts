@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "04709f09-3557-4578-be21-252c270fd033",
+  "capability": {
+    "id": "contact.restore",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-19T14:00:00Z",
+  "updated_at": "2026-09-19T14:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "18f0cbdb-089f-4fff-9a9c-7df6b84504bd",
+      "media_type": "application/vnd.eom.contact-restoration+json",
+      "byte_size": 53,
+      "sha256": "e1e09b791f7d8b110a6756530317a85c58270946069f89829cab95afa03781d2"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "7680b81d-644d-470a-85c4-3b0b0220e58a",
+        "media_type": "application/vnd.eom.contact-restoration-receipt+json",
+        "display_name": "contact-restoration-receipt.json",
+        "byte_size": 149,
+        "sha256": "219531d9ad97e2f0e5103e5e170231b28a4f5dcece4f90372400f45cd6df0313",
+        "payload_base64": "eyJzdWNjZXNzIjp0cnVlLCJjb250YWN0X2lkIjoiZWM5MzQzMTYtMjM1My00NDQ4LWJmOTktMGRhMWFhOGNmMzYzIiwiY29udGFjdF90eXBlIjoiY3VzdG9tZXIiLCJsZWFkX3N0YWdlIjpudWxsLCJzdGF0dXMiOiJhY3RpdmUiLCJpZGVtcG90ZW50IjpmYWxzZX0="
+      }
+    ]
+  }
+}
