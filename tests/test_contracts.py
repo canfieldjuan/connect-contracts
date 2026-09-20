@@ -360,7 +360,7 @@ def _canonical_ocr_profile_text(vector: dict) -> str:
         content_by_page[page["page_index"]] = marked_content
 
     root = pdf["structure_tree"]
-    if root["role"] != "Document":
+    if set(root) != {"role", "kids"} or root["role"] != "Document":
         raise ValueError("structure tree must have one Document root")
     page_nodes = root["kids"]
     if len(page_nodes) != vector["source_page_count"]:
@@ -368,11 +368,26 @@ def _canonical_ocr_profile_text(vector: dict) -> str:
 
     used: set[tuple[int, int]] = set()
 
+    allowed_children = {
+        "Sect": {"P", "Table"},
+        "P": {"Span"},
+        "Table": {"TR"},
+        "TR": {"TH", "TD"},
+        "TH": {"Span"},
+        "TD": {"Span"},
+    }
+
     def resolve_leaf(node: dict, expected_page: int) -> str:
+        if not isinstance(node, dict) or set(node) != {
+            "role",
+            "actual_text",
+            "kids",
+        }:
+            raise ValueError("Span must contain only role, ActualText, and one kid")
         if node["role"] != "Span" or len(node["kids"]) != 1:
             raise ValueError("ActualText must occur on a terminal Span")
         kid = node["kids"][0]
-        if "mcid" not in kid:
+        if not isinstance(kid, dict) or set(kid) != {"page_index", "mcid"}:
             raise ValueError("ActualText Span must contain one marked content reference")
         page_index = kid["page_index"]
         mcid = kid["mcid"]
@@ -395,24 +410,37 @@ def _canonical_ocr_profile_text(vector: dict) -> str:
         used.add(reference)
         return actual_text
 
-    def read_kids(node: dict, expected_page: int) -> str:
+    def read_element(node: dict, parent_role: str, expected_page: int) -> str:
+        if not isinstance(node, dict) or set(node) != {"role", "kids"}:
+            raise ValueError("nonterminal structure element has an invalid shape")
+        role = node["role"]
+        if role not in allowed_children[parent_role]:
+            raise ValueError(f"{role} is not valid directly under {parent_role}")
+        if not node["kids"]:
+            raise ValueError(f"{role} must contain at least one child")
+
         pieces: list[str] = []
         for kid in node["kids"]:
-            if "mcid" in kid:
-                raise ValueError("marked content reference must be owned by a Span")
-            if "page_index" in kid:
-                raise ValueError("only page Sect elements identify a page")
-            if "actual_text" in kid:
+            if role in {"P", "TH", "TD"}:
                 pieces.append(resolve_leaf(kid, expected_page))
                 continue
-            pieces.append(read_kids(kid, expected_page))
+            pieces.append(read_element(kid, role, expected_page))
         return "".join(pieces)
 
     page_text: list[str] = []
     for page_index, page_node in enumerate(page_nodes):
-        if page_node["role"] != "Sect" or page_node.get("page_index") != page_index:
+        if (
+            not isinstance(page_node, dict)
+            or set(page_node) != {"role", "page_index", "kids"}
+            or page_node["role"] != "Sect"
+            or page_node["page_index"] != page_index
+        ):
             raise ValueError("page Sect elements must follow source page order")
-        page_text.append(read_kids(page_node, page_index))
+        page_text.append(
+            "".join(
+                read_element(kid, "Sect", page_index) for kid in page_node["kids"]
+            )
+        )
 
     expected_references = {
         (page_index, mcid)
@@ -474,13 +502,26 @@ class ConnectContractTests(unittest.TestCase):
             vector = json.loads(
                 (OCR_PROFILE_FIXTURES / case["fixture"]).read_text(encoding="utf-8")
             )
-            with self.subTest(fixture=case["fixture"]):
-                self.assertEqual(list(validator.iter_errors(vector)), [])
+            schema_valid = not list(validator.iter_errors(vector))
+            with self.subTest(fixture=case["fixture"], check="schema"):
+                self.assertEqual(schema_valid, case["schema_valid"])
+            try:
                 extracted = _canonical_ocr_profile_text(vector)
-                self.assertEqual(extracted == vector["text_plain"], case["valid"])
-            if case["valid"]:
-                canonical_case = vector
+                walker_valid = True
+            except ValueError:
+                extracted = None
+                walker_valid = False
+            with self.subTest(fixture=case["fixture"], check="walker"):
+                self.assertEqual(walker_valid, case["walker_valid"])
+            if walker_valid:
+                with self.subTest(fixture=case["fixture"], check="text"):
+                    self.assertIsInstance(extracted, str)
+                    self.assertEqual(extracted == vector["text_plain"], case["valid"])
             else:
+                self.assertFalse(case["valid"])
+            if case["kind"] == "canonical":
+                canonical_case = vector
+            elif case["kind"] == "coordinate-order":
                 noncanonical_case = vector
 
         self.assertIsNotNone(canonical_case)
@@ -497,7 +538,7 @@ class ConnectContractTests(unittest.TestCase):
         duplicate_reference = json.loads(json.dumps(canonical_case))
         duplicate_reference["pdf_logical_structure"]["structure_tree"]["kids"][0][
             "kids"
-        ].append(
+        ][0]["kids"][0]["kids"][0]["kids"].append(
             {
                 "role": "Span",
                 "actual_text": "ITEM ",
@@ -545,6 +586,43 @@ class ConnectContractTests(unittest.TestCase):
             "kids"
         ][0]["actual_text"] = "override"
         self.assertTrue(list(validator.iter_errors(parent_actual_text)))
+        with self.assertRaisesRegex(ValueError, "invalid shape"):
+            _canonical_ocr_profile_text(parent_actual_text)
+
+        empty_table = json.loads(json.dumps(canonical_case))
+        empty_table["pdf_logical_structure"]["structure_tree"]["kids"][0]["kids"][
+            0
+        ]["kids"] = []
+        self.assertTrue(list(validator.iter_errors(empty_table)))
+        with self.assertRaisesRegex(ValueError, "must contain at least one child"):
+            _canonical_ocr_profile_text(empty_table)
+
+        nested_span = json.loads(json.dumps(canonical_case))
+        first_span = nested_span["pdf_logical_structure"]["structure_tree"]["kids"][
+            0
+        ]["kids"][0]["kids"][0]["kids"][0]["kids"][0]
+        reference = first_span["kids"][0]
+        first_span["kids"] = [
+            {"role": "Span", "actual_text": "ITEM ", "kids": [reference]}
+        ]
+        self.assertTrue(list(validator.iter_errors(nested_span)))
+        with self.assertRaisesRegex(ValueError, "marked content reference"):
+            _canonical_ocr_profile_text(nested_span)
+
+        empty_final_page = json.loads(json.dumps(canonical_case))
+        empty_final_page["source_page_count"] = 3
+        empty_final_page["pdf_logical_structure"]["pages"].append(
+            {"page_index": 2, "marked_content": []}
+        )
+        empty_final_page["pdf_logical_structure"]["structure_tree"]["kids"].append(
+            {"role": "Sect", "page_index": 2, "kids": []}
+        )
+        empty_final_page["text_plain"] += "\f"
+        self.assertEqual(list(validator.iter_errors(empty_final_page)), [])
+        self.assertEqual(
+            _canonical_ocr_profile_text(empty_final_page),
+            empty_final_page["text_plain"],
+        )
 
     def test_entitlement_v1_fixtures_match_schema_signature_and_time_contract(
         self,

@@ -2,10 +2,37 @@
   "cases": [
     {
       "fixture": "valid/multi-column-table-tag-order.json",
+      "kind": "canonical",
+      "schema_valid": true,
+      "walker_valid": true,
       "valid": true
     },
     {
       "fixture": "invalid/multi-column-table-coordinate-order.json",
+      "kind": "coordinate-order",
+      "schema_valid": true,
+      "walker_valid": true,
+      "valid": false
+    },
+    {
+      "fixture": "invalid/table-td-th.json",
+      "kind": "malformed-hierarchy",
+      "schema_valid": false,
+      "walker_valid": false,
+      "valid": false
+    },
+    {
+      "fixture": "invalid/cell-outside-row.json",
+      "kind": "malformed-hierarchy",
+      "schema_valid": false,
+      "walker_valid": false,
+      "valid": false
+    },
+    {
+      "fixture": "invalid/row-outside-table.json",
+      "kind": "malformed-hierarchy",
+      "schema_valid": false,
+      "walker_valid": false,
       "valid": false
     }
   ]

@@ -127,6 +127,27 @@ tables use the standard
 `Table`, `TR`, `TH`, and `TD` structure types so row and cell membership remain
 explicit.
 
+The logical structure uses this closed grammar, where `+` means one or more and
+`*` means zero or more:
+
+```text
+Document := Sect+
+Sect     := (P | Table)*
+P        := Span+
+Table    := TR+
+TR       := (TH | TD)+
+TH       := Span+
+TD       := Span+
+Span     := one marked-content reference
+```
+
+`P` and `Table` are the only page reading-order blocks. `TR` appears only under
+`Table`; `TH` and `TD` appear only under `TR`; and `Span` appears only under
+`P`, `TH`, or `TD`. No other structure role, table grouping wrapper, direct
+marked-content child, empty nonterminal, or additional nesting is valid in this
+profile. A page with no recognized text has an empty `Sect`; the document still
+must contain non-whitespace text somewhere to complete successfully.
+
 Every terminal OCR text leaf is a `Span` structure element with an `ActualText`
 text string and exactly one marked-content reference to the visible page. That
 marked-content sequence encloses only the aligned glyphs represented by the
@@ -276,8 +297,10 @@ portable profile semantics; each application proves its own integration.
 3. `NO_OCR_TEXT` is failed, nonretryable, and carries no result; and
 4. the versioned canonical-text proof vectors accept tag-tree order for a
    multi-column table and reject the different text produced by a coordinate
-   sort. Duplicate MCID references, cross-page references, unresolved or omitted
-   leaves, and page `Sect` reordering fail.
+   sort. Both the schema and an independent walker reject `Table` > `TD` > `TH`,
+   a cell outside `TR`, and `TR` outside `Table`. Duplicate MCID references,
+   cross-page references, unresolved or omitted leaves, empty nonterminals,
+   terminal nesting, and page `Sect` reordering also fail.
 
 ### OCR provider runtime
 
