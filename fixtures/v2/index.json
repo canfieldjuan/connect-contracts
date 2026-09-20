@@ -153,6 +153,17 @@
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-contact-field-clear-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-contact-field-clear-conflict.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-contact-archive-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-contact-archive-conflict.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-contact-restore-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-contact-restore-conflict.json", "valid": true },
+  { "schema": "manifest.schema.json", "fixture": "valid/manifest-ocr-provider.json", "valid": true },
+  { "schema": "job-request.schema.json", "fixture": "valid/job-request-ocr.json", "provider_manifest": "valid/manifest-ocr-provider.json", "valid": true },
+  { "schema": "job-status.schema.json", "fixture": "valid/job-completed-ocr.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": true },
+  { "schema": "job-status.schema.json", "fixture": "valid/job-failed-ocr-no-text.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": true },
+  { "schema": "manifest.schema.json", "fixture": "invalid/manifest-ocr-wrong-profile.json", "valid": false },
+  { "schema": "manifest.schema.json", "fixture": "invalid/manifest-ocr-duplicate-produces.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-missing-output.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-duplicate-media.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-text-bom.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-text-whitespace.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-failed-ocr-no-text-retryable.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
   { "schema": "job-request.schema.json", "fixture": "invalid/job-request-with-derived-from.json", "provider_manifest": "valid/manifest.json", "valid": false },
   { "schema": "job-status.schema.json", "fixture": "invalid/job-status-with-derived-from.json", "provider_manifest": "valid/manifest.json", "request_fixture": "valid/job-request.json", "valid": false }
 ]

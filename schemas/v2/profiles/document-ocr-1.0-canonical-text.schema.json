@@ -45,6 +45,7 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 262144,
+      "not": {"pattern": "^\\uFEFF"},
       "description": "The strict UTF-8 text/plain value after JSON decoding."
     }
   },

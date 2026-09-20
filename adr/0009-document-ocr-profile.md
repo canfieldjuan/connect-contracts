@@ -171,13 +171,19 @@ reading-order heuristic is noncanonical even when it produces plausible text.
 
 The OCR provider validates appearance preservation, recognized-region
 alignment, complete tagged structure, canonical extraction equivalence, and
-semantic no-truncation before completing the job. A consumer that extracts text
-from the OCR PDF independently implements the same tag-tree traversal and
-rejects output whose canonical extraction differs from the paired plain-text
-artifact. It does not rerun OCR. The consumer implementation used for installed
-proof does not call the provider's extractor or share its extraction or
-traversal helper. Wire-only and export-only consumers are not required to parse
-the PDF and do not claim spatial validation.
+semantic no-truncation before completing the job. Before Email Watcher derives
+an OCR PDF-only handoff to Document Summarizer, Email Watcher independently
+implements the same tag-tree traversal and byte-compares its extracted UTF-8
+with the paired retained plain-text artifact. A mismatch is an invalid OCR
+result and creates no lineage edge or downstream child job. Document Summarizer
+independently implements that traversal again on the already validated OCR PDF
+it receives and uses only those extracted canonical bytes for summarization and
+evidence. It does not receive the paired plain-text artifact in the single-input
+v2 request and therefore does not perform a runtime paired-output comparison.
+Neither consumer reruns OCR, calls the provider's extractor, or shares an
+extraction or traversal helper with the provider or the other consumer.
+Wire-only and export-only consumers are not required to parse the PDF and do
+not claim spatial validation.
 
 The complete PDF is at most 2 MiB. If the provider cannot produce and validate
 the complete PDF within that cap, the job fails with no result:
@@ -205,20 +211,25 @@ independent of array order or display name.
 
 A consumer that extracts the OCR PDF's text additionally validates the complete
 Tagged PDF requirements above and uses only the canonical logical-structure
-procedure for cross-output comparison. Failure is an invalid OCR result and
-creates no downstream analysis result.
+procedure. A consumer that holds both outputs uses those bytes for cross-output
+comparison. A PDF-only downstream provider uses the extracted bytes as its
+analysis text. Failure is an invalid OCR result and creates no downstream
+analysis result.
 
 Email Watcher renders the complete validated text through the profile's 256 KiB
-limit without changing the stored bytes. It offers the PDF only through its safe
-export path. It does not parse that export artifact to infer OCR geometry or
-cross-output fidelity, and it does not rerun OCR. An automatic provider chain
-first applies ADR-0008 and uses the explicitly selected downstream provider's
-exact capability declaration. It submits the PDF only when that capability
-accepts `application/vnd.local-connect.ocr-pdf`; it never relabels the derived
-artifact as `application/pdf` or submits text to a PDF-only capability. The
-distinct media type is the provider-visible source-kind signal; it does not
-replace ADR-0008's complete consumer-owned ancestry. When no actual valid output
-is compatible, the consumer creates no downstream job.
+limit without changing the stored bytes. It offers the PDF through its safe
+export path; export alone does not require parsing for geometry. Before a
+Document Summarizer handoff, Email Watcher's independent canonical extractor
+must reproduce the paired retained text bytes exactly. Any structure or byte
+mismatch rejects the OCR result before the ADR-0008 edge and child job are
+created. Email Watcher does not rerun OCR. An automatic provider chain first
+applies ADR-0008 and uses the explicitly selected downstream provider's exact
+capability declaration. It submits the PDF only when that capability accepts
+`application/vnd.local-connect.ocr-pdf`; it never relabels the derived artifact
+as `application/pdf` or submits text to a PDF-only capability. The distinct
+media type is the provider-visible source-kind signal; it does not replace
+ADR-0008's complete consumer-owned ancestry. When no actual valid output is
+compatible, the consumer creates no downstream job.
 
 No consumer renders, exports, or admits a downstream job when either required
 output is absent, duplicated, empty, over its actual byte cap, has an invalid
@@ -298,9 +309,10 @@ portable profile semantics; each application proves its own integration.
 4. the versioned canonical-text proof vectors accept tag-tree order for a
    multi-column table and reject the different text produced by a coordinate
    sort. Both the schema and an independent walker reject `Table` > `TD` > `TH`,
-   a cell outside `TR`, and `TR` outside `Table`. Duplicate MCID references,
-   cross-page references, unresolved or omitted leaves, empty nonterminals,
-   terminal nesting, and page `Sect` reordering also fail.
+   a cell outside `TR`, `TR` outside `Table`, and canonical text beginning with
+   U+FEFF. Duplicate MCID references, cross-page references, unresolved or
+   omitted leaves, empty nonterminals, terminal nesting, and page `Sect`
+   reordering also fail.
 
 ### OCR provider runtime
 
@@ -326,10 +338,14 @@ portable profile semantics; each application proves its own integration.
 
 ### Consumer integrations
 
-9. Email Watcher validates only the wire-visible profile evidence listed above,
-   retains both exact outputs, previews the valid text through 256 KiB, exports
-   the OCR PDF only through its safe path without parsing it or rerunning OCR,
-   and atomically admits any downstream job with the ADR-0008 edge;
+9. Email Watcher validates the wire-visible profile evidence listed above,
+   retains both exact outputs, previews the valid text through 256 KiB, and
+   exports the OCR PDF only through its safe path without rerunning OCR. Before
+   admitting a Document Summarizer handoff, an Email Watcher implementation
+   independent of the provider and Document Summarizer extracts the canonical
+   text from the retained PDF and byte-compares it with the paired retained
+   text. A mismatch creates neither the ADR-0008 edge nor a child job; a match
+   permits the edge and child to be committed atomically;
 10. Invoice Processor explicitly accepts the OCR PDF media type and carries a
    distinct OCR source identity into the ledger before constructing span and
    table evidence. Native and OCR-derived submissions with identical bytes have
@@ -349,18 +365,23 @@ portable profile semantics; each application proves its own integration.
     source type across reopen, restart, retry, parsing, normalization, every
     text-selection path, evidence, page citations, prompts, and warnings. Its
     independent consumer implementation performs the canonical tag-tree
-    traversal without provider code or a shared extraction helper, rejects the
-    noncanonical coordinate-order control, and proves its extracted UTF-8 bytes
-    equal the paired retained plain-text artifact. A real OCR-derived PDF then
-    completes a
-    cited summary with page attribution without calling reconstructed text
+    traversal on the admitted PDF without provider or Email Watcher code and
+    without a shared extraction helper. It uses the extracted UTF-8 bytes for
+    summary input, evidence, and citations, and its isolated proof rejects
+    malformed tagged structure and proves a coordinate sorter cannot substitute
+    for that traversal. The paired-output comparison occurs in Email Watcher
+    before this single-input child request, not in Document Summarizer. A real
+    OCR-derived PDF then completes a cited summary with page attribution without
+    calling reconstructed text
     native, retains its immediate input artifact and media, and traces through
     the consumer-owned edge to the original scan; and
 12. consumers select by exact media type and downstream capability, never array
     position or display name, and create no downstream job for incompatible,
     invalid, oversized, partial, integrity-failing, or no-text results. Provider
-    evidence proves spatial fidelity and semantic no-truncation; an extracting
-    consumer independently proves canonical cross-output fidelity.
+    evidence proves spatial fidelity and semantic no-truncation; Email Watcher
+    independently proves canonical cross-output fidelity before a PDF-only
+    handoff, and Document Summarizer independently proves that it analyzes the
+    PDF's canonical logical text.
 
 ### Installed same-scan vertical proof
 
@@ -383,13 +404,19 @@ portable profile semantics; each application proves its own integration.
 
     Email Watcher renders the retained text preview for each OCR execution and
     exports its exact source-preserving PDF through the safe export path. For the
-    Document Summarizer execution, record both the provider's canonical text and
-    Document Summarizer's independently extracted canonical text; each must
-    equal the paired retained plain-text bytes. Run the intentionally
-    noncanonical coordinate-order proof vector through the consumer-side
-    comparison and prove it is rejected before summarization. A comparison that
-    calls provider code, reuses the provider's extraction or traversal helper,
-    or compares two provider-produced values does not satisfy this proof.
+    Document Summarizer execution, record the retained plain-text bytes, Email
+    Watcher's independently extracted canonical bytes before child admission,
+    and Document Summarizer's independently extracted canonical bytes used for
+    summarization and evidence. The proof observer verifies all three byte
+    sequences are equal; the Document Summarizer runtime still receives only
+    the PDF. Run the intentionally noncanonical coordinate-order proof vector
+    through Email Watcher's paired comparison and prove it creates no child.
+    Separately run it through Document Summarizer's extraction proof and prove
+    the canonical tag order, rather than coordinate order, supplies analysis
+    text. Provider, Email Watcher, and Document Summarizer use three independent
+    implementations with no shared extraction or traversal helper. A comparison
+    that calls provider code, reuses another participant's helper, or compares
+    two provider-produced values does not satisfy this proof.
 
     Restart the provider and each application across admission and lost-response
     recovery boundaries, then prove reconciliation creates no duplicate OCR

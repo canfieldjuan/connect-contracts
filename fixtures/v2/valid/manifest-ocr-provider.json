@@ -1,0 +1,34 @@
+{
+  "protocol_version": 2,
+  "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "app": {
+    "id": "document-ocr",
+    "name": "Document OCR",
+    "version": "1.0.0"
+  },
+  "capabilities": [
+    {
+      "id": "document.ocr",
+      "version": "1.0",
+      "action": {
+        "label": "Recognize text",
+        "description": "Create a searchable tagged PDF and canonical plain text."
+      },
+      "accepts": [
+        {
+          "media_type": "application/pdf",
+          "max_bytes": 33554432
+        }
+      ],
+      "produces": [
+        "application/vnd.local-connect.ocr-pdf",
+        "text/plain"
+      ],
+      "parameters": [],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    }
+  ]
+}

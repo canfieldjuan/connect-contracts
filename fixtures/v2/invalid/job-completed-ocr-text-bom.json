@@ -1,0 +1,43 @@
+{
+  "protocol_version": 2,
+  "job_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+  "capability": {
+    "id": "document.ocr",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "document-ocr",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-20T06:00:00Z",
+  "updated_at": "2026-09-20T06:00:05Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "media_type": "application/pdf",
+      "byte_size": 9,
+      "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+        "media_type": "application/vnd.local-connect.ocr-pdf",
+        "display_name": "scan.ocr.pdf",
+        "byte_size": 9,
+        "sha256": "0716f9264c9fe19f5d7455276107f3ddcc1d3497f63d60689a73558ae8a1bf5e",
+        "payload_base64": "JVBERi0xLjcK"
+      },
+      {
+        "artifact_id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+        "media_type": "text/plain",
+        "display_name": "scan.txt",
+        "byte_size": 7,
+        "sha256": "2c41d0a224eb8bd56560c0a991292be41524c76456946db349bcbb8cd3d761da",
+        "payload_base64": "77u/SVRFTQ=="
+      }
+    ]
+  }
+}

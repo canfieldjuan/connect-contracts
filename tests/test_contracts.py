@@ -22,6 +22,10 @@ OCR_PROFILE_FIXTURES = FIXTURES / "v2/profiles/document-ocr-1.0"
 OCR_PROFILE_SCHEMA = (
     SCHEMAS / "v2/profiles/document-ocr-1.0-canonical-text.schema.json"
 )
+OCR_CAPABILITY = ("document.ocr", "1.0")
+OCR_PDF_MEDIA_TYPE = "application/vnd.local-connect.ocr-pdf"
+OCR_TEXT_MEDIA_TYPE = "text/plain"
+OCR_REQUIRED_OUTPUT_MEDIA_TYPES = {OCR_PDF_MEDIA_TYPE, OCR_TEXT_MEDIA_TYPE}
 SCHEMA_NAMES = {
     "error.schema.json",
     "job-request.schema.json",
@@ -205,6 +209,84 @@ def _job_status_errors(instance: dict, provider_manifest: dict) -> list[str]:
     return errors
 
 
+def _document_ocr_manifest_errors(instance: dict) -> list[str]:
+    errors: list[str] = []
+    for capability in instance["capabilities"]:
+        reference = (capability["id"], capability["version"])
+        if reference != OCR_CAPABILITY:
+            continue
+        if capability["accepts"] != [
+            {"media_type": "application/pdf", "max_bytes": 33_554_432}
+        ]:
+            errors.append("document.ocr 1.0 must declare the exact PDF input profile")
+        if (
+            len(capability["produces"]) != 2
+            or set(capability["produces"]) != OCR_REQUIRED_OUTPUT_MEDIA_TYPES
+        ):
+            errors.append(
+                "document.ocr 1.0 must declare each required output media type once"
+            )
+        if capability["parameters"]:
+            errors.append("document.ocr 1.0 does not accept parameters")
+        if capability["effects"] != {
+            "external": False,
+            "confirmation_required": False,
+        }:
+            errors.append("document.ocr 1.0 effect flags must both be false")
+    return errors
+
+
+def _document_ocr_status_errors(instance: dict) -> list[str]:
+    reference = (instance["capability"]["id"], instance["capability"]["version"])
+    if reference != OCR_CAPABILITY:
+        return []
+
+    if instance["status"] == "failed":
+        error = instance["error"]
+        if error["code"] == "NO_OCR_TEXT" and error != {
+            "code": "NO_OCR_TEXT",
+            "message": "No text was detected in the document.",
+            "retryable": False,
+        }:
+            return ["document.ocr 1.0 NO_OCR_TEXT has the wrong error shape"]
+        return []
+    if instance["status"] != "completed":
+        return []
+
+    outputs = instance["result"]["outputs"]
+    output_media_types = [output["media_type"] for output in outputs]
+    errors: list[str] = []
+    if (
+        len(output_media_types) != 2
+        or set(output_media_types) != OCR_REQUIRED_OUTPUT_MEDIA_TYPES
+    ):
+        errors.append(
+            "document.ocr 1.0 must complete with each required output media type once"
+        )
+
+    text_outputs = [
+        output for output in outputs if output["media_type"] == OCR_TEXT_MEDIA_TYPE
+    ]
+    if len(text_outputs) != 1:
+        return errors
+    try:
+        payload = base64.b64decode(text_outputs[0]["payload_base64"], validate=True)
+    except (binascii.Error, ValueError):
+        return errors
+    try:
+        text = payload.decode("utf-8")
+    except UnicodeDecodeError:
+        errors.append("document.ocr 1.0 text output must be strict UTF-8")
+        return errors
+    if payload.startswith(b"\xef\xbb\xbf") or text.startswith("\ufeff"):
+        errors.append("document.ocr 1.0 text output must not start with a BOM")
+    if not text or text.isspace():
+        errors.append("document.ocr 1.0 text output must contain non-whitespace text")
+    if len(payload) > 262_144:
+        errors.append("document.ocr 1.0 text output exceeds 262144 decoded bytes")
+    return errors
+
+
 def _registration_manifest_errors(registration: dict, manifest: dict) -> list[str]:
     errors: list[str] = []
     if registration["app_id"] != manifest["app"]["id"]:
@@ -301,6 +383,7 @@ def semantic_errors(
                 if name in parameter_names:
                     errors.append(f"duplicate parameter name: {name}")
                 parameter_names.add(name)
+        errors.extend(_document_ocr_manifest_errors(instance))
 
     if schema_name == "job-request.schema.json":
         errors.extend(
@@ -312,6 +395,7 @@ def semantic_errors(
 
     if schema_name == "job-status.schema.json" and provider_manifest is not None:
         errors.extend(_job_status_errors(instance, provider_manifest))
+        errors.extend(_document_ocr_status_errors(instance))
     if schema_name == "job-status.schema.json" and job_request is not None:
         errors.extend(_job_status_request_errors(instance, job_request))
 
@@ -450,6 +534,8 @@ def _canonical_ocr_profile_text(vector: dict) -> str:
     if used != expected_references:
         raise ValueError("every canonical OCR marked-content sequence must be used once")
     canonical = "\f".join(page_text)
+    if canonical.startswith("\ufeff"):
+        raise ValueError("canonical OCR text must not begin with U+FEFF")
     if not canonical or not any(not character.isspace() for character in canonical):
         raise ValueError("canonical OCR text must contain non-whitespace text")
     if len(canonical.encode("utf-8")) > 262_144:
@@ -623,6 +709,102 @@ class ConnectContractTests(unittest.TestCase):
             _canonical_ocr_profile_text(empty_final_page),
             empty_final_page["text_plain"],
         )
+
+    def test_document_ocr_profile_semantics_are_exact_and_order_independent(
+        self,
+    ) -> None:
+        fixture_dir = FIXTURES / "v2"
+        manifest = json.loads(
+            (fixture_dir / "valid/manifest-ocr-provider.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(_document_ocr_manifest_errors(manifest), [])
+
+        reversed_outputs = json.loads(json.dumps(manifest))
+        reversed_outputs["capabilities"][0]["produces"].reverse()
+        self.assertEqual(_document_ocr_manifest_errors(reversed_outputs), [])
+
+        mixed_manifest = json.loads(json.dumps(manifest))
+        generic_manifest = json.loads(
+            (fixture_dir / "valid/manifest.json").read_text(encoding="utf-8")
+        )
+        mixed_manifest["capabilities"].append(generic_manifest["capabilities"][0])
+        self.assertEqual(
+            semantic_errors("v2", "manifest.schema.json", mixed_manifest), []
+        )
+        mixed_invalid_manifest = json.loads(json.dumps(mixed_manifest))
+        mixed_invalid_manifest["capabilities"][0]["accepts"][0][
+            "max_bytes"
+        ] += 1
+        self.assertTrue(
+            semantic_errors("v2", "manifest.schema.json", mixed_invalid_manifest)
+        )
+
+        for fixture in (
+            "invalid/manifest-ocr-wrong-profile.json",
+            "invalid/manifest-ocr-duplicate-produces.json",
+        ):
+            invalid_manifest = json.loads(
+                (fixture_dir / fixture).read_text(encoding="utf-8")
+            )
+            with self.subTest(fixture=fixture):
+                self.assertTrue(_document_ocr_manifest_errors(invalid_manifest))
+
+        completed = json.loads(
+            (fixture_dir / "valid/job-completed-ocr.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(_document_ocr_status_errors(completed), [])
+        reversed_status = json.loads(json.dumps(completed))
+        reversed_status["result"]["outputs"].reverse()
+        self.assertEqual(_document_ocr_status_errors(reversed_status), [])
+        mixed_outputs = json.loads(json.dumps(completed))
+        extra_output = json.loads(
+            json.dumps(mixed_outputs["result"]["outputs"][1])
+        )
+        extra_output["artifact_id"] = "99999999-9999-4999-8999-999999999999"
+        extra_output["media_type"] = "application/json"
+        mixed_outputs["result"]["outputs"].append(extra_output)
+        self.assertTrue(_document_ocr_status_errors(mixed_outputs))
+
+        for fixture in (
+            "invalid/job-completed-ocr-missing-output.json",
+            "invalid/job-completed-ocr-duplicate-media.json",
+            "invalid/job-completed-ocr-text-bom.json",
+            "invalid/job-completed-ocr-text-whitespace.json",
+            "invalid/job-failed-ocr-no-text-retryable.json",
+        ):
+            invalid_status = json.loads(
+                (fixture_dir / fixture).read_text(encoding="utf-8")
+            )
+            with self.subTest(fixture=fixture):
+                self.assertTrue(_document_ocr_status_errors(invalid_status))
+
+        def with_text_payload(payload: bytes) -> dict:
+            status = json.loads(json.dumps(completed))
+            text_output = next(
+                output
+                for output in status["result"]["outputs"]
+                if output["media_type"] == OCR_TEXT_MEDIA_TYPE
+            )
+            text_output["payload_base64"] = base64.b64encode(payload).decode("ascii")
+            text_output["byte_size"] = len(payload)
+            text_output["sha256"] = hashlib.sha256(payload).hexdigest()
+            return status
+
+        self.assertEqual(_document_ocr_status_errors(with_text_payload(b"A" * 262_144)), [])
+        for payload in (b"A" * 262_145, b"", b"\xff"):
+            with self.subTest(payload_size=len(payload), payload_prefix=payload[:1]):
+                self.assertTrue(
+                    _document_ocr_status_errors(with_text_payload(payload))
+                )
+
+        unrelated_status = json.loads(
+            (fixture_dir / "valid/job-completed.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(_document_ocr_status_errors(unrelated_status), [])
 
     def test_entitlement_v1_fixtures_match_schema_signature_and_time_contract(
         self,
