@@ -1,10 +1,10 @@
 # ADR-0008: Consumer-owned derived artifact lineage
 
-**Status:** Proposed
+**Status:** Proposed (accepted when this decision merges)
 
 **Date:** 2026-09-17
 
-**Decider:** Pending
+**Decider:** Juan Canfield
 
 ## Context
 

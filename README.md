@@ -16,6 +16,7 @@ Current decisions:
 - [ADR-0005: Windows Local Connect placement](adr/0005-windows-local-placement.md)
 - [ADR-0006: Consumer-owned admission and the Automate feature](adr/0006-consumer-admission-and-automate-feature.md)
 - [ADR-0007: Background provider lifecycle](adr/0007-background-provider-lifecycle.md)
+- [ADR-0008: Consumer-owned derived artifact lineage](adr/0008-consumer-owned-derived-artifact-lineage.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
