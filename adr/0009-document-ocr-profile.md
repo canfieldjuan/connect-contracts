@@ -116,6 +116,15 @@ page's extracted text corresponds to the same page segment in the required
 plain-text output. For this comparison, each side is normalized to Unicode NFC,
 each maximal Unicode whitespace run is replaced with one U+0020 SPACE, and
 leading and trailing space is removed; the normalized page strings must match.
+
+Those semantic, spatial, and cross-output fidelity properties are owned and
+validated by the OCR provider. They are not represented as independently
+verifiable facts in the v2 status. Provider runtime and installed-package
+evidence therefore prove recognized-region alignment, source-geometry
+preservation, normalized PDF-extraction equivalence, and semantic
+no-truncation. A consumer does not claim to verify those properties by parsing
+the export artifact or by running OCR again.
+
 The complete PDF is at most 2 MiB. If the provider cannot produce and validate
 the complete PDF within that cap, the job fails with no result:
 
@@ -130,24 +139,36 @@ the complete PDF within that cap, the job fails with no result:
 The provider emits neither output when either output exceeds its cap. It never
 truncates either artifact to convert an overflow into success.
 
-A conforming consumer identifies outputs by media type, independent of array
-order or display name, and applies this profile in addition to generic v2
-validation before rendering, export, or chaining. Email Watcher renders the
-complete validated text through the profile's 256 KiB limit without changing
-the stored bytes. It offers the PDF only through its safe export path. An automatic
-provider chain first applies ADR-0008 and uses the explicitly selected
-downstream provider's exact capability declaration. It submits the PDF only
-when that capability accepts `application/vnd.local-connect.ocr-pdf`; it never
-relabels the derived artifact as `application/pdf` or submits text to a PDF-only
-capability. The distinct media type is the provider-visible source-kind signal;
-it does not replace ADR-0008's complete consumer-owned ancestry. When no actual
-valid output is compatible, the consumer creates no downstream job. No consumer
-renders, exports, or admits a downstream job when either required output is
-absent, duplicated, malformed, empty, over cap, has a declared size or digest
-mismatch, or fails the page-count, page-segment, geometry, or normalized
-cross-output checks above. Semantic truncation within otherwise self-consistent
-artifacts is not consumer-detectable; the provider's runtime evidence owns the
-no-truncation proof.
+A conforming consumer enforces only evidence available in the manifest, request,
+status, retained bytes, and its private ADR-0008 state. It validates the exact
+profile declaration; generic v2 schema, integrity, and authorization; output
+cardinality and exact media types; distinct non-aliased artifact IDs; canonical
+base64, actual decoded byte counts, declared sizes, and SHA-256 digests; the
+actual input page bound; the actual text and PDF output byte bounds; strict
+UTF-8, no byte-order mark, non-whitespace text; and one form-feed-delimited text
+segment per admitted source page. It identifies outputs by media type,
+independent of array order or display name.
+
+Email Watcher renders the complete validated text through the profile's 256 KiB
+limit without changing the stored bytes. It offers the PDF only through its safe
+export path. It does not parse that export artifact to infer OCR geometry or
+cross-output fidelity, and it does not rerun OCR. An automatic provider chain
+first applies ADR-0008 and uses the explicitly selected downstream provider's
+exact capability declaration. It submits the PDF only when that capability
+accepts `application/vnd.local-connect.ocr-pdf`; it never relabels the derived
+artifact as `application/pdf` or submits text to a PDF-only capability. The
+distinct media type is the provider-visible source-kind signal; it does not
+replace ADR-0008's complete consumer-owned ancestry. When no actual valid output
+is compatible, the consumer creates no downstream job.
+
+No consumer renders, exports, or admits a downstream job when either required
+output is absent, duplicated, empty, over its actual byte cap, has an invalid
+encoding or a declared-size or digest mismatch, follows an input outside the
+admitted page bound, has invalid text-page segmentation, is not declared and
+compatible for the selected capability, or lacks the required authorization and
+ADR-0008 state. Recognized-region alignment, source-geometry preservation,
+normalized PDF-extraction equivalence, and semantic truncation remain
+provider-owned proof obligations.
 
 A downstream provider that accepts the OCR PDF persists the exact vendor media
 type or a closed OCR source kind before parsing and carries that classification
@@ -231,13 +252,16 @@ portable profile semantics; each application proves its own integration.
    artifacts were not truncated to fit; and
 7. a real scanned multi-column table produces a structurally valid text-only PDF
    with preserved page geometry and aligned recognized coordinates, while its
-   normalized per-page extracted text matches the plain-text segments. Installed
-   background operation separately satisfies ADR-0007.
+   normalized per-page extracted text matches the plain-text segments. The
+   provider's own runtime probe proves these spatial, semantic, and cross-output
+   properties without assigning them to a consumer. Installed background
+   operation separately satisfies ADR-0007.
 
 ### Consumer integrations
 
-8. Email Watcher validates the profile, retains both exact outputs, previews the
-   valid text through 256 KiB, exports the OCR PDF only through its safe path,
+8. Email Watcher validates only the wire-visible profile evidence listed above,
+   retains both exact outputs, previews the valid text through 256 KiB, exports
+   the OCR PDF only through its safe path without parsing it or rerunning OCR,
    and atomically admits any downstream job with the ADR-0008 edge;
 9. Invoice Processor explicitly accepts the OCR PDF media type and carries a
    distinct OCR source identity into the ledger before constructing span and
@@ -263,12 +287,41 @@ portable profile semantics; each application proves its own integration.
 11. consumers select by exact media type and downstream capability, never array
     position or display name, and create no downstream job for incompatible,
     invalid, oversized, partial, integrity-failing, or no-text results. Provider
-    evidence, rather than consumer inference, proves semantic no-truncation.
+    evidence, rather than consumer inference, proves semantic, spatial, and
+    cross-output fidelity.
+
+### Installed same-scan vertical proof
+
+12. after ADR-0008 is accepted, one exact-package installed proof uses one
+    retained scanned multi-column table and one installed OCR provider instance
+    across the complete path. Record the operating system, exact source commit
+    and package SHA-256 for the OCR provider, Email Watcher, Invoice Processor,
+    and Document Summarizer, plus the discovered OCR provider app and durable
+    instance IDs. Installed Email Watcher discovers that installed provider,
+    submits the scan, renders the retained text preview, and exports the exact
+    source-preserving PDF through its safe export path. The same retained OCR
+    output then creates one ADR-0008 edge and exactly one reconciled downstream
+    child for installed Invoice Processor, and a separate ADR-0008 edge and
+    exactly one reconciled downstream child for installed Document Summarizer.
+    Restart the provider and each application across admission and lost-response
+    recovery boundaries, then prove reconciliation creates no duplicate edge or
+    child. Invoice Processor shows buyer-visible reconstructed rows, columns,
+    and source provenance; Document Summarizer shows a buyer-visible cited
+    summary bound to the OCR media and source kind; Email Watcher shows the
+    retained preview, exported artifact identity, and both downstream lineage
+    outcomes. Every displayed provenance chain identifies the original scan,
+    OCR provider instance and job, selected output, downstream provider instance
+    and job, and exact artifact digest. No chaining control or automatic
+    admission is enabled before ADR-0008 is accepted. Isolated repository
+    fixtures, different scans per application, development binaries, or
+    separately packaged demonstrations cannot substitute for this proof.
 
 Static contract fixtures prove declaration and status semantics. Generated PDFs
 at the input, page, and output boundaries require OCR provider runtime tests
 because the shared JSON harness does not inspect streamed bytes. No provider
-conformance run depends on a private consumer repository.
+conformance run depends on a private consumer repository. Those isolated checks
+are prerequisites, not substitutes for the exact-package same-scan installed
+proof.
 
 ## Consequences
 
