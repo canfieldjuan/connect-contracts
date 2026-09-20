@@ -18,6 +18,36 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
 FIXTURES = ROOT / "fixtures"
 ENTITLEMENTS = ROOT / "entitlements"
+OCR_PROFILE_FIXTURES = FIXTURES / "v2/profiles/document-ocr-1.0"
+OCR_PROFILE_SCHEMA = (
+    SCHEMAS / "v2/profiles/document-ocr-1.0-canonical-text.schema.json"
+)
+OCR_CAPABILITY = ("document.ocr", "1.0")
+OCR_PDF_MEDIA_TYPE = "application/vnd.local-connect.ocr-pdf"
+OCR_TEXT_MEDIA_TYPE = "text/plain"
+OCR_REQUIRED_OUTPUT_MEDIA_TYPES = {OCR_PDF_MEDIA_TYPE, OCR_TEXT_MEDIA_TYPE}
+OCR_ERROR_POLICY: dict[str, dict[str, object]] = {
+    "DOCUMENT_INVALID": {
+        "message": "The PDF is not a readable document with at least one page.",
+        "retryable": False,
+    },
+    "INPUT_PAGE_LIMIT_EXCEEDED": {
+        "message": "The PDF has more than 100 pages.",
+        "retryable": False,
+    },
+    "OUTPUT_TEXT_LIMIT_EXCEEDED": {
+        "message": "The recognized text is larger than this provider can return.",
+        "retryable": False,
+    },
+    "OUTPUT_PDF_LIMIT_EXCEEDED": {
+        "message": "The reconstructed PDF is larger than this provider can return.",
+        "retryable": False,
+    },
+    "NO_OCR_TEXT": {
+        "message": "No text was detected in the document.",
+        "retryable": False,
+    },
+}
 SCHEMA_NAMES = {
     "error.schema.json",
     "job-request.schema.json",
@@ -201,6 +231,103 @@ def _job_status_errors(instance: dict, provider_manifest: dict) -> list[str]:
     return errors
 
 
+def _document_ocr_manifest_errors(instance: dict) -> list[str]:
+    errors: list[str] = []
+    for capability in instance["capabilities"]:
+        reference = (capability["id"], capability["version"])
+        if reference != OCR_CAPABILITY:
+            continue
+        if capability["accepts"] != [
+            {"media_type": "application/pdf", "max_bytes": 33_554_432}
+        ]:
+            errors.append("document.ocr 1.0 must declare the exact PDF input profile")
+        if (
+            len(capability["produces"]) != 2
+            or set(capability["produces"]) != OCR_REQUIRED_OUTPUT_MEDIA_TYPES
+        ):
+            errors.append(
+                "document.ocr 1.0 must declare each required output media type once"
+            )
+        if capability["parameters"]:
+            errors.append("document.ocr 1.0 does not accept parameters")
+        if capability["effects"] != {
+            "external": False,
+            "confirmation_required": False,
+        }:
+            errors.append("document.ocr 1.0 effect flags must both be false")
+    return errors
+
+
+def _document_ocr_status_errors(instance: dict) -> list[str]:
+    reference = (instance["capability"]["id"], instance["capability"]["version"])
+    if reference != OCR_CAPABILITY:
+        return []
+
+    if instance["status"] == "failed":
+        error = instance["error"]
+        policy = OCR_ERROR_POLICY.get(error["code"])
+        if policy is not None and error != {"code": error["code"], **policy}:
+            return [
+                f"document.ocr 1.0 {error['code']} has the wrong error shape"
+            ]
+        return []
+    if instance["status"] != "completed":
+        return []
+
+    outputs = instance["result"]["outputs"]
+    output_media_types = [output["media_type"] for output in outputs]
+    errors: list[str] = []
+    if (
+        len(output_media_types) != 2
+        or set(output_media_types) != OCR_REQUIRED_OUTPUT_MEDIA_TYPES
+    ):
+        errors.append(
+            "document.ocr 1.0 must complete with each required output media type once"
+        )
+
+    pdf_outputs = [
+        output for output in outputs if output["media_type"] == OCR_PDF_MEDIA_TYPE
+    ]
+    if len(pdf_outputs) == 1:
+        try:
+            pdf_payload = base64.b64decode(
+                pdf_outputs[0]["payload_base64"], validate=True
+            )
+        except (binascii.Error, ValueError):
+            pdf_payload = None
+        if pdf_payload is not None and (
+            not pdf_payload
+            or pdf_outputs[0]["byte_size"] <= 0
+            or pdf_outputs[0]["byte_size"] != len(pdf_payload)
+        ):
+            errors.append(
+                "document.ocr 1.0 PDF output must have a nonempty payload "
+                "and a consistent nonzero byte_size"
+            )
+
+    text_outputs = [
+        output for output in outputs if output["media_type"] == OCR_TEXT_MEDIA_TYPE
+    ]
+    if len(text_outputs) != 1:
+        return errors
+    try:
+        payload = base64.b64decode(text_outputs[0]["payload_base64"], validate=True)
+    except (binascii.Error, ValueError):
+        return errors
+    try:
+        text = payload.decode("utf-8")
+    except UnicodeDecodeError:
+        errors.append("document.ocr 1.0 text output must be strict UTF-8")
+        return errors
+    if payload.startswith(b"\xef\xbb\xbf") or text.startswith("\ufeff"):
+        errors.append("document.ocr 1.0 text output must not start with a BOM")
+    if not text or text.isspace():
+        errors.append("document.ocr 1.0 text output must contain non-whitespace text")
+    if len(payload) > 262_144:
+        errors.append("document.ocr 1.0 text output exceeds 262144 decoded bytes")
+    return errors
+
+
 def _registration_manifest_errors(registration: dict, manifest: dict) -> list[str]:
     errors: list[str] = []
     if registration["app_id"] != manifest["app"]["id"]:
@@ -297,6 +424,7 @@ def semantic_errors(
                 if name in parameter_names:
                     errors.append(f"duplicate parameter name: {name}")
                 parameter_names.add(name)
+        errors.extend(_document_ocr_manifest_errors(instance))
 
     if schema_name == "job-request.schema.json":
         errors.extend(
@@ -308,6 +436,7 @@ def semantic_errors(
 
     if schema_name == "job-status.schema.json" and provider_manifest is not None:
         errors.extend(_job_status_errors(instance, provider_manifest))
+        errors.extend(_document_ocr_status_errors(instance))
     if schema_name == "job-status.schema.json" and job_request is not None:
         errors.extend(_job_status_request_errors(instance, job_request))
 
@@ -335,7 +464,443 @@ def semantic_errors(
     return errors
 
 
+def _canonical_ocr_profile_text(vector: dict) -> str:
+    pdf = vector["pdf_logical_structure"]
+    if pdf["mark_info_marked"] is not True:
+        raise ValueError("Tagged PDF MarkInfo.Marked must be true")
+
+    pages = pdf["pages"]
+    if [page["page_index"] for page in pages] != list(
+        range(vector["source_page_count"])
+    ):
+        raise ValueError("PDF pages must be in zero-based source order")
+
+    content_by_page: dict[int, dict[int, dict]] = {}
+    for page in pages:
+        marked_content: dict[int, dict] = {}
+        for item in page["marked_content"]:
+            if item["mcid"] in marked_content:
+                raise ValueError("MCIDs must be unique within a page")
+            marked_content[item["mcid"]] = item
+        content_by_page[page["page_index"]] = marked_content
+
+    root = pdf["structure_tree"]
+    if set(root) != {"role", "kids"} or root["role"] != "Document":
+        raise ValueError("structure tree must have one Document root")
+    page_nodes = root["kids"]
+    if len(page_nodes) != vector["source_page_count"]:
+        raise ValueError("Document root must have one page Sect per source page")
+
+    used: set[tuple[int, int]] = set()
+
+    allowed_children = {
+        "Sect": {"P", "Table"},
+        "P": {"Span"},
+        "Table": {"TR"},
+        "TR": {"TH", "TD"},
+        "TH": {"Span"},
+        "TD": {"Span"},
+    }
+
+    def resolve_leaf(node: dict, expected_page: int) -> str:
+        if not isinstance(node, dict) or set(node) != {
+            "role",
+            "actual_text",
+            "kids",
+        }:
+            raise ValueError("Span must contain only role, ActualText, and one kid")
+        if node["role"] != "Span" or len(node["kids"]) != 1:
+            raise ValueError("ActualText must occur on a terminal Span")
+        kid = node["kids"][0]
+        if not isinstance(kid, dict) or set(kid) != {"page_index", "mcid"}:
+            raise ValueError("ActualText Span must contain one marked content reference")
+        page_index = kid["page_index"]
+        mcid = kid["mcid"]
+        if page_index != expected_page:
+            raise ValueError("marked content reference crosses its page Sect")
+        reference = (page_index, mcid)
+        if reference in used:
+            raise ValueError("marked content reference is duplicated")
+        try:
+            content_by_page[page_index][mcid]
+        except KeyError as exc:
+            raise ValueError("marked content reference is unresolved") from exc
+        actual_text = node["actual_text"]
+        if "\f" in actual_text:
+            raise ValueError("ActualText must not contain U+000C")
+        try:
+            actual_text.encode("utf-8")
+        except UnicodeEncodeError as exc:
+            raise ValueError(
+                "ActualText must contain Unicode scalar values"
+            ) from exc
+        used.add(reference)
+        return actual_text
+
+    def read_element(node: dict, parent_role: str, expected_page: int) -> str:
+        if not isinstance(node, dict) or set(node) != {"role", "kids"}:
+            raise ValueError("nonterminal structure element has an invalid shape")
+        role = node["role"]
+        if role not in allowed_children[parent_role]:
+            raise ValueError(f"{role} is not valid directly under {parent_role}")
+        if not node["kids"]:
+            raise ValueError(f"{role} must contain at least one child")
+
+        pieces: list[str] = []
+        for kid in node["kids"]:
+            if role in {"P", "TH", "TD"}:
+                pieces.append(resolve_leaf(kid, expected_page))
+                continue
+            pieces.append(read_element(kid, role, expected_page))
+        return "".join(pieces)
+
+    page_text: list[str] = []
+    for page_index, page_node in enumerate(page_nodes):
+        if (
+            not isinstance(page_node, dict)
+            or set(page_node) != {"role", "page_index", "kids"}
+            or page_node["role"] != "Sect"
+            or page_node["page_index"] != page_index
+        ):
+            raise ValueError("page Sect elements must follow source page order")
+        page_text.append(
+            "".join(
+                read_element(kid, "Sect", page_index) for kid in page_node["kids"]
+            )
+        )
+
+    expected_references = {
+        (page_index, mcid)
+        for page_index, marked_content in content_by_page.items()
+        for mcid in marked_content
+    }
+    if used != expected_references:
+        raise ValueError("every canonical OCR marked-content sequence must be used once")
+    canonical = "\f".join(page_text)
+    if canonical.startswith("\ufeff"):
+        raise ValueError("canonical OCR text must not begin with U+FEFF")
+    if not canonical or not any(not character.isspace() for character in canonical):
+        raise ValueError("canonical OCR text must contain non-whitespace text")
+    if len(canonical.encode("utf-8")) > 262_144:
+        raise ValueError("canonical OCR text exceeds the decoded byte limit")
+    return canonical
+
+
+def _coordinate_sorted_ocr_text(vector: dict) -> str:
+    text_by_reference: dict[tuple[int, int], str] = {}
+
+    def collect(node: dict) -> None:
+        if "actual_text" in node:
+            reference = node["kids"][0]
+            text_by_reference[(reference["page_index"], reference["mcid"])] = node[
+                "actual_text"
+            ]
+            return
+        for kid in node["kids"]:
+            collect(kid)
+
+    collect(vector["pdf_logical_structure"]["structure_tree"])
+    page_text: list[str] = []
+    for page in vector["pdf_logical_structure"]["pages"]:
+        items = sorted(
+            page["marked_content"],
+            key=lambda item: (item["bbox"][1], item["bbox"][0]),
+        )
+        page_text.append(
+            "".join(
+                text_by_reference[(page["page_index"], item["mcid"])] for item in items
+            )
+        )
+    return "\f".join(page_text)
+
+
 class ConnectContractTests(unittest.TestCase):
+    def test_document_ocr_profile_uses_tag_tree_order_for_canonical_text(
+        self,
+    ) -> None:
+        schema = json.loads(OCR_PROFILE_SCHEMA.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        validator = Draft202012Validator(schema)
+        index = json.loads(
+            (OCR_PROFILE_FIXTURES / "index.json").read_text(encoding="utf-8")
+        )
+
+        canonical_case = None
+        noncanonical_case = None
+        for case in index["cases"]:
+            vector = json.loads(
+                (OCR_PROFILE_FIXTURES / case["fixture"]).read_text(encoding="utf-8")
+            )
+            schema_valid = not list(validator.iter_errors(vector))
+            with self.subTest(fixture=case["fixture"], check="schema"):
+                self.assertEqual(schema_valid, case["schema_valid"])
+            try:
+                extracted = _canonical_ocr_profile_text(vector)
+                walker_valid = True
+            except ValueError:
+                extracted = None
+                walker_valid = False
+            with self.subTest(fixture=case["fixture"], check="walker"):
+                self.assertEqual(walker_valid, case["walker_valid"])
+            if walker_valid:
+                with self.subTest(fixture=case["fixture"], check="text"):
+                    self.assertIsInstance(extracted, str)
+                    self.assertEqual(extracted == vector["text_plain"], case["valid"])
+            else:
+                self.assertFalse(case["valid"])
+            if case["kind"] == "canonical":
+                canonical_case = vector
+            elif case["kind"] == "coordinate-order":
+                noncanonical_case = vector
+
+        self.assertIsNotNone(canonical_case)
+        self.assertIsNotNone(noncanonical_case)
+        self.assertNotEqual(
+            _coordinate_sorted_ocr_text(canonical_case),
+            canonical_case["text_plain"],
+        )
+        self.assertEqual(
+            _coordinate_sorted_ocr_text(canonical_case),
+            noncanonical_case["text_plain"],
+        )
+
+        duplicate_reference = json.loads(json.dumps(canonical_case))
+        duplicate_reference["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ][0]["kids"][0]["kids"][0]["kids"].append(
+            {
+                "role": "Span",
+                "actual_text": "ITEM ",
+                "kids": [{"page_index": 0, "mcid": 0}],
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "reference is duplicated"):
+            _canonical_ocr_profile_text(duplicate_reference)
+
+        wrong_page = json.loads(json.dumps(canonical_case))
+        wrong_page["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ][0]["kids"][0]["kids"][0]["kids"][0]["kids"][0]["page_index"] = 1
+        with self.assertRaisesRegex(ValueError, "crosses its page Sect"):
+            _canonical_ocr_profile_text(wrong_page)
+
+        unresolved_reference = json.loads(json.dumps(canonical_case))
+        unresolved_reference["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ][0]["kids"][0]["kids"][0]["kids"][0]["kids"][0]["mcid"] = 99
+        with self.assertRaisesRegex(ValueError, "reference is unresolved"):
+            _canonical_ocr_profile_text(unresolved_reference)
+
+        omitted_leaf = json.loads(json.dumps(canonical_case))
+        omitted_leaf["pdf_logical_structure"]["structure_tree"]["kids"][0]["kids"][
+            0
+        ]["kids"][0]["kids"].pop()
+        with self.assertRaisesRegex(ValueError, "must be used once"):
+            _canonical_ocr_profile_text(omitted_leaf)
+
+        reordered_pages = json.loads(json.dumps(canonical_case))
+        reordered_pages["pdf_logical_structure"]["structure_tree"]["kids"].reverse()
+        with self.assertRaisesRegex(ValueError, "must follow source page order"):
+            _canonical_ocr_profile_text(reordered_pages)
+
+        duplicate_mcid = json.loads(json.dumps(canonical_case))
+        duplicate_mcid["pdf_logical_structure"]["pages"][0]["marked_content"].append(
+            duplicate_mcid["pdf_logical_structure"]["pages"][0]["marked_content"][0]
+        )
+        with self.assertRaisesRegex(ValueError, "MCIDs must be unique"):
+            _canonical_ocr_profile_text(duplicate_mcid)
+
+        parent_actual_text = json.loads(json.dumps(canonical_case))
+        parent_actual_text["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ][0]["actual_text"] = "override"
+        self.assertTrue(list(validator.iter_errors(parent_actual_text)))
+        with self.assertRaisesRegex(ValueError, "invalid shape"):
+            _canonical_ocr_profile_text(parent_actual_text)
+
+        empty_table = json.loads(json.dumps(canonical_case))
+        empty_table["pdf_logical_structure"]["structure_tree"]["kids"][0]["kids"][
+            0
+        ]["kids"] = []
+        self.assertTrue(list(validator.iter_errors(empty_table)))
+        with self.assertRaisesRegex(ValueError, "must contain at least one child"):
+            _canonical_ocr_profile_text(empty_table)
+
+        nested_span = json.loads(json.dumps(canonical_case))
+        first_span = nested_span["pdf_logical_structure"]["structure_tree"]["kids"][
+            0
+        ]["kids"][0]["kids"][0]["kids"][0]["kids"][0]
+        reference = first_span["kids"][0]
+        first_span["kids"] = [
+            {"role": "Span", "actual_text": "ITEM ", "kids": [reference]}
+        ]
+        self.assertTrue(list(validator.iter_errors(nested_span)))
+        with self.assertRaisesRegex(ValueError, "marked content reference"):
+            _canonical_ocr_profile_text(nested_span)
+
+        empty_final_page = json.loads(json.dumps(canonical_case))
+        empty_final_page["source_page_count"] = 3
+        empty_final_page["pdf_logical_structure"]["pages"].append(
+            {"page_index": 2, "marked_content": []}
+        )
+        empty_final_page["pdf_logical_structure"]["structure_tree"]["kids"].append(
+            {"role": "Sect", "page_index": 2, "kids": []}
+        )
+        empty_final_page["text_plain"] += "\f"
+        self.assertEqual(list(validator.iter_errors(empty_final_page)), [])
+        self.assertEqual(
+            _canonical_ocr_profile_text(empty_final_page),
+            empty_final_page["text_plain"],
+        )
+
+    def test_document_ocr_profile_semantics_are_exact_and_order_independent(
+        self,
+    ) -> None:
+        fixture_dir = FIXTURES / "v2"
+        manifest = json.loads(
+            (fixture_dir / "valid/manifest-ocr-provider.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(_document_ocr_manifest_errors(manifest), [])
+
+        reversed_outputs = json.loads(json.dumps(manifest))
+        reversed_outputs["capabilities"][0]["produces"].reverse()
+        self.assertEqual(_document_ocr_manifest_errors(reversed_outputs), [])
+
+        mixed_manifest = json.loads(json.dumps(manifest))
+        generic_manifest = json.loads(
+            (fixture_dir / "valid/manifest.json").read_text(encoding="utf-8")
+        )
+        mixed_manifest["capabilities"].append(generic_manifest["capabilities"][0])
+        self.assertEqual(
+            semantic_errors("v2", "manifest.schema.json", mixed_manifest), []
+        )
+        mixed_invalid_manifest = json.loads(json.dumps(mixed_manifest))
+        mixed_invalid_manifest["capabilities"][0]["accepts"][0][
+            "max_bytes"
+        ] += 1
+        self.assertTrue(
+            semantic_errors("v2", "manifest.schema.json", mixed_invalid_manifest)
+        )
+
+        for fixture in (
+            "invalid/manifest-ocr-wrong-profile.json",
+            "invalid/manifest-ocr-duplicate-produces.json",
+        ):
+            invalid_manifest = json.loads(
+                (fixture_dir / fixture).read_text(encoding="utf-8")
+            )
+            with self.subTest(fixture=fixture):
+                self.assertTrue(_document_ocr_manifest_errors(invalid_manifest))
+
+        completed = json.loads(
+            (fixture_dir / "valid/job-completed-ocr.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(_document_ocr_status_errors(completed), [])
+        reversed_status = json.loads(json.dumps(completed))
+        reversed_status["result"]["outputs"].reverse()
+        self.assertEqual(_document_ocr_status_errors(reversed_status), [])
+        mixed_outputs = json.loads(json.dumps(completed))
+        extra_output = json.loads(
+            json.dumps(mixed_outputs["result"]["outputs"][1])
+        )
+        extra_output["artifact_id"] = "99999999-9999-4999-8999-999999999999"
+        extra_output["media_type"] = "application/json"
+        mixed_outputs["result"]["outputs"].append(extra_output)
+        self.assertTrue(_document_ocr_status_errors(mixed_outputs))
+
+        for fixture in (
+            "invalid/job-completed-ocr-missing-output.json",
+            "invalid/job-completed-ocr-empty-pdf.json",
+            "invalid/job-completed-ocr-duplicate-media.json",
+            "invalid/job-completed-ocr-text-bom.json",
+            "invalid/job-completed-ocr-text-whitespace.json",
+            "invalid/job-failed-ocr-no-text-retryable.json",
+            "invalid/job-failed-ocr-document-invalid-retryable.json",
+            "invalid/job-failed-ocr-input-page-limit-exceeded-retryable.json",
+            "invalid/job-failed-ocr-output-text-limit-exceeded-retryable.json",
+            "invalid/job-failed-ocr-output-pdf-limit-exceeded-retryable.json",
+        ):
+            invalid_status = json.loads(
+                (fixture_dir / fixture).read_text(encoding="utf-8")
+            )
+            with self.subTest(fixture=fixture):
+                self.assertTrue(_document_ocr_status_errors(invalid_status))
+
+        inconsistent_pdf_size = json.loads(json.dumps(completed))
+        next(
+            output
+            for output in inconsistent_pdf_size["result"]["outputs"]
+            if output["media_type"] == OCR_PDF_MEDIA_TYPE
+        )["byte_size"] = 0
+        self.assertTrue(_document_ocr_status_errors(inconsistent_pdf_size))
+
+        failed = json.loads(
+            (fixture_dir / "valid/job-failed-ocr-no-text.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            set(OCR_ERROR_POLICY),
+            {
+                "DOCUMENT_INVALID",
+                "INPUT_PAGE_LIMIT_EXCEEDED",
+                "OUTPUT_TEXT_LIMIT_EXCEEDED",
+                "OUTPUT_PDF_LIMIT_EXCEEDED",
+                "NO_OCR_TEXT",
+            },
+        )
+        for code, policy in OCR_ERROR_POLICY.items():
+            exact = json.loads(json.dumps(failed))
+            exact["error"] = {"code": code, **policy}
+            with self.subTest(code=code, mutation="exact"):
+                self.assertEqual(_document_ocr_status_errors(exact), [])
+
+            wrong_retry = json.loads(json.dumps(exact))
+            wrong_retry["error"]["retryable"] = True
+            with self.subTest(code=code, mutation="retryable"):
+                self.assertTrue(_document_ocr_status_errors(wrong_retry))
+
+            wrong_message = json.loads(json.dumps(exact))
+            wrong_message["error"]["message"] += " Extra"
+            with self.subTest(code=code, mutation="message"):
+                self.assertTrue(_document_ocr_status_errors(wrong_message))
+
+        generic_failure = json.loads(json.dumps(failed))
+        generic_failure["error"] = {
+            "code": "OCR_ENGINE_FAILED",
+            "message": "The OCR engine failed.",
+            "retryable": True,
+        }
+        self.assertEqual(_document_ocr_status_errors(generic_failure), [])
+
+        def with_text_payload(payload: bytes) -> dict:
+            status = json.loads(json.dumps(completed))
+            text_output = next(
+                output
+                for output in status["result"]["outputs"]
+                if output["media_type"] == OCR_TEXT_MEDIA_TYPE
+            )
+            text_output["payload_base64"] = base64.b64encode(payload).decode("ascii")
+            text_output["byte_size"] = len(payload)
+            text_output["sha256"] = hashlib.sha256(payload).hexdigest()
+            return status
+
+        self.assertEqual(_document_ocr_status_errors(with_text_payload(b"A" * 262_144)), [])
+        for payload in (b"A" * 262_145, b"", b"\xff"):
+            with self.subTest(payload_size=len(payload), payload_prefix=payload[:1]):
+                self.assertTrue(
+                    _document_ocr_status_errors(with_text_payload(payload))
+                )
+
+        unrelated_status = json.loads(
+            (fixture_dir / "valid/job-completed.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(_document_ocr_status_errors(unrelated_status), [])
+
     def test_entitlement_v1_fixtures_match_schema_signature_and_time_contract(
         self,
     ) -> None:

@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+  "capability": {
+    "id": "document.ocr",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "media_type": "application/pdf",
+      "byte_size": 9,
+      "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "display_name": "scan.pdf",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

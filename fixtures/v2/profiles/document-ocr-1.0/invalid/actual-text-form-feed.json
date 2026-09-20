@@ -1,0 +1,37 @@
+{
+  "profile": "document.ocr/1.0",
+  "source_page_count": 1,
+  "pdf_logical_structure": {
+    "mark_info_marked": true,
+    "pages": [
+      {
+        "page_index": 0,
+        "marked_content": [
+          {"mcid": 0, "bbox": [24, 700, 200, 14]}
+        ]
+      }
+    ],
+    "structure_tree": {
+      "role": "Document",
+      "kids": [
+        {
+          "role": "Sect",
+          "page_index": 0,
+          "kids": [
+            {
+              "role": "P",
+              "kids": [
+                {
+                  "role": "Span",
+                  "actual_text": "ITEM\fQTY",
+                  "kids": [{"page_index": 0, "mcid": 0}]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "text_plain": "ITEM\fQTY"
+}
