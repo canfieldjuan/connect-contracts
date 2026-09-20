@@ -1,10 +1,10 @@
 # ADR-0009: Connect v2 document OCR capability profile
 
-**Status:** Proposed
+**Status:** Proposed (accepted when this decision merges)
 
 **Date:** 2026-09-17
 
-**Decider:** Pending
+**Decider:** Juan Canfield
 
 ## Context
 
@@ -216,8 +216,8 @@ text native.
 
 A background OCR provider follows ADR-0007. This profile does not silently
 enable it, change per-user consent, or weaken provider ownership and recovery
-requirements. ADR-0008 and ADR-0007 must be accepted before this decision can
-be accepted.
+requirements. Accepted ADR-0007 and ADR-0008 are prerequisites for this
+decision.
 
 ## Required acceptance evidence
 
@@ -292,7 +292,7 @@ portable profile semantics; each application proves its own integration.
 
 ### Installed same-scan vertical proof
 
-12. after ADR-0008 is accepted, one exact-package installed proof uses one
+12. under accepted ADR-0008, one exact-package installed proof uses one
     retained scanned multi-column table and one installed OCR provider instance
     across the complete path. Record the operating system, exact source commit
     and package SHA-256 for the OCR provider, Email Watcher, Invoice Processor,
