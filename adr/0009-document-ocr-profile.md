@@ -47,8 +47,11 @@ A conforming provider declares this exact semantic profile:
 
 Labels and descriptions remain bounded untrusted presentation text and may vary.
 The semantic requirements are the capability identity, exactly one PDF input
-declaration with the 32 MiB cap, the exact produced-media set, no parameters,
-and both effect flags false. Output order in the declaration is not semantic.
+declaration with the 32 MiB cap, exactly two `produces` entries containing
+`application/vnd.local-connect.ocr-pdf` exactly once and `text/plain` exactly
+once, no parameters, and both effect flags false. Output order in the
+declaration is not semantic. A duplicate required media type is invalid even
+when the set of distinct declared media types still matches this profile.
 
 Version 1.0 accepts no image media types and performs no external effect. A
 provider bounds the actual streamed artifact before admission and verifies that
@@ -226,9 +229,10 @@ portable profile semantics; each application proves its own integration.
 
 ### Shared profile fixtures
 
-1. the exact manifest profile is accepted; image input, a different 32 MiB input
-   cap, additional parameters, missing or extra produced media, and either true
-   effect flag are rejected;
+1. the exact manifest profile is accepted in either produced-media order; image
+   input, a different 32 MiB input cap, additional parameters, missing or extra
+   produced media, either required media type repeated, and either true effect
+   flag are rejected;
 2. a completed status with exactly one
    `application/vnd.local-connect.ocr-pdf` output and one text output passes
    regardless of order, while either output alone, duplicate media, a third
@@ -292,29 +296,38 @@ portable profile semantics; each application proves its own integration.
 
 ### Installed same-scan vertical proof
 
-12. under accepted ADR-0008, one exact-package installed proof uses one
-    retained scanned multi-column table and one installed OCR provider instance
-    across the complete path. Record the operating system, exact source commit
-    and package SHA-256 for the OCR provider, Email Watcher, Invoice Processor,
-    and Document Summarizer, plus the discovered OCR provider app and durable
-    instance IDs. Installed Email Watcher discovers that installed provider,
-    submits the scan, renders the retained text preview, and exports the exact
-    source-preserving PDF through its safe export path. The same retained OCR
-    output then creates one ADR-0008 edge and exactly one reconciled downstream
-    child for installed Invoice Processor, and a separate ADR-0008 edge and
-    exactly one reconciled downstream child for installed Document Summarizer.
-    Restart the provider and each application across admission and lost-response
-    recovery boundaries, then prove reconciliation creates no duplicate edge or
-    child. Invoice Processor shows buyer-visible reconstructed rows, columns,
-    and source provenance; Document Summarizer shows a buyer-visible cited
-    summary bound to the OCR media and source kind; Email Watcher shows the
-    retained preview, exported artifact identity, and both downstream lineage
-    outcomes. Every displayed provenance chain identifies the original scan,
-    OCR provider instance and job, selected output, downstream provider instance
-    and job, and exact artifact digest. No chaining control or automatic
-    admission is enabled before ADR-0008 is accepted. Isolated repository
-    fixtures, different scans per application, development binaries, or
-    separately packaged demonstrations cannot substitute for this proof.
+12. under accepted ADR-0008, one exact-package installed proof uses one retained
+    scanned multi-column table and one installed OCR provider instance across
+    the complete path. Record the operating system, exact source commit and
+    package SHA-256 for the OCR provider, Email Watcher, Invoice Processor, and
+    Document Summarizer, plus the discovered OCR provider app and durable
+    instance IDs. Installed Email Watcher discovers that installed provider and
+    submits the exact same retained scan bytes and digest as two independently
+    admitted OCR executions with distinct consumer-owned execution identities.
+    The first OCR job and its selected retained output create one ADR-0008 edge
+    and exactly one reconciled downstream child for installed Invoice Processor.
+    The second OCR job and its distinct selected retained output create one
+    separate ADR-0008 edge and exactly one reconciled downstream child for
+    installed Document Summarizer. No producer job, selected output, execution
+    identity, or lineage edge is reused across the two downstream children, so
+    each execution is a linear one-parent, one-child path and this proof does not
+    require the branching semantics deferred by ADR-0008.
+
+    Email Watcher renders the retained text preview for each OCR execution and
+    exports its exact source-preserving PDF through the safe export path. Restart
+    the provider and each application across admission and lost-response
+    recovery boundaries, then prove reconciliation creates no duplicate OCR
+    job, edge, or child within either execution. Invoice Processor shows
+    buyer-visible reconstructed rows, columns, and source provenance; Document
+    Summarizer shows a buyer-visible cited summary bound to the OCR media and
+    source kind; Email Watcher shows both retained previews, exported artifact
+    identities, and downstream lineage outcomes. Every displayed provenance
+    chain identifies the same original scan bytes and digest, its own OCR
+    provider instance and job, selected output, downstream provider instance and
+    job, and exact artifact digest. No chaining control or automatic admission
+    is enabled before ADR-0008 is accepted. Isolated repository fixtures,
+    different scans per application, development binaries, or separately
+    packaged demonstrations cannot substitute for this proof.
 
 Static contract fixtures prove declaration and status semantics. Generated PDFs
 at the input, page, and output boundaries require OCR provider runtime tests
