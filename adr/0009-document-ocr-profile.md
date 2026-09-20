@@ -91,7 +91,8 @@ truncated, and emits no partial result:
 A completed `document.ocr` 1.0 job contains exactly one
 `application/vnd.local-connect.ocr-pdf` output and exactly one `text/plain`
 output, with no duplicate or additional media type. The two output artifact IDs
-are distinct and neither aliases the input.
+are distinct and neither aliases the input. The decoded PDF payload is nonempty,
+and its declared `byte_size` is nonzero and equals its decoded byte count.
 
 Every output retains v2's canonical base64, decoded size, and SHA-256. The
 required text is strict UTF-8 without a byte-order mark, contains at least one
@@ -310,9 +311,9 @@ portable profile semantics; each application proves its own integration.
    multi-column table and reject the different text produced by a coordinate
    sort. Both the schema and an independent walker reject `Table` > `TD` > `TH`,
    a cell outside `TR`, `TR` outside `Table`, and canonical text beginning with
-   U+FEFF. Duplicate MCID references, cross-page references, unresolved or
-   omitted leaves, empty nonterminals, terminal nesting, and page `Sect`
-   reordering also fail.
+   U+FEFF or containing U+000C in an `ActualText` leaf. Duplicate MCID
+   references, cross-page references, unresolved or omitted leaves, empty
+   nonterminals, terminal nesting, and page `Sect` reordering also fail.
 
 ### OCR provider runtime
 

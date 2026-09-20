@@ -160,6 +160,7 @@
   { "schema": "manifest.schema.json", "fixture": "invalid/manifest-ocr-wrong-profile.json", "valid": false },
   { "schema": "manifest.schema.json", "fixture": "invalid/manifest-ocr-duplicate-produces.json", "valid": false },
   { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-missing-output.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-empty-pdf.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
   { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-duplicate-media.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
   { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-text-bom.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
   { "schema": "job-status.schema.json", "fixture": "invalid/job-completed-ocr-text-whitespace.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },

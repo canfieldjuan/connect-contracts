@@ -41,6 +41,13 @@
       "schema_valid": false,
       "walker_valid": false,
       "valid": false
+    },
+    {
+      "fixture": "invalid/actual-text-form-feed.json",
+      "kind": "actual-text-form-feed",
+      "schema_valid": false,
+      "walker_valid": false,
+      "valid": false
     }
   ]
 }

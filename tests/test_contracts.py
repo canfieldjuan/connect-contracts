@@ -264,6 +264,26 @@ def _document_ocr_status_errors(instance: dict) -> list[str]:
             "document.ocr 1.0 must complete with each required output media type once"
         )
 
+    pdf_outputs = [
+        output for output in outputs if output["media_type"] == OCR_PDF_MEDIA_TYPE
+    ]
+    if len(pdf_outputs) == 1:
+        try:
+            pdf_payload = base64.b64decode(
+                pdf_outputs[0]["payload_base64"], validate=True
+            )
+        except (binascii.Error, ValueError):
+            pdf_payload = None
+        if pdf_payload is not None and (
+            not pdf_payload
+            or pdf_outputs[0]["byte_size"] <= 0
+            or pdf_outputs[0]["byte_size"] != len(pdf_payload)
+        ):
+            errors.append(
+                "document.ocr 1.0 PDF output must have a nonempty payload "
+                "and a consistent nonzero byte_size"
+            )
+
     text_outputs = [
         output for output in outputs if output["media_type"] == OCR_TEXT_MEDIA_TYPE
     ]
@@ -485,6 +505,8 @@ def _canonical_ocr_profile_text(vector: dict) -> str:
         except KeyError as exc:
             raise ValueError("marked content reference is unresolved") from exc
         actual_text = node["actual_text"]
+        if "\f" in actual_text:
+            raise ValueError("ActualText must not contain U+000C")
         try:
             actual_text.encode("utf-8")
         except UnicodeEncodeError as exc:
@@ -771,6 +793,7 @@ class ConnectContractTests(unittest.TestCase):
 
         for fixture in (
             "invalid/job-completed-ocr-missing-output.json",
+            "invalid/job-completed-ocr-empty-pdf.json",
             "invalid/job-completed-ocr-duplicate-media.json",
             "invalid/job-completed-ocr-text-bom.json",
             "invalid/job-completed-ocr-text-whitespace.json",
@@ -781,6 +804,14 @@ class ConnectContractTests(unittest.TestCase):
             )
             with self.subTest(fixture=fixture):
                 self.assertTrue(_document_ocr_status_errors(invalid_status))
+
+        inconsistent_pdf_size = json.loads(json.dumps(completed))
+        next(
+            output
+            for output in inconsistent_pdf_size["result"]["outputs"]
+            if output["media_type"] == OCR_PDF_MEDIA_TYPE
+        )["byte_size"] = 0
+        self.assertTrue(_document_ocr_status_errors(inconsistent_pdf_size))
 
         def with_text_payload(payload: bytes) -> dict:
             status = json.loads(json.dumps(completed))
