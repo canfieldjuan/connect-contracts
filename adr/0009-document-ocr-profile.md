@@ -275,6 +275,26 @@ valid for this capability profile. This profile uses an explicit terminal
 failure so automatic consumers cannot mistake an empty artifact for analysis
 input.
 
+### Profile error policy
+
+Every deterministic failure condition defined by this profile uses `failed`
+status, carries no `result`, and has the exact error object stated below. All
+five conditions are nonretryable; changing the message or retry flag is not the
+same profile error.
+
+| Code | Exact message | Retryable |
+|---|---|---:|
+| `DOCUMENT_INVALID` | `The PDF is not a readable document with at least one page.` | false |
+| `INPUT_PAGE_LIMIT_EXCEEDED` | `The PDF has more than 100 pages.` | false |
+| `OUTPUT_TEXT_LIMIT_EXCEEDED` | `The recognized text is larger than this provider can return.` | false |
+| `OUTPUT_PDF_LIMIT_EXCEEDED` | `The reconstructed PDF is larger than this provider can return.` | false |
+| `NO_OCR_TEXT` | `No text was detected in the document.` | false |
+
+This map is exhaustive for deterministic conditions defined by this profile; it
+is not a closed set of every provider failure. A provider may use another
+v2-conforming code for a failure condition this profile does not define, but it
+does not substitute another code for one of the five conditions above.
+
 ### Provenance and lifecycle
 
 ADR-0008 governs any OCR output submitted to another provider. Its lineage edge
@@ -306,7 +326,8 @@ portable profile semantics; each application proves its own integration.
    regardless of order, while either output alone, duplicate media, a third
    media type, input alias, invalid UTF-8, byte-order-mark, whitespace-only, and
    zero-byte completed results fail; and
-3. `NO_OCR_TEXT` is failed, nonretryable, and carries no result; and
+3. every profile-defined error uses the exact code, message, and nonretryable
+   shape in the profile error-policy map and carries no result; and
 4. the versioned canonical-text proof vectors accept tag-tree order for a
    multi-column table and reject the different text produced by a coordinate
    sort. Both the schema and an independent walker reject `Table` > `TD` > `TH`,

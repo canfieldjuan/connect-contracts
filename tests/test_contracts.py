@@ -26,6 +26,28 @@ OCR_CAPABILITY = ("document.ocr", "1.0")
 OCR_PDF_MEDIA_TYPE = "application/vnd.local-connect.ocr-pdf"
 OCR_TEXT_MEDIA_TYPE = "text/plain"
 OCR_REQUIRED_OUTPUT_MEDIA_TYPES = {OCR_PDF_MEDIA_TYPE, OCR_TEXT_MEDIA_TYPE}
+OCR_ERROR_POLICY: dict[str, dict[str, object]] = {
+    "DOCUMENT_INVALID": {
+        "message": "The PDF is not a readable document with at least one page.",
+        "retryable": False,
+    },
+    "INPUT_PAGE_LIMIT_EXCEEDED": {
+        "message": "The PDF has more than 100 pages.",
+        "retryable": False,
+    },
+    "OUTPUT_TEXT_LIMIT_EXCEEDED": {
+        "message": "The recognized text is larger than this provider can return.",
+        "retryable": False,
+    },
+    "OUTPUT_PDF_LIMIT_EXCEEDED": {
+        "message": "The reconstructed PDF is larger than this provider can return.",
+        "retryable": False,
+    },
+    "NO_OCR_TEXT": {
+        "message": "No text was detected in the document.",
+        "retryable": False,
+    },
+}
 SCHEMA_NAMES = {
     "error.schema.json",
     "job-request.schema.json",
@@ -243,12 +265,11 @@ def _document_ocr_status_errors(instance: dict) -> list[str]:
 
     if instance["status"] == "failed":
         error = instance["error"]
-        if error["code"] == "NO_OCR_TEXT" and error != {
-            "code": "NO_OCR_TEXT",
-            "message": "No text was detected in the document.",
-            "retryable": False,
-        }:
-            return ["document.ocr 1.0 NO_OCR_TEXT has the wrong error shape"]
+        policy = OCR_ERROR_POLICY.get(error["code"])
+        if policy is not None and error != {"code": error["code"], **policy}:
+            return [
+                f"document.ocr 1.0 {error['code']} has the wrong error shape"
+            ]
         return []
     if instance["status"] != "completed":
         return []
@@ -798,6 +819,10 @@ class ConnectContractTests(unittest.TestCase):
             "invalid/job-completed-ocr-text-bom.json",
             "invalid/job-completed-ocr-text-whitespace.json",
             "invalid/job-failed-ocr-no-text-retryable.json",
+            "invalid/job-failed-ocr-document-invalid-retryable.json",
+            "invalid/job-failed-ocr-input-page-limit-exceeded-retryable.json",
+            "invalid/job-failed-ocr-output-text-limit-exceeded-retryable.json",
+            "invalid/job-failed-ocr-output-pdf-limit-exceeded-retryable.json",
         ):
             invalid_status = json.loads(
                 (fixture_dir / fixture).read_text(encoding="utf-8")
@@ -812,6 +837,45 @@ class ConnectContractTests(unittest.TestCase):
             if output["media_type"] == OCR_PDF_MEDIA_TYPE
         )["byte_size"] = 0
         self.assertTrue(_document_ocr_status_errors(inconsistent_pdf_size))
+
+        failed = json.loads(
+            (fixture_dir / "valid/job-failed-ocr-no-text.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            set(OCR_ERROR_POLICY),
+            {
+                "DOCUMENT_INVALID",
+                "INPUT_PAGE_LIMIT_EXCEEDED",
+                "OUTPUT_TEXT_LIMIT_EXCEEDED",
+                "OUTPUT_PDF_LIMIT_EXCEEDED",
+                "NO_OCR_TEXT",
+            },
+        )
+        for code, policy in OCR_ERROR_POLICY.items():
+            exact = json.loads(json.dumps(failed))
+            exact["error"] = {"code": code, **policy}
+            with self.subTest(code=code, mutation="exact"):
+                self.assertEqual(_document_ocr_status_errors(exact), [])
+
+            wrong_retry = json.loads(json.dumps(exact))
+            wrong_retry["error"]["retryable"] = True
+            with self.subTest(code=code, mutation="retryable"):
+                self.assertTrue(_document_ocr_status_errors(wrong_retry))
+
+            wrong_message = json.loads(json.dumps(exact))
+            wrong_message["error"]["message"] += " Extra"
+            with self.subTest(code=code, mutation="message"):
+                self.assertTrue(_document_ocr_status_errors(wrong_message))
+
+        generic_failure = json.loads(json.dumps(failed))
+        generic_failure["error"] = {
+            "code": "OCR_ENGINE_FAILED",
+            "message": "The OCR engine failed.",
+            "retryable": True,
+        }
+        self.assertEqual(_document_ocr_status_errors(generic_failure), [])
 
         def with_text_payload(payload: bytes) -> dict:
             status = json.loads(json.dumps(completed))
