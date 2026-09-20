@@ -152,5 +152,7 @@
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-operator-contact-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-operator-contact-conflict.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-contact-field-clear-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-contact-field-clear-conflict.json", "valid": true },
   { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-contact-archive-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-contact-archive-conflict.json", "valid": true },
-  { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-contact-restore-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-contact-restore-conflict.json", "valid": true }
+  { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-contact-restore-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-contact-restore-conflict.json", "valid": true },
+  { "schema": "job-request.schema.json", "fixture": "invalid/job-request-with-derived-from.json", "provider_manifest": "valid/manifest.json", "valid": false },
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-status-with-derived-from.json", "provider_manifest": "valid/manifest.json", "request_fixture": "valid/job-request.json", "valid": false }
 ]
