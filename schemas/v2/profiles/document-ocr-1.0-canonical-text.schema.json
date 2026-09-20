@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.dev/schemas/v2/profiles/document-ocr-1.0-canonical-text.schema.json",
+  "title": "Document OCR 1.0 canonical Tagged PDF text proof vector",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile",
+    "source_page_count",
+    "pdf_logical_structure",
+    "text_plain"
+  ],
+  "properties": {
+    "profile": {
+      "const": "document.ocr/1.0"
+    },
+    "source_page_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "pdf_logical_structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mark_info_marked", "pages", "structure_tree"],
+      "properties": {
+        "mark_info_marked": {
+          "const": true,
+          "description": "Models Catalog/MarkInfo/Marked in the Tagged PDF."
+        },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/page"
+          }
+        },
+        "structure_tree": {
+          "$ref": "#/$defs/structureElement"
+        }
+      }
+    },
+    "text_plain": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 262144,
+      "description": "The strict UTF-8 text/plain value after JSON decoding."
+    }
+  },
+  "$defs": {
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_index", "marked_content"],
+      "properties": {
+        "page_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99
+        },
+        "marked_content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/markedContent"
+          }
+        }
+      }
+    },
+    "markedContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mcid", "bbox"],
+      "properties": {
+        "mcid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bbox": {
+          "type": "array",
+          "description": "Test-only x, y, width, height geometry; it never controls canonical order.",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {"type": "number"},
+            {"type": "number"},
+            {"type": "number", "exclusiveMinimum": 0},
+            {"type": "number", "exclusiveMinimum": 0}
+          ],
+          "items": false
+        }
+      }
+    },
+    "structureElement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "kids"],
+      "allOf": [
+        {
+          "if": {
+            "properties": {"role": {"const": "Span"}},
+            "required": ["role"]
+          },
+          "then": {
+            "required": ["actual_text"],
+            "properties": {
+              "kids": {
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {"$ref": "#/$defs/markedContentReference"}
+              }
+            }
+          }
+        },
+        {
+          "if": {"required": ["actual_text"]},
+          "then": {"properties": {"role": {"const": "Span"}}}
+        },
+        {
+          "if": {
+            "properties": {"role": {"const": "Sect"}},
+            "required": ["role"]
+          },
+          "then": {"required": ["page_index"]},
+          "else": {"not": {"required": ["page_index"]}}
+        }
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9]*$"
+        },
+        "page_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99
+        },
+        "actual_text": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\f]*$",
+          "description": "The Unicode value of ActualText on a terminal Span structure element."
+        },
+        "kids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/$defs/structureElement"},
+              {"$ref": "#/$defs/markedContentReference"}
+            ]
+          }
+        }
+      }
+    },
+    "markedContentReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_index", "mcid"],
+      "properties": {
+        "page_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99
+        },
+        "mcid": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

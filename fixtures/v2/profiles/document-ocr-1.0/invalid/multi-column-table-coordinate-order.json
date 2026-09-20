@@ -1,0 +1,389 @@
+{
+  "profile": "document.ocr/1.0",
+  "source_page_count": 2,
+  "pdf_logical_structure": {
+    "mark_info_marked": true,
+    "pages": [
+      {
+        "page_index": 0,
+        "marked_content": [
+          {
+            "mcid": 0,
+            "bbox": [
+              40,
+              80,
+              70,
+              12
+            ]
+          },
+          {
+            "mcid": 1,
+            "bbox": [
+              140,
+              80,
+              30,
+              12
+            ]
+          },
+          {
+            "mcid": 2,
+            "bbox": [
+              40,
+              110,
+              70,
+              12
+            ]
+          },
+          {
+            "mcid": 3,
+            "bbox": [
+              140,
+              110,
+              30,
+              12
+            ]
+          },
+          {
+            "mcid": 4,
+            "bbox": [
+              40,
+              140,
+              70,
+              12
+            ]
+          },
+          {
+            "mcid": 5,
+            "bbox": [
+              140,
+              140,
+              30,
+              12
+            ]
+          },
+          {
+            "mcid": 6,
+            "bbox": [
+              320,
+              80,
+              70,
+              12
+            ]
+          },
+          {
+            "mcid": 7,
+            "bbox": [
+              420,
+              80,
+              50,
+              12
+            ]
+          },
+          {
+            "mcid": 8,
+            "bbox": [
+              320,
+              110,
+              70,
+              12
+            ]
+          },
+          {
+            "mcid": 9,
+            "bbox": [
+              420,
+              110,
+              50,
+              12
+            ]
+          },
+          {
+            "mcid": 10,
+            "bbox": [
+              320,
+              140,
+              70,
+              12
+            ]
+          },
+          {
+            "mcid": 11,
+            "bbox": [
+              420,
+              140,
+              50,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "page_index": 1,
+        "marked_content": [
+          {
+            "mcid": 0,
+            "bbox": [
+              40,
+              80,
+              100,
+              12
+            ]
+          }
+        ]
+      }
+    ],
+    "structure_tree": {
+      "role": "Document",
+      "kids": [
+        {
+          "role": "Sect",
+          "page_index": 0,
+          "kids": [
+            {
+              "role": "Table",
+              "kids": [
+                {
+                  "role": "TR",
+                  "kids": [
+                    {
+                      "role": "TH",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "ITEM ",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 0
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "TH",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "QTY\n",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "TR",
+                  "kids": [
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "Mops ",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 2
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "2\n",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 3
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "TR",
+                  "kids": [
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "Soap ",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 4
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "1\n",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 5
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "Table",
+              "kids": [
+                {
+                  "role": "TR",
+                  "kids": [
+                    {
+                      "role": "TH",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "AMOUNT ",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 6
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "TH",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "STATUS\n",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 7
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "TR",
+                  "kids": [
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "$20 ",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 8
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "Paid\n",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 9
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "TR",
+                  "kids": [
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "$5 ",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 10
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "TD",
+                      "kids": [
+                        {
+                          "role": "Span",
+                          "actual_text": "Due",
+                          "kids": [
+                            {
+                              "page_index": 0,
+                              "mcid": 11
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "role": "Sect",
+          "page_index": 1,
+          "kids": [
+            {
+              "role": "P",
+              "kids": [
+                {
+                  "role": "Span",
+                  "actual_text": "TOTAL $25",
+                  "kids": [
+                    {
+                      "page_index": 1,
+                      "mcid": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "text_plain": "ITEM QTY\nAMOUNT STATUS\nMops 2\n$20 Paid\nSoap 1\n$5 Due\fTOTAL $25"
+}

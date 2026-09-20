@@ -111,22 +111,52 @@ If the complete UTF-8 text exceeds 262,144 bytes, the job fails with no result:
 }
 ```
 
-The PDF is a structurally valid text-only reconstruction. It embeds no source
-page image. It preserves the source page count, order, boxes, rotation, scale,
-and recognized text coordinates without reflow or repagination. Its text
-objects are spatially aligned with their recognized source regions, and each
-page's extracted text corresponds to the same page segment in the required
-plain-text output. For this comparison, each side is normalized to Unicode NFC,
-each maximal Unicode whitespace run is replaced with one U+0020 SPACE, and
-leading and trailing space is removed; the normalized page strings must match.
+The PDF is a structurally valid searchable reconstruction. It preserves the
+source page count and order, page boxes, rotation, scale, and visible appearance
+without reflow or repagination. Its OCR text objects do not change that visible
+appearance and are spatially aligned with their recognized source regions.
 
-Those semantic, spatial, and cross-output fidelity properties are owned and
-validated by the OCR provider. They are not represented as independently
-verifiable facts in the v2 status. Provider runtime and installed-package
-evidence therefore prove recognized-region alignment, source-geometry
-preservation, normalized PDF-extraction equivalence, and semantic
-no-truncation. A consumer does not claim to verify those properties by parsing
-the export artifact or by running OCR again.
+The PDF carries one canonical text order using Tagged PDF logical structure as
+defined by ISO 32000. The document catalog has `MarkInfo/Marked` set to true and
+a `StructTreeRoot`. That root has exactly one `Document` structure element whose
+`K` array has exactly one `Sect` child for each source page, in source page
+order. Each page `Sect` has a `Pg` entry bound to that page. Its descendant
+structure elements use their `K` arrays to state logical reading order
+independently of content stream, object, glyph, or coordinate order. Recognized
+tables use the standard
+`Table`, `TR`, `TH`, and `TD` structure types so row and cell membership remain
+explicit.
+
+Every terminal OCR text leaf is a `Span` structure element with an `ActualText`
+text string and exactly one marked-content reference to the visible page. That
+marked-content sequence encloses only the aligned glyphs represented by the
+leaf. Its MCID is unique on that page, the page's `StructParents` and the
+structure tree's `ParentTree` map it back to the same `Span`, and the reference
+is neither unresolved, omitted, duplicated, nor used from a different page
+`Sect`. Parent structure elements do not carry `ActualText`, so no replacement
+text can override a child. Source appearance content outside the OCR layer is
+marked as an artifact and does not enter the logical text traversal.
+
+Canonical extraction processes source pages in order. On each page it walks
+the page `Sect` depth first, processes every `K` array in array order, decodes
+each terminal `Span/ActualText` with the PDF text-string Unicode rules, and
+concatenates those Unicode values without inserting, removing, or normalizing
+characters. Every decoded value is a valid Unicode scalar sequence and contains
+no U+000C. Encoding the concatenated page value as UTF-8 must reproduce that
+page's exact `text/plain` segment byte for byte. Joining those page values with
+one U+000C between adjacent pages must reproduce the complete plain-text output.
+A coordinate sort, content-stream walk, PDF-object walk, or parser-specific
+reading-order heuristic is noncanonical even when it produces plausible text.
+
+The OCR provider validates appearance preservation, recognized-region
+alignment, complete tagged structure, canonical extraction equivalence, and
+semantic no-truncation before completing the job. A consumer that extracts text
+from the OCR PDF independently implements the same tag-tree traversal and
+rejects output whose canonical extraction differs from the paired plain-text
+artifact. It does not rerun OCR. The consumer implementation used for installed
+proof does not call the provider's extractor or share its extraction or
+traversal helper. Wire-only and export-only consumers are not required to parse
+the PDF and do not claim spatial validation.
 
 The complete PDF is at most 2 MiB. If the provider cannot produce and validate
 the complete PDF within that cap, the job fails with no result:
@@ -152,6 +182,11 @@ UTF-8, no byte-order mark, non-whitespace text; and one form-feed-delimited text
 segment per admitted source page. It identifies outputs by media type,
 independent of array order or display name.
 
+A consumer that extracts the OCR PDF's text additionally validates the complete
+Tagged PDF requirements above and uses only the canonical logical-structure
+procedure for cross-output comparison. Failure is an invalid OCR result and
+creates no downstream analysis result.
+
 Email Watcher renders the complete validated text through the profile's 256 KiB
 limit without changing the stored bytes. It offers the PDF only through its safe
 export path. It does not parse that export artifact to infer OCR geometry or
@@ -169,9 +204,9 @@ output is absent, duplicated, empty, over its actual byte cap, has an invalid
 encoding or a declared-size or digest mismatch, follows an input outside the
 admitted page bound, has invalid text-page segmentation, is not declared and
 compatible for the selected capability, or lacks the required authorization and
-ADR-0008 state. Recognized-region alignment, source-geometry preservation,
-normalized PDF-extraction equivalence, and semantic truncation remain
-provider-owned proof obligations.
+ADR-0008 state. Recognized-region alignment, source-appearance preservation,
+and semantic no-truncation remain provider-owned proof obligations. Canonical
+tag-tree extraction equivalence is independently consumer-verifiable.
 
 A downstream provider that accepts the OCR PDF persists the exact vendor media
 type or a closed OCR source kind before parsing and carries that classification
@@ -238,36 +273,41 @@ portable profile semantics; each application proves its own integration.
    regardless of order, while either output alone, duplicate media, a third
    media type, input alias, invalid UTF-8, byte-order-mark, whitespace-only, and
    zero-byte completed results fail; and
-3. `NO_OCR_TEXT` is failed, nonretryable, and carries no result.
+3. `NO_OCR_TEXT` is failed, nonretryable, and carries no result; and
+4. the versioned canonical-text proof vectors accept tag-tree order for a
+   multi-column table and reject the different text produced by a coordinate
+   sort. Duplicate MCID references, cross-page references, unresolved or omitted
+   leaves, and page `Sect` reordering fail.
 
 ### OCR provider runtime
 
-4. actual input bytes at 32 MiB are admitted and 32 MiB plus one byte is rejected
+5. actual input bytes at 32 MiB are admitted and 32 MiB plus one byte is rejected
    before OCR even when underdeclared; shorter and longer size mismatches and a
    same-size digest mismatch call the OCR engine zero times;
-5. runtime PDFs at 1 and 100 pages reach OCR; a structurally invalid or zero-page
+6. runtime PDFs at 1 and 100 pages reach OCR; a structurally invalid or zero-page
    PDF returns `DOCUMENT_INVALID`, and 101 pages returns
    `INPUT_PAGE_LIMIT_EXCEEDED`; each failure calls the OCR engine zero times and
    emits no partial output;
-6. complete UTF-8 text at 256 KiB and a text-only PDF at 2 MiB pass. Text one
+7. complete UTF-8 text at 256 KiB and a searchable PDF at 2 MiB pass. Text one
    byte over fails nonretryably as `OUTPUT_TEXT_LIMIT_EXCEEDED`; PDF one byte
    over fails nonretryably as `OUTPUT_PDF_LIMIT_EXCEEDED`; either overflow emits
    no result or partial output. Provider runtime evidence proves the complete
    artifacts were not truncated to fit; and
-7. a real scanned multi-column table produces a structurally valid text-only PDF
-   with preserved page geometry and aligned recognized coordinates, while its
-   normalized per-page extracted text matches the plain-text segments. The
-   provider's own runtime probe proves these spatial, semantic, and cross-output
-   properties without assigning them to a consumer. Installed background
-   operation separately satisfies ADR-0007.
+8. a real scanned multi-column table produces a structurally valid Tagged PDF
+   with preserved page appearance and geometry, aligned recognized coordinates,
+   one source-ordered page `Sect` per page, table roles, unique page MCIDs, and
+   terminal `Span/ActualText` leaves. The provider's canonical traversal matches
+   the plain-text segments byte for byte. The provider runtime proves the
+   spatial and semantic properties. Installed background operation separately
+   satisfies ADR-0007.
 
 ### Consumer integrations
 
-8. Email Watcher validates only the wire-visible profile evidence listed above,
+9. Email Watcher validates only the wire-visible profile evidence listed above,
    retains both exact outputs, previews the valid text through 256 KiB, exports
    the OCR PDF only through its safe path without parsing it or rerunning OCR,
    and atomically admits any downstream job with the ADR-0008 edge;
-9. Invoice Processor explicitly accepts the OCR PDF media type and carries a
+10. Invoice Processor explicitly accepts the OCR PDF media type and carries a
    distinct OCR source identity into the ledger before constructing span and
    table evidence. Native and OCR-derived submissions with identical bytes have
    distinct logical identities, while their content-addressed physical copy is
@@ -277,26 +317,31 @@ portable profile semantics; each application proves its own integration.
    native or OCR logical reference, and crash after reference deletion, pending
    delete persistence, unlink, and marker retirement; no committed record loses
    its copy and orphan cleanup remains idempotent;
-10. Document Summarizer keeps v1 PDF-only and admits the exact
+11. Document Summarizer keeps v1 PDF-only and admits the exact
     `application/vnd.local-connect.ocr-pdf` media type only in v2. Descriptor
     vendor media with an ordinary-PDF multipart part and descriptor ordinary PDF
     with a vendor-media part both fail before document or job persistence.
     Admission atomically persists `OcrText` with the document/job before parsing,
     while migration classifies legacy rows as `NativeText`. It retains that
     source type across reopen, restart, retry, parsing, normalization, every
-    text-selection path, evidence, page citations, prompts, and warnings. A real
-    OCR-derived PDF completes a cited summary with page attribution without
-    calling reconstructed text native, retains its immediate input artifact and
-    media, and traces through the consumer-owned edge to the original scan; and
-11. consumers select by exact media type and downstream capability, never array
+    text-selection path, evidence, page citations, prompts, and warnings. Its
+    independent consumer implementation performs the canonical tag-tree
+    traversal without provider code or a shared extraction helper, rejects the
+    noncanonical coordinate-order control, and proves its extracted UTF-8 bytes
+    equal the paired retained plain-text artifact. A real OCR-derived PDF then
+    completes a
+    cited summary with page attribution without calling reconstructed text
+    native, retains its immediate input artifact and media, and traces through
+    the consumer-owned edge to the original scan; and
+12. consumers select by exact media type and downstream capability, never array
     position or display name, and create no downstream job for incompatible,
     invalid, oversized, partial, integrity-failing, or no-text results. Provider
-    evidence, rather than consumer inference, proves semantic, spatial, and
-    cross-output fidelity.
+    evidence proves spatial fidelity and semantic no-truncation; an extracting
+    consumer independently proves canonical cross-output fidelity.
 
 ### Installed same-scan vertical proof
 
-12. under accepted ADR-0008, one exact-package installed proof uses one retained
+13. under accepted ADR-0008, one exact-package installed proof uses one retained
     scanned multi-column table and one installed OCR provider instance across
     the complete path. Record the operating system, exact source commit and
     package SHA-256 for the OCR provider, Email Watcher, Invoice Processor, and
@@ -314,8 +359,16 @@ portable profile semantics; each application proves its own integration.
     require the branching semantics deferred by ADR-0008.
 
     Email Watcher renders the retained text preview for each OCR execution and
-    exports its exact source-preserving PDF through the safe export path. Restart
-    the provider and each application across admission and lost-response
+    exports its exact source-preserving PDF through the safe export path. For the
+    Document Summarizer execution, record both the provider's canonical text and
+    Document Summarizer's independently extracted canonical text; each must
+    equal the paired retained plain-text bytes. Run the intentionally
+    noncanonical coordinate-order proof vector through the consumer-side
+    comparison and prove it is rejected before summarization. A comparison that
+    calls provider code, reuses the provider's extraction or traversal helper,
+    or compares two provider-produced values does not satisfy this proof.
+
+    Restart the provider and each application across admission and lost-response
     recovery boundaries, then prove reconciliation creates no duplicate OCR
     job, edge, or child within either execution. Invoice Processor shows
     buyer-visible reconstructed rows, columns, and source provenance; Document
@@ -329,17 +382,19 @@ portable profile semantics; each application proves its own integration.
     different scans per application, development binaries, or separately
     packaged demonstrations cannot substitute for this proof.
 
-Static contract fixtures prove declaration and status semantics. Generated PDFs
-at the input, page, and output boundaries require OCR provider runtime tests
-because the shared JSON harness does not inspect streamed bytes. No provider
-conformance run depends on a private consumer repository. Those isolated checks
-are prerequisites, not substitutes for the exact-package same-scan installed
-proof.
+Static contract fixtures prove declaration, status, and canonical logical-order
+semantics. Generated PDFs at the input, page, and output boundaries require OCR
+provider runtime tests because the shared JSON harness models the ISO structure
+objects but does not inspect streamed PDF bytes. No provider conformance run
+depends on a private consumer repository. Those isolated checks are
+prerequisites, not substitutes for the independent consumer extraction in the
+exact-package same-scan installed proof.
 
 ## Consequences
 
 - Every OCR consumer has one deterministic text artifact for analysis.
-- The required text-only PDF remains available for safe export and for a
+- The required source-appearance-preserving searchable PDF remains available for
+  safe export and carries one interoperable logical text order for a
   lineage-protected downstream capability that explicitly accepts its OCR media
   type.
 - Ordinary `application/pdf` inputs retain native-PDF semantics; a downstream

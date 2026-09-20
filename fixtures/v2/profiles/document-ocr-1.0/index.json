@@ -1,0 +1,12 @@
+{
+  "cases": [
+    {
+      "fixture": "valid/multi-column-table-tag-order.json",
+      "valid": true
+    },
+    {
+      "fixture": "invalid/multi-column-table-coordinate-order.json",
+      "valid": false
+    }
+  ]
+}

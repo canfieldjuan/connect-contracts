@@ -18,6 +18,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
 FIXTURES = ROOT / "fixtures"
 ENTITLEMENTS = ROOT / "entitlements"
+OCR_PROFILE_FIXTURES = FIXTURES / "v2/profiles/document-ocr-1.0"
+OCR_PROFILE_SCHEMA = (
+    SCHEMAS / "v2/profiles/document-ocr-1.0-canonical-text.schema.json"
+)
 SCHEMA_NAMES = {
     "error.schema.json",
     "job-request.schema.json",
@@ -335,7 +339,213 @@ def semantic_errors(
     return errors
 
 
+def _canonical_ocr_profile_text(vector: dict) -> str:
+    pdf = vector["pdf_logical_structure"]
+    if pdf["mark_info_marked"] is not True:
+        raise ValueError("Tagged PDF MarkInfo.Marked must be true")
+
+    pages = pdf["pages"]
+    if [page["page_index"] for page in pages] != list(
+        range(vector["source_page_count"])
+    ):
+        raise ValueError("PDF pages must be in zero-based source order")
+
+    content_by_page: dict[int, dict[int, dict]] = {}
+    for page in pages:
+        marked_content: dict[int, dict] = {}
+        for item in page["marked_content"]:
+            if item["mcid"] in marked_content:
+                raise ValueError("MCIDs must be unique within a page")
+            marked_content[item["mcid"]] = item
+        content_by_page[page["page_index"]] = marked_content
+
+    root = pdf["structure_tree"]
+    if root["role"] != "Document":
+        raise ValueError("structure tree must have one Document root")
+    page_nodes = root["kids"]
+    if len(page_nodes) != vector["source_page_count"]:
+        raise ValueError("Document root must have one page Sect per source page")
+
+    used: set[tuple[int, int]] = set()
+
+    def resolve_leaf(node: dict, expected_page: int) -> str:
+        if node["role"] != "Span" or len(node["kids"]) != 1:
+            raise ValueError("ActualText must occur on a terminal Span")
+        kid = node["kids"][0]
+        if "mcid" not in kid:
+            raise ValueError("ActualText Span must contain one marked content reference")
+        page_index = kid["page_index"]
+        mcid = kid["mcid"]
+        if page_index != expected_page:
+            raise ValueError("marked content reference crosses its page Sect")
+        reference = (page_index, mcid)
+        if reference in used:
+            raise ValueError("marked content reference is duplicated")
+        try:
+            content_by_page[page_index][mcid]
+        except KeyError as exc:
+            raise ValueError("marked content reference is unresolved") from exc
+        actual_text = node["actual_text"]
+        try:
+            actual_text.encode("utf-8")
+        except UnicodeEncodeError as exc:
+            raise ValueError(
+                "ActualText must contain Unicode scalar values"
+            ) from exc
+        used.add(reference)
+        return actual_text
+
+    def read_kids(node: dict, expected_page: int) -> str:
+        pieces: list[str] = []
+        for kid in node["kids"]:
+            if "mcid" in kid:
+                raise ValueError("marked content reference must be owned by a Span")
+            if "page_index" in kid:
+                raise ValueError("only page Sect elements identify a page")
+            if "actual_text" in kid:
+                pieces.append(resolve_leaf(kid, expected_page))
+                continue
+            pieces.append(read_kids(kid, expected_page))
+        return "".join(pieces)
+
+    page_text: list[str] = []
+    for page_index, page_node in enumerate(page_nodes):
+        if page_node["role"] != "Sect" or page_node.get("page_index") != page_index:
+            raise ValueError("page Sect elements must follow source page order")
+        page_text.append(read_kids(page_node, page_index))
+
+    expected_references = {
+        (page_index, mcid)
+        for page_index, marked_content in content_by_page.items()
+        for mcid in marked_content
+    }
+    if used != expected_references:
+        raise ValueError("every canonical OCR marked-content sequence must be used once")
+    canonical = "\f".join(page_text)
+    if not canonical or not any(not character.isspace() for character in canonical):
+        raise ValueError("canonical OCR text must contain non-whitespace text")
+    if len(canonical.encode("utf-8")) > 262_144:
+        raise ValueError("canonical OCR text exceeds the decoded byte limit")
+    return canonical
+
+
+def _coordinate_sorted_ocr_text(vector: dict) -> str:
+    text_by_reference: dict[tuple[int, int], str] = {}
+
+    def collect(node: dict) -> None:
+        if "actual_text" in node:
+            reference = node["kids"][0]
+            text_by_reference[(reference["page_index"], reference["mcid"])] = node[
+                "actual_text"
+            ]
+            return
+        for kid in node["kids"]:
+            collect(kid)
+
+    collect(vector["pdf_logical_structure"]["structure_tree"])
+    page_text: list[str] = []
+    for page in vector["pdf_logical_structure"]["pages"]:
+        items = sorted(
+            page["marked_content"],
+            key=lambda item: (item["bbox"][1], item["bbox"][0]),
+        )
+        page_text.append(
+            "".join(
+                text_by_reference[(page["page_index"], item["mcid"])] for item in items
+            )
+        )
+    return "\f".join(page_text)
+
+
 class ConnectContractTests(unittest.TestCase):
+    def test_document_ocr_profile_uses_tag_tree_order_for_canonical_text(
+        self,
+    ) -> None:
+        schema = json.loads(OCR_PROFILE_SCHEMA.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        validator = Draft202012Validator(schema)
+        index = json.loads(
+            (OCR_PROFILE_FIXTURES / "index.json").read_text(encoding="utf-8")
+        )
+
+        canonical_case = None
+        noncanonical_case = None
+        for case in index["cases"]:
+            vector = json.loads(
+                (OCR_PROFILE_FIXTURES / case["fixture"]).read_text(encoding="utf-8")
+            )
+            with self.subTest(fixture=case["fixture"]):
+                self.assertEqual(list(validator.iter_errors(vector)), [])
+                extracted = _canonical_ocr_profile_text(vector)
+                self.assertEqual(extracted == vector["text_plain"], case["valid"])
+            if case["valid"]:
+                canonical_case = vector
+            else:
+                noncanonical_case = vector
+
+        self.assertIsNotNone(canonical_case)
+        self.assertIsNotNone(noncanonical_case)
+        self.assertNotEqual(
+            _coordinate_sorted_ocr_text(canonical_case),
+            canonical_case["text_plain"],
+        )
+        self.assertEqual(
+            _coordinate_sorted_ocr_text(canonical_case),
+            noncanonical_case["text_plain"],
+        )
+
+        duplicate_reference = json.loads(json.dumps(canonical_case))
+        duplicate_reference["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ].append(
+            {
+                "role": "Span",
+                "actual_text": "ITEM ",
+                "kids": [{"page_index": 0, "mcid": 0}],
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "reference is duplicated"):
+            _canonical_ocr_profile_text(duplicate_reference)
+
+        wrong_page = json.loads(json.dumps(canonical_case))
+        wrong_page["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ][0]["kids"][0]["kids"][0]["kids"][0]["kids"][0]["page_index"] = 1
+        with self.assertRaisesRegex(ValueError, "crosses its page Sect"):
+            _canonical_ocr_profile_text(wrong_page)
+
+        unresolved_reference = json.loads(json.dumps(canonical_case))
+        unresolved_reference["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ][0]["kids"][0]["kids"][0]["kids"][0]["kids"][0]["mcid"] = 99
+        with self.assertRaisesRegex(ValueError, "reference is unresolved"):
+            _canonical_ocr_profile_text(unresolved_reference)
+
+        omitted_leaf = json.loads(json.dumps(canonical_case))
+        omitted_leaf["pdf_logical_structure"]["structure_tree"]["kids"][0]["kids"][
+            0
+        ]["kids"][0]["kids"].pop()
+        with self.assertRaisesRegex(ValueError, "must be used once"):
+            _canonical_ocr_profile_text(omitted_leaf)
+
+        reordered_pages = json.loads(json.dumps(canonical_case))
+        reordered_pages["pdf_logical_structure"]["structure_tree"]["kids"].reverse()
+        with self.assertRaisesRegex(ValueError, "must follow source page order"):
+            _canonical_ocr_profile_text(reordered_pages)
+
+        duplicate_mcid = json.loads(json.dumps(canonical_case))
+        duplicate_mcid["pdf_logical_structure"]["pages"][0]["marked_content"].append(
+            duplicate_mcid["pdf_logical_structure"]["pages"][0]["marked_content"][0]
+        )
+        with self.assertRaisesRegex(ValueError, "MCIDs must be unique"):
+            _canonical_ocr_profile_text(duplicate_mcid)
+
+        parent_actual_text = json.loads(json.dumps(canonical_case))
+        parent_actual_text["pdf_logical_structure"]["structure_tree"]["kids"][0][
+            "kids"
+        ][0]["actual_text"] = "override"
+        self.assertTrue(list(validator.iter_errors(parent_actual_text)))
+
     def test_entitlement_v1_fixtures_match_schema_signature_and_time_contract(
         self,
     ) -> None:
