@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "cafe0001-0001-4001-8001-cafe00010001",
+  "capability": {
+    "id": "lead.review-queue.list",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-17T12:00:00Z",
+  "updated_at": "2026-09-17T12:00:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "cafe0002-0002-4002-8002-cafe00020002",
+      "media_type": "application/json",
+      "byte_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "cafe0003-0003-4003-8003-cafe00030003",
+        "media_type": "application/vnd.eom.funnel-review-queue+json",
+        "display_name": "funnel-review-queue.json",
+        "byte_size": 189,
+        "sha256": "d144ab797352d4a67ffda03c3c76f939bdd12d53e8b9734336964c123b2dfe62",
+        "payload_base64": "eyJjdXJzb3IiOm51bGwsImhhc01vcmUiOmZhbHNlLCJsZWFkcyI6W3siY29udGFjdElkIjoiMTExMTExMTEtMTExMS00MTExLTgxMTEtMTExMTExMTExMTExIiwic3RhdGVUb2tlbiI6InRvay1uZXcifV0sIm5leHRDdXJzb3IiOm51bGwsInBlbmRpbmdIYW5kb2ZmcyI6W10sInN1Y2Nlc3MiOnRydWUsIndvcmtpbmdMZWFkcyI6W119"
+      }
+    ]
+  }
+}

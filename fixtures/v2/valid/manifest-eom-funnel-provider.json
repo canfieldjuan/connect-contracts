@@ -43,6 +43,41 @@
       }
     },
     {
+      "id": "lead.review-queue.list",
+      "version": "1.0",
+      "action": {
+        "label": "List funnel review queue",
+        "description": "Poll the funnel review work-queue on the bound operator's behalf: new leads, working leads, and pending handoffs. Read-only projection; alters no lead, booking, or handoff state."
+      },
+      "accepts": [
+        {
+          "media_type": "application/json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.funnel-review-queue+json"],
+      "parameters": [
+        {
+          "name": "limit",
+          "value_type": "integer",
+          "required": false,
+          "label": "Limit",
+          "description": "Maximum number of leads to return in one page."
+        },
+        {
+          "name": "cursor",
+          "value_type": "string",
+          "required": false,
+          "label": "Cursor",
+          "description": "Opaque pagination cursor returned by a prior page."
+        }
+      ],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    },
+    {
       "id": "lead.customer-handoff",
       "version": "1.0",
       "action": {
