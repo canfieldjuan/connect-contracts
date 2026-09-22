@@ -1,0 +1,19 @@
+{
+  "protocol_version": 2,
+  "job_id": "c1c1c1c1-1111-4111-8111-c1c1c1c1c1c1",
+  "capability": {
+    "id": "lead.mark-working",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "d1d1d1d1-1111-4111-8111-d1d1d1d1d1d1",
+      "media_type": "application/vnd.eom.mark-working+json",
+      "byte_size": 201,
+      "sha256": "f2ab50620914b9f19b042fb06eb21f34786dea51aaf26c7f6b4571083992c298",
+      "display_name": "mark-working.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {}
+}

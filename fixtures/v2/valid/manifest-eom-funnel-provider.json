@@ -78,6 +78,26 @@
       }
     },
     {
+      "id": "lead.mark-working",
+      "version": "1.0",
+      "action": {
+        "label": "Mark lead working",
+        "description": "Claim a review-queue lead as being worked, so it is no longer offered to another operator. Optimistic on the lead's state token; a stale token conflicts. Creates durable state and requires a fresh operator approval."
+      },
+      "accepts": [
+        {
+          "media_type": "application/vnd.eom.mark-working+json",
+          "max_bytes": 1024
+        }
+      ],
+      "produces": ["application/vnd.eom.mark-working-receipt+json"],
+      "parameters": [],
+      "effects": {
+        "external": true,
+        "confirmation_required": true
+      }
+    },
+    {
       "id": "lead.customer-handoff",
       "version": "1.0",
       "action": {

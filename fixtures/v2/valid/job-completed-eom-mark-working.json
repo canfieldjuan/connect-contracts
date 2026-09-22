@@ -1,0 +1,35 @@
+{
+  "protocol_version": 2,
+  "job_id": "c1c1c1c1-1111-4111-8111-c1c1c1c1c1c1",
+  "capability": {
+    "id": "lead.mark-working",
+    "version": "1.0"
+  },
+  "provider": {
+    "app_id": "eom-funnel-provider",
+    "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  },
+  "status": "completed",
+  "created_at": "2026-09-17T12:20:00Z",
+  "updated_at": "2026-09-17T12:20:02Z",
+  "input_artifacts": [
+    {
+      "artifact_id": "d1d1d1d1-1111-4111-8111-d1d1d1d1d1d1",
+      "media_type": "application/vnd.eom.mark-working+json",
+      "byte_size": 201,
+      "sha256": "f2ab50620914b9f19b042fb06eb21f34786dea51aaf26c7f6b4571083992c298"
+    }
+  ],
+  "result": {
+    "outputs": [
+      {
+        "artifact_id": "d2d2d2d2-2222-4222-8222-d2d2d2d2d2d2",
+        "media_type": "application/vnd.eom.mark-working-receipt+json",
+        "display_name": "mark-working-receipt.json",
+        "byte_size": 231,
+        "sha256": "b1b532e8747dd7988a24bb5b81cc393c43ad8102e2250085104f7a0047564e0a",
+        "payload_base64": "eyJzdWNjZXNzIjogdHJ1ZSwgIndvcmtpbmdMZWFkIjogeyJjb250YWN0SWQiOiAiMTExMTExMTEtMTExMS00MTExLTgxMTEtMTExMTExMTExMTExIiwgIm1hcmtlZEF0IjogIjIwMjYtMDktMTdUMTI6MjA6MDBaIiwgIm1hcmtlZEJ5RW1wbG95ZWVJZCI6IDQyLCAic3RhdGVUb2tlbiI6ICI3M2NhYzZkNDAyY2NhZDI1NjEyMzZkZGFmYzkxMDk4M2Q2YWY1Njc1ZjFjOTJlZWZiNjUxYjg2YjdhMGYwMzUwIn19"
+      }
+    ]
+  }
+}
