@@ -176,5 +176,9 @@
   { "schema": "job-status.schema.json", "fixture": "invalid/job-failed-ocr-output-text-limit-exceeded-retryable.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
   { "schema": "job-status.schema.json", "fixture": "invalid/job-failed-ocr-output-pdf-limit-exceeded-retryable.json", "provider_manifest": "valid/manifest-ocr-provider.json", "request_fixture": "valid/job-request-ocr.json", "valid": false },
   { "schema": "job-request.schema.json", "fixture": "invalid/job-request-with-derived-from.json", "provider_manifest": "valid/manifest.json", "valid": false },
-  { "schema": "job-status.schema.json", "fixture": "invalid/job-status-with-derived-from.json", "provider_manifest": "valid/manifest.json", "request_fixture": "valid/job-request.json", "valid": false }
+  { "schema": "job-status.schema.json", "fixture": "invalid/job-status-with-derived-from.json", "provider_manifest": "valid/manifest.json", "request_fixture": "valid/job-request.json", "valid": false },
+  { "schema": "job-request.schema.json", "fixture": "valid/job-request-eom-mark-working.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "valid": true },
+  { "schema": "job-request.schema.json", "fixture": "valid/job-request-eom-mark-working-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "valid": true },
+  { "schema": "job-status.schema.json", "fixture": "valid/job-completed-eom-mark-working.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-mark-working.json", "valid": true },
+  { "schema": "job-status.schema.json", "fixture": "valid/job-failed-eom-mark-working-conflict.json", "provider_manifest": "valid/manifest-eom-funnel-provider.json", "request_fixture": "valid/job-request-eom-mark-working-conflict.json", "valid": true }
 ]
