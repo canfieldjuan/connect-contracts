@@ -1,0 +1,21 @@
+{
+  "protocol_version": 2,
+  "job_id": "cafe0001-0001-4001-8001-cafe00010001",
+  "capability": {
+    "id": "lead.review-queue.list",
+    "version": "1.0"
+  },
+  "inputs": [
+    {
+      "artifact_id": "cafe0002-0002-4002-8002-cafe00020002",
+      "media_type": "application/json",
+      "byte_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "display_name": "review-queue-query.json",
+      "source_app_id": "email-watcher"
+    }
+  ],
+  "parameters": {
+    "limit": 25
+  }
+}
