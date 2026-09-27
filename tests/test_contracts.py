@@ -48,6 +48,15 @@ OCR_ERROR_POLICY: dict[str, dict[str, object]] = {
         "retryable": False,
     },
 }
+OCR_V3_ERROR_POLICY: dict[str, dict[str, object]] = {
+    **OCR_ERROR_POLICY,
+    "OUTPUT_PDF_BUDGET_EXCEEDED": {
+        "message": (
+            "The retained source PDF leaves insufficient room for the OCR layer in the output budget."
+        ),
+        "retryable": False,
+    },
+}
 SCHEMA_NAMES = {
     "error.schema.json",
     "job-request.schema.json",
@@ -435,14 +444,9 @@ def _streamed_metadata_errors(schema_name, document, manifest=None, request=None
             errors.append("v3 OCR status must use profile 1.1")
         if document["status"] == "failed" and ocr:
             error = document["error"]
-            policy = OCR_ERROR_POLICY.get(error["code"])
+            policy = OCR_V3_ERROR_POLICY.get(error["code"])
             if policy is not None and error != {"code": error["code"], **policy}:
                 errors.append("OCR failure must retain its declared error policy")
-            if (
-                error["code"] == "OUTPUT_PDF_BUDGET_EXCEEDED"
-                and error["retryable"]
-            ):
-                errors.append("OCR PDF budget refusal is not retryable")
         if document["status"] == "completed":
             ids = {artifact["artifact_id"] for artifact in document["input_artifacts"]}
             outputs = document["result"]["outputs"]

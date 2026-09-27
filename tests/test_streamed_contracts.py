@@ -146,6 +146,16 @@ class StreamedContractTests(unittest.TestCase):
                 document["error"] = envelope["error"]
                 self.assertTrue(errors_for("job-status.schema.json", document))
 
+    def test_ocr_budget_error_requires_exact_profile_message(self):
+        valid = load(FIXTURES / "valid/job-failed-budget.json")
+        self.assertFalse(errors_for("job-status.schema.json", valid))
+        invalid = load(FIXTURES / "invalid/status-budget-wrong-message.json")
+        self.assertTrue(errors_for("job-status.schema.json", invalid))
+
+        # Other capabilities retain their own failure messages.
+        invalid["capability"] = {"id": "document.summarize", "version": "1.0"}
+        self.assertFalse(errors_for("job-status.schema.json", invalid))
+
     def test_digests_are_exact_lowercase_sha256(self):
         for schema, source, path in (
             ("job-request.schema.json", "job-request-generic.json", ("inputs", 0)),

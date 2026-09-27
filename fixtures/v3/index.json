@@ -373,5 +373,12 @@
     "valid": false,
     "provider_manifest": "valid/manifest-generic.json",
     "request_fixture": "valid/job-request-generic.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/status-budget-wrong-message.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-ocr.json",
+    "request_fixture": "valid/job-request-ocr.json"
   }
 ]
