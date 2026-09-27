@@ -32,6 +32,34 @@ GET  /v3/jobs/{job_id}/outputs/{artifact_id}
 Its registrations live in `$XDG_RUNTIME_DIR/local-connect/v3/providers/` on
 Unix and `%LOCALAPPDATA%\LocalConnect\runtime\v3\providers\` on Windows.
 ADR-0005's owner-private placement, no-fallback rule, and verification apply.
+
+A Windows v3 registration has the fixed filename
+`local-connect-v3-<instance_id>.json`; its same-directory publication temporary
+is `.local-connect-v3-<instance_id>.json.tmp`. The instance ID is the canonical
+lowercase UUIDv4, with no `app_id` component. V3 publication, including a v3-only
+publisher, reuses ADR-0005's existing durable-instance ownership lock:
+
+```text
+%LOCALAPPDATA%\LocalConnect\runtime\v2\locks\.local-connect-v2-<instance_id>.lock
+```
+
+There is no separate v3 ownership lock namespace. Reusing the v2 lock excludes
+an already-installed v2-only publisher as well as another v3 publisher, even
+under a different `app_id`. A process publishing both versions acquires this
+lock once. ADR-0005's protected-path/opened-file checks, persistent one-byte
+initialization and non-blocking exclusive byte-range lock (offset 0, length 1)
+apply unchanged. Acquire before binding or publication, hold through the entire
+serving lifetime and serialized stale-temporary recovery, remove only owned
+registrations after matching their current bearer token, and release last. A
+busy lock fails startup without replacing or removing either registration.
+
+Windows discovery applies ADR-0005's 256-direct-entry bound and candidate
+admission to the v3 providers directory. Identity reset follows ADR-0005's
+explicit stopped-provider transition under the old instance lock, including
+safe cleanup of both v2 and v3 destinations and their exact temporaries before
+committing the new identity; failed cleanup aborts the transition. Normal
+shutdown removes every registration this process published under that lock.
+
 V3 keeps ADR-0002's exact-loopback endpoint validation, authenticated manifest
 attribution, durable instance identity, rotating process token, primitive
 parameters, single streamed input, effects policy, and job idempotency.
@@ -203,6 +231,20 @@ bytes of bounded headroom and reports non-retryable
 `OUTPUT_PDF_BUDGET_EXCEEDED` before rendering/OCR when that budget is exceeded.
 The final cap still produces `OUTPUT_PDF_LIMIT_EXCEEDED`; neither guard claims
 all admitted sources can complete. A failed profile emits neither artifact.
+
+Profile 1.1 extends ADR-0009's exact error-policy map with this object:
+
+```json
+{
+  "code": "OUTPUT_PDF_BUDGET_EXCEEDED",
+  "message": "The retained source PDF leaves insufficient room for the OCR layer in the output budget.",
+  "retryable": false
+}
+```
+
+This deterministic failure uses `failed` status with no `result`. A different
+message or retry flag is not the same profile error. ADR-0009's existing error
+objects remain unchanged.
 
 Invoice Processor and DocSum own their v3 OCR clients, paired validation,
 private files and ADR-0008 recovery/lineage. Each must continue withholding
