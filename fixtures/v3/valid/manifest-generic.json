@@ -1,0 +1,33 @@
+{
+  "protocol_version": 3,
+  "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "app": {
+    "id": "reference-provider",
+    "name": "Reference provider",
+    "version": "1.0.0"
+  },
+  "capabilities": [
+    {
+      "id": "document.summarize",
+      "version": "1.0",
+      "action": {
+        "label": "Recognize text",
+        "description": "Create a searchable tagged PDF and canonical plain text."
+      },
+      "accepts": [
+        {
+          "media_type": "application/pdf",
+          "max_bytes": 33554432
+        }
+      ],
+      "produces": [
+        "text/plain"
+      ],
+      "parameters": [],
+      "effects": {
+        "external": false,
+        "confirmation_required": false
+      }
+    }
+  ]
+}

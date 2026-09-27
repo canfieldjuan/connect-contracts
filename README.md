@@ -34,8 +34,8 @@ job-status metadata separate from streamed, integrity-checked output bytes.
 Its schemas and fixtures live under `schemas/v3/` and `fixtures/v3/`; v1/v2
 remain unchanged. Runtime support requires separate provider and consumer PRs.
 
-Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts` after installing the development
-dependency in `requirements-dev.txt`.
+Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts`
+after installing the development dependencies in `requirements-dev.txt`.
 
 Commercial Connect authorization is a separate, signed local contract under
 `entitlements/v1/`. The feature identifiers a licence may carry are enumerated in
@@ -90,7 +90,7 @@ ADR-0005 extends discovery and entitlement placement to Windows without
 changing the wire transport: Windows uses exact-loopback HTTP and per-user
 files rooted under `%LOCALAPPDATA%\LocalConnect\`. Named pipes remain deferred.
 
-Both versions use the same intentionally small HTTP shape under their own
+V1 and v2 use the same intentionally small HTTP shape under their own
 versioned routes:
 
 - `GET /v{n}/manifest` returns the authenticated manifest.

@@ -1,0 +1,15 @@
+{
+  "protocol_version": 3,
+  "instance_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "app_id": "document-ocr",
+  "pid": 4242,
+  "started_at": "2026-08-30T12:00:00Z",
+  "transport": {
+    "kind": "http-loopback-v3",
+    "base_url": "http://127.0.0.1:43127/"
+  },
+  "auth": {
+    "scheme": "bearer",
+    "token": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "protocol_version": 3,
+  "error": {
+    "code": "OUTPUT_NOT_READY",
+    "message": "Retrieval failed.",
+    "retryable": false
+  }
+}
