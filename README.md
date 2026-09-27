@@ -18,6 +18,7 @@ Current decisions:
 - [ADR-0007: Background provider lifecycle](adr/0007-background-provider-lifecycle.md)
 - [ADR-0008: Consumer-owned derived artifact lineage](adr/0008-consumer-owned-derived-artifact-lineage.md)
 - [ADR-0009: Connect v2 document OCR capability profile](adr/0009-document-ocr-profile.md)
+- [ADR-0010: Connect v3 streamed output retrieval](adr/0010-streamed-output-retrieval.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
@@ -28,7 +29,12 @@ under `schemas/v2/` and `fixtures/v2/`. V2 adds native action metadata,
 bounded primitive parameters, explicit effect/confirmation declarations, and
 generic integrity-checked output bytes. It does not modify v1.
 
-Run `python3 -m unittest tests.test_contracts` after installing the development
+Connect v3 is the versioned retrieval successor in ADR-0010. It keeps bounded
+job-status metadata separate from streamed, integrity-checked output bytes.
+Its schemas and fixtures live under `schemas/v3/` and `fixtures/v3/`; v1/v2
+remain unchanged. Runtime support requires separate provider and consumer PRs.
+
+Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts` after installing the development
 dependency in `requirements-dev.txt`.
 
 Commercial Connect authorization is a separate, signed local contract under

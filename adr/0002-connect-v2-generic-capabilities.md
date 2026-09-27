@@ -114,6 +114,10 @@ Output artifacts are limited to 2 MiB each and eight outputs per job. The
 transport implementation must bound the complete response before parsing.
 Larger or streaming outputs require a later versioned retrieval contract.
 
+ADR-0010 supplies that successor as protocol v3. It leaves these v2 documents,
+routes and bounds unchanged; new consumers explicitly select the separately
+registered version before submitting work.
+
 ### Compatibility and matching
 
 Availability still means a supported owner-private registration plus a
