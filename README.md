@@ -31,10 +31,10 @@ generic integrity-checked output bytes. It does not modify v1.
 
 Connect v3 is the versioned retrieval successor in ADR-0010. It keeps bounded
 job-status metadata separate from streamed, integrity-checked output bytes.
-Its schemas and fixtures live under `schemas/v3/` and `fixtures/v3/`; v1/v2
-remain unchanged. Runtime support requires separate provider and consumer PRs.
+Schemas and conformance fixtures will follow in a separate PR; v1/v2 remain
+unchanged. Runtime support requires separate provider and consumer PRs.
 
-Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts` after installing the development
+Run `python3 -m unittest tests.test_contracts` after installing the development
 dependency in `requirements-dev.txt`.
 
 Commercial Connect authorization is a separate, signed local contract under
