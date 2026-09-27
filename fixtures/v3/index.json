@@ -299,5 +299,79 @@
     "valid": false,
     "provider_manifest": "valid/manifest-ocr.json",
     "request_fixture": "valid/job-request-ocr.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/job-failed-job_not_found.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-ocr.json",
+    "request_fixture": "valid/job-request-ocr.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/job-failed-malformed_request.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-ocr.json",
+    "request_fixture": "valid/job-request-ocr.json"
+  },
+  {
+    "schema": "job-request.schema.json",
+    "fixture": "invalid/request-input-digest-short.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json"
+  },
+  {
+    "schema": "job-request.schema.json",
+    "fixture": "invalid/request-input-digest-uppercase.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json"
+  },
+  {
+    "schema": "job-request.schema.json",
+    "fixture": "invalid/request-input-digest-nonhex.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/status-input-digest-short.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json",
+    "request_fixture": "valid/job-request-generic.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/status-input-digest-uppercase.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json",
+    "request_fixture": "valid/job-request-generic.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/status-input-digest-nonhex.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json",
+    "request_fixture": "valid/job-request-generic.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/output-digest-short.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json",
+    "request_fixture": "valid/job-request-generic.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/output-digest-uppercase.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json",
+    "request_fixture": "valid/job-request-generic.json"
+  },
+  {
+    "schema": "job-status.schema.json",
+    "fixture": "invalid/output-digest-nonhex.json",
+    "valid": false,
+    "provider_manifest": "valid/manifest-generic.json",
+    "request_fixture": "valid/job-request-generic.json"
   }
 ]

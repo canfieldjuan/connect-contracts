@@ -128,6 +128,62 @@ class StreamedContractTests(unittest.TestCase):
                 document["result"]["outputs"][0]["artifact_id"] = value
                 self.assertTrue(errors_for("job-status.schema.json", document))
 
+    def test_retrieval_errors_are_standalone_not_job_failures(self):
+        failed = load(FIXTURES / "valid/job-failed-budget.json")
+        self.assertFalse(errors_for("job-status.schema.json", failed))
+        for code in (
+            "MALFORMED_REQUEST",
+            "JOB_NOT_FOUND",
+            "OUTPUT_NOT_READY",
+            "OUTPUT_NOT_FOUND",
+            "OUTPUT_BUSY",
+            "OUTPUT_UNAVAILABLE",
+        ):
+            with self.subTest(code=code):
+                envelope = load(FIXTURES / f"valid/error-{code.lower()}.json")
+                self.assertFalse(errors_for("error.schema.json", envelope))
+                document = copy.deepcopy(failed)
+                document["error"] = envelope["error"]
+                self.assertTrue(errors_for("job-status.schema.json", document))
+
+    def test_digests_are_exact_lowercase_sha256(self):
+        for schema, source, path in (
+            ("job-request.schema.json", "job-request-generic.json", ("inputs", 0)),
+            (
+                "job-status.schema.json",
+                "job-completed-generic.json",
+                ("input_artifacts", 0),
+            ),
+            (
+                "job-status.schema.json",
+                "job-completed-generic.json",
+                ("result", "outputs", 0),
+            ),
+        ):
+            for digest, valid in (
+                ("f" * 64, True),
+                ("f" * 63, False),
+                ("f" * 65, False),
+                ("F" * 64, False),
+                ("g" * 64, False),
+                ("f" * 64 + "\n", False),
+                ("", False),
+                (False, False),
+                (None, False),
+            ):
+                with self.subTest(schema=schema, path=path, digest=repr(digest)):
+                    document = load(FIXTURES / "valid" / source)
+                    artifact = document
+                    for key in path:
+                        artifact = artifact[key]
+                    artifact["sha256"] = digest
+                    self.assertEqual(not errors_for(schema, document), valid)
+
+        # One valid descriptor cannot hide a malformed sibling in the OCR pair.
+        document = load(FIXTURES / "valid/job-completed-ocr-large.json")
+        document["result"]["outputs"][1]["sha256"] = "f" * 63
+        self.assertTrue(errors_for("job-status.schema.json", document))
+
     def test_descriptor_is_rejected_by_frozen_v2(self):
         document = load(FIXTURES / "valid/job-completed-ocr-large.json")
         document["protocol_version"] = 2

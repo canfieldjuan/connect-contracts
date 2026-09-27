@@ -288,6 +288,8 @@
           "code": {
             "enum": [
               "PROVIDER_BUSY",
+              "JOB_NOT_FOUND",
+              "MALFORMED_REQUEST",
               "OUTPUT_BUSY",
               "OUTPUT_NOT_READY",
               "OUTPUT_NOT_FOUND",
