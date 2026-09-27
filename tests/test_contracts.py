@@ -48,6 +48,15 @@ OCR_ERROR_POLICY: dict[str, dict[str, object]] = {
         "retryable": False,
     },
 }
+OCR_V3_ERROR_POLICY: dict[str, dict[str, object]] = {
+    **OCR_ERROR_POLICY,
+    "OUTPUT_PDF_BUDGET_EXCEEDED": {
+        "message": (
+            "The retained source PDF leaves insufficient room for the OCR layer in the output budget."
+        ),
+        "retryable": False,
+    },
+}
 SCHEMA_NAMES = {
     "error.schema.json",
     "job-request.schema.json",
@@ -387,6 +396,80 @@ def _job_status_request_errors(status: dict, request: dict) -> list[str]:
     return errors
 
 
+def _streamed_metadata_errors(schema_name, document, manifest=None, request=None):
+    """Shared generic v2 semantics plus the v3 descriptor/profile differences."""
+    errors = []
+    if (
+        manifest is not None
+        and manifest["protocol_version"] != document["protocol_version"]
+    ):
+        errors.append("selected manifest uses a different protocol")
+    if (
+        request is not None
+        and request["protocol_version"] != document["protocol_version"]
+    ):
+        errors.append("original request uses a different protocol")
+    if schema_name == "registration.schema.json":
+        errors.extend(_registration_url_errors(document["transport"]["base_url"]))
+        if manifest is not None:
+            errors.extend(_registration_manifest_errors(document, manifest))
+    if schema_name == "manifest.schema.json":
+        errors.extend(semantic_errors("v2", schema_name, document))
+        for capability in document["capabilities"]:
+            if capability["id"] != "document.ocr":
+                continue
+            if (
+                capability["version"] != "1.1"
+                or capability["accepts"] != [
+                    {"media_type": "application/pdf", "max_bytes": 33_554_432}
+                ]
+                or len(capability["produces"]) != 2
+                or set(capability["produces"]) != OCR_REQUIRED_OUTPUT_MEDIA_TYPES
+                or capability["parameters"]
+                or capability["effects"] != {
+                    "external": False,
+                    "confirmation_required": False,
+                }
+            ):
+                errors.append("v3 document.ocr must declare profile 1.1 exactly")
+    if schema_name == "job-request.schema.json" and manifest is not None:
+        errors.extend(_job_request_errors(document, manifest["capabilities"]))
+    if schema_name == "job-status.schema.json":
+        if manifest is not None:
+            errors.extend(_job_status_errors(document, manifest))
+        if request is not None:
+            errors.extend(_job_status_request_errors(document, request))
+        ocr = document["capability"]["id"] == "document.ocr"
+        if ocr and document["capability"]["version"] != "1.1":
+            errors.append("v3 OCR status must use profile 1.1")
+        if document["status"] == "failed" and ocr:
+            error = document["error"]
+            policy = OCR_V3_ERROR_POLICY.get(error["code"])
+            if policy is not None and error != {"code": error["code"], **policy}:
+                errors.append("OCR failure must retain its declared error policy")
+        if document["status"] == "completed":
+            ids = {artifact["artifact_id"] for artifact in document["input_artifacts"]}
+            outputs = document["result"]["outputs"]
+            for artifact in outputs:
+                if artifact["artifact_id"] in ids:
+                    errors.append("duplicate or input-aliased output ID")
+                ids.add(artifact["artifact_id"])
+            if ocr:
+                if len(outputs) != 2 or {
+                    artifact["media_type"] for artifact in outputs
+                } != OCR_REQUIRED_OUTPUT_MEDIA_TYPES:
+                    errors.append("OCR requires exactly the PDF/text pair")
+                for artifact in outputs:
+                    cap = (
+                        262_144
+                        if artifact["media_type"] == "text/plain"
+                        else 37_748_736
+                    )
+                    if not 0 < artifact["byte_size"] <= cap:
+                        errors.append("OCR artifact has an invalid profile size")
+    return errors
+
+
 def semantic_errors(
     version: str,
     schema_name: str,
@@ -394,6 +477,10 @@ def semantic_errors(
     provider_manifest: dict | None = None,
     job_request: dict | None = None,
 ) -> list[str]:
+    if version == "v3":
+        return _streamed_metadata_errors(
+            schema_name, instance, provider_manifest, job_request
+        )
     errors: list[str] = []
     if schema_name == "registration.schema.json":
         errors.extend(_registration_url_errors(instance["transport"]["base_url"]))
@@ -1227,7 +1314,7 @@ class ConnectContractTests(unittest.TestCase):
 
     def test_schemas_are_valid_and_fixtures_match_expectations(self) -> None:
         versions = sorted(path.name for path in FIXTURES.iterdir() if path.is_dir())
-        self.assertEqual(versions, ["v1", "v2"])
+        self.assertEqual(versions, ["v1", "v2", "v3"])
 
         for version in versions:
             with self.subTest(version=version):
@@ -1249,7 +1336,7 @@ class ConnectContractTests(unittest.TestCase):
 
                 provider_manifests: dict[str, dict] = {}
                 job_requests: dict[str, dict] = {}
-                if version == "v2":
+                if version in {"v2", "v3"}:
                     for case in cases:
                         if case["valid"] and case["schema"] == "manifest.schema.json":
                             manifest = json.loads(
@@ -1279,7 +1366,7 @@ class ConnectContractTests(unittest.TestCase):
                         )
                         schema_errors = list(validator.iter_errors(instance))
                         provider_manifest = None
-                        if version == "v2" and case["schema"] in {
+                        if version in {"v2", "v3"} and case["schema"] in {
                             "registration.schema.json",
                             "job-request.schema.json",
                             "job-status.schema.json",
@@ -1290,7 +1377,7 @@ class ConnectContractTests(unittest.TestCase):
                             provider_manifest = provider_manifests[provider_fixture]
                         job_request = None
                         if (
-                            version == "v2"
+                            version in {"v2", "v3"}
                             and case["schema"] == "job-status.schema.json"
                         ):
                             request_fixture = case.get("request_fixture")

@@ -1,0 +1,8 @@
+{
+  "protocol_version": 3,
+  "error": {
+    "code": "MALFORMED_REQUEST",
+    "message": "Retrieval failed.",
+    "retryable": false
+  }
+}
