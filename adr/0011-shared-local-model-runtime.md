@@ -395,7 +395,10 @@ The CPU tier uses `-ngl 0 -t <physical cores>` in place of
 `--device <device> -ngl 999 -fa on`.
 
 The placeholders are the only values a host fills in:
-- `<model>`: the path of the leased descriptor;
+- `<model>`: `/proc/self/fd/<n>`, where `<n>` is the GGUF descriptor that the
+  server inherits and the host holds the read lease on. It is never a store
+  path string, so the fail-closed lease covers exactly the bytes the server
+  reads;
 - `<device>`: the one chosen device, as the pinned server's `--list-devices`
   names it;
 - `<GGUF sha256>`, `<key>`, `<socket>` and `<physical cores>`.
@@ -585,7 +588,12 @@ with a different deployment and trust model.
    client is idle.
 9. **No network.** Neither the host nor the server opens a TCP listener or
    makes a network request.
-10. **Start.** The host runs as a transient user service, outside every
+10. **Environment.** The server's `/proc/<pid>/environ` holds exactly `HOME`,
+    `LANG`, `CUDA_DEVICE_ORDER` and the host-built `LD_LIBRARY_PATH`. A client
+    started with `LLAMA_ARG_HF_REPO`, `LLAMA_ARG_MODEL_URL` or `LLAMA_ARG_MODEL`
+    set gets a server that has none of them. llama.cpp reads every option from
+    `LLAMA_ARG_*`, so this guards the no-network rule.
+11. **Start.** The host runs as a transient user service, outside every
     application's control group. Without a reachable user service manager,
     attaching reports the runtime unavailable, and never starts the host as
     a child.
