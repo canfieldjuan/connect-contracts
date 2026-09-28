@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/profile.schema.json",
+  "title": "Local Connect shared model runtime profile v1 (ADR-0011)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_version",
+    "llama_cpp_commit",
+    "context_tokens",
+    "tiers"
+  ],
+  "properties": {
+    "profile_version": {
+      "const": 1
+    },
+    "llama_cpp_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "context_tokens": {
+      "const": 32768
+    },
+    "tiers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/tier"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "file_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,199}$"
+    },
+    "relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_name",
+        "size_bytes",
+        "sha256",
+        "url"
+      ],
+      "properties": {
+        "file_name": {
+          "$ref": "#/$defs/file_name"
+        },
+        "size_bytes": {
+          "$ref": "#/$defs/size"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      }
+    },
+    "tier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "device_class",
+        "requirements",
+        "model",
+        "chat_template_sha256",
+        "runtime",
+        "argv"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "gpu-cuda",
+            "gpu-vulkan",
+            "cpu"
+          ]
+        },
+        "device_class": {
+          "enum": [
+            "nvidia-cuda",
+            "vulkan-discrete",
+            "cpu"
+          ]
+        },
+        "requirements": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "memory_floor_mib"
+          ],
+          "properties": {
+            "memory_floor_mib": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            },
+            "cuda_compute_capabilities": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]?\\.[0-9]$"
+              }
+            },
+            "min_driver_cuda_version": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]?\\.[0-9]{1,2}$"
+            },
+            "cpu_features": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "avx2"
+                ]
+              }
+            }
+          }
+        },
+        "model": {
+          "$ref": "#/$defs/pin"
+        },
+        "chat_template_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "archive",
+            "server_path",
+            "files"
+          ],
+          "properties": {
+            "archive": {
+              "$ref": "#/$defs/pin"
+            },
+            "server_path": {
+              "$ref": "#/$defs/relative_path"
+            },
+            "files": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 512,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "properties": {
+                  "path": {
+                    "$ref": "#/$defs/relative_path"
+                  },
+                  "sha256": {
+                    "$ref": "#/$defs/sha256"
+                  }
+                }
+              }
+            },
+            "libraries": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "archive",
+                  "members"
+                ],
+                "properties": {
+                  "archive": {
+                    "$ref": "#/$defs/pin"
+                  },
+                  "members": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 32,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "archive_path",
+                        "path"
+                      ],
+                      "properties": {
+                        "archive_path": {
+                          "$ref": "#/$defs/relative_path"
+                        },
+                        "path": {
+                          "$ref": "#/$defs/relative_path"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "argv": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

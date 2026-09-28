@@ -1,0 +1,174 @@
+{
+  "profile_version": 1,
+  "llama_cpp_commit": "c1d0e7a004015f23bc0233470b747b596f29b264",
+  "context_tokens": 32768,
+  "tiers": [
+    {
+      "id": "cpu",
+      "device_class": "cpu",
+      "requirements": {
+        "memory_floor_mib": 4882,
+        "cpu_features": [
+          "avx2"
+        ]
+      },
+      "model": {
+        "file_name": "fixture-4b.gguf",
+        "size_bytes": 2000000000,
+        "sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+        "url": "https://huggingface.co/fixture-org/fixture-4b/resolve/0123456789abcdef0123456789abcdef01234567/fixture-4b.gguf"
+      },
+      "chat_template_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "runtime": {
+        "archive": {
+          "file_name": "fixture-cpu.tar.gz",
+          "size_bytes": 16000000,
+          "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10621/fixture-cpu.tar.gz"
+        },
+        "server_path": "build/bin/llama-server",
+        "files": [
+          {
+            "path": "build/bin/llama-server",
+            "sha256": "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1"
+          },
+          {
+            "path": "build/bin/libggml-cpu.so",
+            "sha256": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2"
+          }
+        ]
+      },
+      "argv": [
+        "-m",
+        "<model>",
+        "-c",
+        "32768",
+        "-np",
+        "1",
+        "-ngl",
+        "0",
+        "-t",
+        "<physical cores>",
+        "--jinja",
+        "--chat-template-kwargs",
+        "{\"enable_thinking\":false}",
+        "--reasoning",
+        "off",
+        "--alias",
+        "<GGUF sha256>",
+        "--api-key-file",
+        "<key>",
+        "--offline",
+        "--no-webui",
+        "--no-warmup",
+        "--host",
+        "<socket>"
+      ]
+    },
+    {
+      "id": "gpu-cuda",
+      "device_class": "nvidia-cuda",
+      "requirements": {
+        "memory_floor_mib": 7330,
+        "cuda_compute_capabilities": [
+          "5.0",
+          "8.6",
+          "12.0"
+        ],
+        "min_driver_cuda_version": "12.8"
+      },
+      "model": {
+        "file_name": "fixture-9b.gguf",
+        "size_bytes": 5000000000,
+        "sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+        "url": "https://huggingface.co/fixture-org/fixture-9b/resolve/0123456789abcdef0123456789abcdef01234567/fixture-9b.gguf"
+      },
+      "chat_template_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "runtime": {
+        "archive": {
+          "file_name": "fixture-cuda.tar.gz",
+          "size_bytes": 400000000,
+          "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "url": "https://huggingface.co/fixture-org/fixture-runtime/resolve/0123456789abcdef0123456789abcdef01234567/fixture-cuda.tar.gz"
+        },
+        "server_path": "fixture-cuda/llama-server",
+        "files": [
+          {
+            "path": "fixture-cuda/llama-server",
+            "sha256": "c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1"
+          },
+          {
+            "path": "fixture-cuda/libggml-cuda.so",
+            "sha256": "c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2"
+          },
+          {
+            "path": "fixture-cuda/libcudart.so.12",
+            "sha256": "c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3"
+          },
+          {
+            "path": "fixture-cuda/libcublas.so.12",
+            "sha256": "c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4"
+          }
+        ],
+        "libraries": [
+          {
+            "archive": {
+              "file_name": "fixture-cudart.tar.xz",
+              "size_bytes": 1000000,
+              "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cudart/linux-x86_64/fixture-cudart.tar.xz"
+            },
+            "members": [
+              {
+                "archive_path": "fixture-cudart/lib/libcudart.so.12",
+                "path": "fixture-cuda/libcudart.so.12"
+              }
+            ]
+          },
+          {
+            "archive": {
+              "file_name": "fixture-cublas.tar.xz",
+              "size_bytes": 900000000,
+              "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/linux-x86_64/fixture-cublas.tar.xz"
+            },
+            "members": [
+              {
+                "archive_path": "fixture-cublas/lib/libcublas.so.12",
+                "path": "fixture-cuda/libcublas.so.12"
+              }
+            ]
+          }
+        ]
+      },
+      "argv": [
+        "-m",
+        "<model>",
+        "--device",
+        "<device>",
+        "-c",
+        "32768",
+        "-np",
+        "1",
+        "-ngl",
+        "999",
+        "-fa",
+        "on",
+        "--jinja",
+        "--chat-template-kwargs",
+        "{\"enable_thinking\":false}",
+        "--reasoning",
+        "off",
+        "--alias",
+        "<GGUF sha256>",
+        "--api-key-file",
+        "<key>",
+        "--offline",
+        "--no-webui",
+        "--no-warmup",
+        "--host",
+        "<socket>"
+      ]
+    }
+  ]
+}

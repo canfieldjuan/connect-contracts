@@ -35,7 +35,13 @@ job-status metadata separate from streamed, integrity-checked output bytes.
 Its schemas and fixtures live under `schemas/v3/` and `fixtures/v3/`; v1/v2
 remain unchanged. Runtime support requires separate provider and consumer PRs.
 
-Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts`
+ADR-0011's shared model runtime is not a Connect wire protocol. Its documents
+live in their own family: the schemas for the canonical profile, the host's
+`server.json` and its `failure.json` are under `schemas/runtime/v1/`, and their
+synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itself,
+`runtime/v1/profile.json`, lands once its tiers qualify on the ADR's exact argv.
+
+Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts`
 after installing the development dependencies in `requirements-dev.txt`.
 
 Commercial Connect authorization is a separate, signed local contract under

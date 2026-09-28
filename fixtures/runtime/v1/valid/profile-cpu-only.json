@@ -1,0 +1,69 @@
+{
+  "profile_version": 1,
+  "llama_cpp_commit": "c1d0e7a004015f23bc0233470b747b596f29b264",
+  "context_tokens": 32768,
+  "tiers": [
+    {
+      "id": "cpu",
+      "device_class": "cpu",
+      "requirements": {
+        "memory_floor_mib": 4882,
+        "cpu_features": [
+          "avx2"
+        ]
+      },
+      "model": {
+        "file_name": "fixture-4b.gguf",
+        "size_bytes": 2000000000,
+        "sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+        "url": "https://huggingface.co/fixture-org/fixture-4b/resolve/0123456789abcdef0123456789abcdef01234567/fixture-4b.gguf"
+      },
+      "chat_template_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "runtime": {
+        "archive": {
+          "file_name": "fixture-cpu.tar.gz",
+          "size_bytes": 16000000,
+          "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10621/fixture-cpu.tar.gz"
+        },
+        "server_path": "build/bin/llama-server",
+        "files": [
+          {
+            "path": "build/bin/llama-server",
+            "sha256": "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1"
+          },
+          {
+            "path": "build/bin/libggml-cpu.so",
+            "sha256": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2"
+          }
+        ]
+      },
+      "argv": [
+        "-m",
+        "<model>",
+        "-c",
+        "32768",
+        "-np",
+        "1",
+        "-ngl",
+        "0",
+        "-t",
+        "<physical cores>",
+        "--jinja",
+        "--chat-template-kwargs",
+        "{\"enable_thinking\":false}",
+        "--reasoning",
+        "off",
+        "--alias",
+        "<GGUF sha256>",
+        "--api-key-file",
+        "<key>",
+        "--offline",
+        "--no-webui",
+        "--no-warmup",
+        "--host",
+        "<socket>"
+      ]
+    }
+  ]
+}
