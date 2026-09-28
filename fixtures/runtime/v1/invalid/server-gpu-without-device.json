@@ -1,0 +1,23 @@
+{
+  "protocol": 1,
+  "state": "ready",
+  "start_id": "3f2b8c1e-5d4a-4c3b-9a2f-1e0d9c8b7a65",
+  "ready_by": "2026-09-27T23:05:00Z",
+  "profile_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "tier": "gpu-cuda",
+  "device": null,
+  "host": {
+    "pid": 4242,
+    "start_time": 123456,
+    "boot_id": "0f1e2d3c-4b5a-4968-8776-655443322110"
+  },
+  "server": {
+    "pid": 4250,
+    "start_time": 123470
+  },
+  "socket_path": "/run/user/1000/local-connect/model/v1/server.sock",
+  "model_sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+  "context_tokens": 32768,
+  "build_commit": "c1d0e7a004015f23bc0233470b747b596f29b264",
+  "chat_template_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+}

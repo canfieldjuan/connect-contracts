@@ -1313,8 +1313,12 @@ class ConnectContractTests(unittest.TestCase):
             )
 
     def test_schemas_are_valid_and_fixtures_match_expectations(self) -> None:
-        versions = sorted(path.name for path in FIXTURES.iterdir() if path.is_dir())
+        families = sorted(path.name for path in FIXTURES.iterdir() if path.is_dir())
+        versions = [name for name in families if re.fullmatch(r"v[0-9]+", name)]
         self.assertEqual(versions, ["v1", "v2", "v3"])
+        # ADR-0011's runtime documents are a separate family (tests/test_runtime_contracts.py);
+        # any other directory here is a mistake.
+        self.assertEqual(sorted(set(families) - set(versions)), ["runtime"])
 
         for version in versions:
             with self.subTest(version=version):

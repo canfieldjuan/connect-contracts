@@ -1,0 +1,16 @@
+{
+  "protocol": 1,
+  "code": "SERVER_CRASHED",
+  "start_id": "3f2b8c1e-5d4a-4c3b-9a2f-1e0d9c8b7a65",
+  "profile_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "host": {
+    "pid": 4242,
+    "start_time": 123456,
+    "boot_id": "0f1e2d3c-4b5a-4968-8776-655443322110"
+  },
+  "at": "2026-09-27T23:01:30Z",
+  "log_tail": [
+    "main: loading model",
+    "llama_model_load: error loading model: fixture"
+  ]
+}

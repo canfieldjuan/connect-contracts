@@ -1,0 +1,128 @@
+[
+  {
+    "schema": "profile.schema.json",
+    "fixture": "valid/profile-three-tiers.json",
+    "valid": true
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "valid/profile-cpu-only.json",
+    "valid": true
+  },
+  {
+    "schema": "server.schema.json",
+    "fixture": "valid/server-starting.json",
+    "valid": true
+  },
+  {
+    "schema": "server.schema.json",
+    "fixture": "valid/server-ready.json",
+    "valid": true
+  },
+  {
+    "schema": "server.schema.json",
+    "fixture": "valid/server-ready-cpu.json",
+    "valid": true
+  },
+  {
+    "schema": "failure.schema.json",
+    "fixture": "valid/failure-server-failed.json",
+    "valid": true
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-argv-extra-port.json",
+    "valid": false,
+    "reason": "argv differs from ADR-0011's"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-argv-missing-offline.json",
+    "valid": false,
+    "reason": "argv differs from ADR-0011's"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-argv-model-path.json",
+    "valid": false,
+    "reason": "argv differs from ADR-0011's"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-cpu-with-device.json",
+    "valid": false,
+    "reason": "argv differs from ADR-0011's"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-context-16k.json",
+    "valid": false,
+    "reason": "schema: context is 32768"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-model-url-branch.json",
+    "valid": false,
+    "reason": "URL not at a fixed revision"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-archive-http.json",
+    "valid": false,
+    "reason": "URL not https"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-manifest-escape.json",
+    "valid": false,
+    "reason": "path escapes the runtime set"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-cuda-without-libraries.json",
+    "valid": false,
+    "reason": "gpu-cuda needs NVIDIA library archives"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-tier-order.json",
+    "valid": false,
+    "reason": "tiers out of preference order"
+  },
+  {
+    "schema": "profile.schema.json",
+    "fixture": "invalid/profile-size-boolean.json",
+    "valid": false,
+    "reason": "schema: size is a positive integer"
+  },
+  {
+    "schema": "server.schema.json",
+    "fixture": "invalid/server-ready-without-server.json",
+    "valid": false,
+    "reason": "ready needs a server"
+  },
+  {
+    "schema": "server.schema.json",
+    "fixture": "invalid/server-gpu-without-device.json",
+    "valid": false,
+    "reason": "a GPU tier names its device"
+  },
+  {
+    "schema": "server.schema.json",
+    "fixture": "invalid/server-socket-108-bytes.json",
+    "valid": false,
+    "reason": "socket path over 107 bytes"
+  },
+  {
+    "schema": "failure.schema.json",
+    "fixture": "invalid/failure-unknown-code.json",
+    "valid": false,
+    "reason": "schema: unknown code"
+  },
+  {
+    "schema": "failure.schema.json",
+    "fixture": "invalid/failure-21-lines.json",
+    "valid": false,
+    "reason": "schema: at most 20 lines"
+  }
+]
