@@ -20,6 +20,7 @@ Current decisions:
 - [ADR-0009: Connect v2 document OCR capability profile](adr/0009-document-ocr-profile.md)
 - [ADR-0010: Connect v3 streamed output retrieval](adr/0010-streamed-output-retrieval.md)
 - [ADR-0011: Shared local model runtime](adr/0011-shared-local-model-runtime.md)
+- [ADR-0012: Shared local model runtime on Windows](adr/0012-shared-local-model-runtime-windows.md) (proposed)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
