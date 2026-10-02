@@ -142,9 +142,17 @@ argument and the sealed copies.
     read-only from that handle (`src/llama-mmap.cpp`: `ggml_fopen` at lines 87
     and 219, `CreateFileMappingA` at line 543).
   - The host's read-sharing handle admits both.
+  - **A non-ASCII store path is safe.** The server rebuilds its arguments as UTF-8 from the wide command
+    line (`common/arg.cpp`, lines 1254 to 1266). `ggml_fopen` converts UTF-8 back to wide characters
+    before `_wfopen` (`ggml/src/ggml.c`, lines 606 to 617).
 - **A store on a volume that cannot pin files is refused** with
-  `STORE_UNSUPPORTED`: one that reports no file id, or does not enforce sharing
-  modes, for example some network shares.
+  `STORE_UNSUPPORTED`. The host checks this by probing, not by trusting the volume type:
+  1. It opens a probe file in the store, `.sharing-probe`, with `FILE_SHARE_READ` only.
+  2. It requires a second write-open of that file to fail with `ERROR_SHARING_VIOLATION`, and a rename
+     of it to fail the same way.
+
+  A volume where either succeeds, or that reports no file id, is refused. Examples are some network
+  shares, and redirected or filter-driver filesystems.
 
 **Running the server**, in place of `PR_SET_PDEATHSIG`:
 - **It runs only inside a job that ends with the host:**
@@ -211,9 +219,21 @@ from the registration directory's owner-private DACL, not from POSIX modes.
     `sun_path` length check.
 - **Who can connect.** Only a process that can reach the socket file inside the
   owner-private directory, so no other local user.
-- **The path limit is the same.** A socket path of 108 bytes or more refuses
-  before the host starts, and 107 bytes works. A very long user profile path
-  therefore makes the shared runtime unavailable, and the application says so.
+- **The path limit counts UTF-8 bytes.**
+  - The server receives the path as UTF-8 (`common/arg.cpp`, lines 1254 to 1266), and its HTTP library
+    copies those bytes into `sun_path` unchanged (`httplib.cpp`, lines 2304 to 2305).
+  - A socket path of 108 bytes or more refuses before the host starts, and 107 bytes works.
+  - A very long user profile path therefore makes the shared runtime unavailable, and the application
+    says so.
+- **A non-ASCII socket path is refused, until M1's non-ASCII case passes.**
+  - The bound name must be the same file for three components:
+    - Windows `AF_UNIX`, interpreting `sun_path`'s bytes;
+    - the client's connect;
+    - the host's stale-socket removal, through wide Win32 calls.
+  - Nothing yet shows they agree on non-ASCII bytes. A profile such as `C:\Users\Zoë`, or one with a CJK
+    name, could bind one name, connect to another, and leave a `server.sock` the host cannot remove.
+  - So, until M1 shows they agree, a socket path containing any byte outside ASCII refuses before the
+    host starts, like an over-length one, and the application says so.
 - **A named pipe is rejected:** `llama-server` cannot listen on one, so it would
   need a proxy process in every request's path.
 - **A loopback port is rejected,** as in ADR-0011.
@@ -309,7 +329,15 @@ failed measurement revises this decision before any Windows release.
     `/health`, `/v1/models` and `/props` with the key.
   - Another local user cannot connect.
   - A 107-byte socket path works, and a 108-byte path refuses before the host
-    starts.
+    starts, counted in UTF-8 bytes.
+  - **Non-ASCII.** On accounts whose profile path holds characters outside the system ANSI code page
+    (one Latin name such as `Zoë`, and one CJK name), each of these addresses the same file:
+    - bind;
+    - the client's connect;
+    - M3's peer check;
+    - stale-socket removal.
+
+    Until this passes, the non-ASCII refusal above stands.
 - **M2, start.** A host started with breakaway survives its starter's job, in
   two cases:
   - **from a window:** from a window's attach child inside a kill-on-close job
@@ -319,6 +347,8 @@ failed measurement revises this decision before any Windows release.
 - **M3, peer.** `SIO_AF_UNIX_GETPEERPID` returns the server's process id on a
   client's connection.
 - **M4, pinning.**
+  - **The store's sharing probe** passes on NTFS. Where a volume that does not enforce sharing modes is
+    available, such as a mapped network drive, it refuses there with `STORE_UNSUPPORTED`.
   - **Admitted:** with the host's handles held, the server loads the model and
     serves.
   - **Refused with a sharing violation, while the server keeps serving:**
