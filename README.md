@@ -38,8 +38,10 @@ remain unchanged. Runtime support requires separate provider and consumer PRs.
 ADR-0011's shared model runtime is not a Connect wire protocol. Its documents
 live in their own family: the schemas for the canonical profile, the host's
 `server.json` and its `failure.json` are under `schemas/runtime/v1/`, and their
-synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itself,
-`runtime/v1/profile.json`, lands once its tiers qualify on the ADR's exact argv.
+synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itself is
+`runtime/v1/profile.json`. It carries only tiers that qualified on the ADR's exact argv
+(invoice-processor MODEL-SETUP MS-PIN-4): today `gpu-cuda` and `gpu-vulkan`. Applications
+vendor its exact bytes, and its `PROFILE_ID` is their SHA-256.
 
 Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts`
 after installing the development dependencies in `requirements-dev.txt`.
