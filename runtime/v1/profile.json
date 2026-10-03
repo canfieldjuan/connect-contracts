@@ -7,7 +7,7 @@
       "id": "gpu-cuda",
       "device_class": "nvidia-cuda",
       "requirements": {
-        "memory_floor_mib": 7350,
+        "memory_floor_mib": 7373,
         "cuda_compute_capabilities": [
           "5.0",
           "5.2",
@@ -217,7 +217,7 @@
       "id": "gpu-vulkan",
       "device_class": "vulkan-discrete",
       "requirements": {
-        "memory_floor_mib": 7350
+        "memory_floor_mib": 7373
       },
       "model": {
         "file_name": "Qwen3.5-9B-Q4_K_M.gguf",
