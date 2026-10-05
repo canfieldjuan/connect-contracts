@@ -159,8 +159,19 @@ left, in this order:
 2. **A stale socket.** `server.sock` is removed only after that, and only when
    a `connect()` to it fails.
 
-Then, before any file check or tier probe, the host writes `state: starting`
-with a `ready_by` deadline at most 300 seconds away. That budget covers:
+Then, before any profile or store file check or tier probe, the host writes
+`state: starting` with a `ready_by` deadline at most 300 seconds away.
+At this point `tier`, `device`, `server`, `model_sha256`, `context_tokens`,
+`build_commit` and `chat_template_sha256` are all `null`: no runtime has been
+selected yet. The other fields are already known, including the client's
+expected `profile_id`; that id does not claim the profile bytes were admitted.
+The null group is allowed only in `starting`, and only as a complete group.
+After profile admission and tier choice, the host atomically replaces it with
+the selected runtime details; `server` stays null until the child exists.
+Fully selected `starting`, `ready` and `stopping` records keep their existing
+requirements. A starting record never authorizes an inference request.
+
+That budget covers:
 - its file checks, including a re-hash when a file's identity changed;
 - the tier choice;
 - the server's start.

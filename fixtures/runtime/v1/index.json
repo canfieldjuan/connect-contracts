@@ -16,6 +16,11 @@
   },
   {
     "schema": "server.schema.json",
+    "fixture": "valid/server-starting-unselected.json",
+    "valid": true
+  },
+  {
+    "schema": "server.schema.json",
     "fixture": "valid/server-ready.json",
     "valid": true
   },
