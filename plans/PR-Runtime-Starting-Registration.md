@@ -45,12 +45,27 @@ is unavailable. Inspect the final diff and confirm profile bytes did not change.
 
 ## Implementation summary
 
-Pending.
+The schema has disjoint complete selected and unselected branches. Only the
+unselected branch requires starting and a null device/server. The semantic
+helper applies device-class rules only after selection. ADR-0011 describes
+the initial state, and the public fixture inventory contains that record.
 
 ## Cold diff audit
 
-Pending.
+- `schemas/runtime/v1/server.schema.json`, `selected_runtime` and `oneOf`:
+  preserve selected field validators and add complete pending-state validation.
+- `tests/test_runtime_contracts.py`, `test_starting_before_profile_admission`:
+  fail-before/pass-after probe, every selected/unselected combination, absent
+  keys, invalid/falsy values, and premature server/device values.
+- `fixtures/runtime/v1/valid/server-starting-unselected.json` and `index.json`:
+  admit the truthful initial state through the existing inventory gate.
+- ADR-0011 Starting: explains unknown values without changing readiness, pins
+  or argv. This plan records the contract and evidence.
+
+Focused regression passed; runtime suite passed; repository discovery passed.
+The final diff check passed and canonical profile bytes are unchanged.
 
 ## Gap audit
 
-NOT DONE. Contract committed before implementation; regression and fix pending.
+NOT DONE. Implementation and local verification complete; PR review pending.
+Actual host startup remains a separate implementation and proof requirement.
