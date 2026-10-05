@@ -435,6 +435,8 @@ to this ADR first. The amendment must decide:
 - the equivalent of the read lease, for example a no-write sharing mode on
   the GGUF.
 
+ADR-0012 is that amendment for Windows x86-64 (proposed).
+
 macOS remains a later platform decision.
 
 **Packaging.** This decision assumes native packages that share the user's
