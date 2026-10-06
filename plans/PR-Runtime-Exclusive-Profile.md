@@ -54,12 +54,27 @@ Canonical consumer adoption and review are separate release gates.
 
 ## Implementation summary
 
-Pending publication aliases and pin derivation.
+Both profile archives now use public fixed-revision root aliases of the approved
+bytes. CUDA retains 21 unchanged archive payloads and all three external NVIDIA
+pins; only registry/build metadata changed. Vulkan retains 50 unchanged regular
+payloads and adds build metadata beside the corrected registry. The ADR names
+the descriptor-bound directory and exclusive native search owner.
 
 ## Cold diff audit
 
-Pending final diff.
+- `runtime/v1/profile.json`, both runtime objects: published archive pins and
+  derived regular-file manifests. Derivation checks archive hashes, accounts for
+  every payload change, and asserts all other profile fields unchanged.
+- ADR-0011, "How the host runs the server": describes the merged host directory
+  binding and corrected native registry, with no additional environment keys.
+- This plan: scope, existing native regression ownership and adoption gates.
+
+The README local gate passed: 38 tests, OK. Public downloads match approved
+hashes; profile id is
+`58bf361ec2d2a082931ffe19fb70dc9a22ffd8d7c10bc7837df137f843cd60d1`.
+Native consumer proof and independent review remain release gates.
 
 ## Gap audit
 
-NOT DONE: pin derivation, local verification, review and consumer proof remain.
+NOT DONE: implementation and local verification complete; independent review
+and consumer proof remain. No consumer adoption is claimed by this PR alone.
