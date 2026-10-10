@@ -59,6 +59,46 @@ class FixedParameterContractTests(unittest.TestCase):
         self.assertTrue(any("fixed_value" in error for error in errors))
         self.assertEqual([], feature.manifest_errors(vector["input"]))
 
+    def test_refusal_vectors_validate_directly_against_schema(self):
+        for vector in VECTORS:
+            if vector["kind"] != "refusal":
+                continue
+            with self.subTest(vector=vector["name"]):
+                errors = feature.schema_errors(
+                    feature.FEATURE_BASE + "refusal.schema.json", vector["input"]
+                )
+                self.assertEqual(vector["valid"], not errors, errors)
+
+    def test_refusal_schema_mutations_are_falsifiable_directly(self):
+        original_load = feature.load
+        path = feature.SCHEMA_DIR / "refusal.schema.json"
+        for member in ("code", "retryable"):
+            changed = deepcopy(original_load(path))
+            changed["properties"]["body"]["allOf"][1]["properties"]["error"][
+                "properties"
+            ].pop(member)
+
+            def mutant_load(candidate):
+                return changed if candidate == path else original_load(candidate)
+
+            with (
+                self.subTest(member=member),
+                patch.object(feature, "load", mutant_load),
+            ):
+                killed = [
+                    v["name"]
+                    for v in VECTORS
+                    if v["kind"] == "refusal"
+                    and bool(
+                        feature.schema_errors(
+                            feature.FEATURE_BASE + "refusal.schema.json", v["input"]
+                        )
+                    )
+                    == v["valid"]
+                ]
+                MUTATION_KILLS["refusal_without_" + member] = killed
+                self.assertTrue(killed, member)
+
     def test_all_feature_schemas_are_valid(self):
         for path in feature.SCHEMA_DIR.glob("*.schema.json"):
             with self.subTest(schema=path.name):

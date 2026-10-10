@@ -310,14 +310,5 @@ def vector_result(vector):
     if kind == "sequence":
         return sequence_result(value)
     if kind == "refusal":
-        errors = schema_errors(FEATURE_BASE + "refusal.schema.json", value)
-        if errors:
-            return errors, None
-        if (
-            value["http_status"] != 409
-            or value["body"]["error"]["code"] != "FIXED_PARAMETER_MISMATCH"
-            or value["body"]["error"]["retryable"] is not False
-        ):
-            errors.append("fixed mismatch refusal differs from ADR")
-        return errors, None
+        return schema_errors(FEATURE_BASE + "refusal.schema.json", value), None
     raise ValueError("unknown fixture kind")

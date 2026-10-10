@@ -17477,6 +17477,133 @@
           "value": 1.0
         }
       }
+    },
+    {
+      "name": "refusal-missing-status",
+      "kind": "refusal",
+      "input": {
+        "body": {
+          "protocol_version": 2,
+          "error": {
+            "code": "FIXED_PARAMETER_MISMATCH",
+            "message": "Fixed compatibility identity differs.",
+            "retryable": false
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refusal-missing-code",
+      "kind": "refusal",
+      "input": {
+        "http_status": 409,
+        "body": {
+          "protocol_version": 2,
+          "error": {
+            "message": "Fixed compatibility identity differs.",
+            "retryable": false
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refusal-missing-retryable",
+      "kind": "refusal",
+      "input": {
+        "http_status": 409,
+        "body": {
+          "protocol_version": 2,
+          "error": {
+            "code": "FIXED_PARAMETER_MISMATCH",
+            "message": "Fixed compatibility identity differs."
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refusal-extra-error-member",
+      "kind": "refusal",
+      "input": {
+        "http_status": 409,
+        "body": {
+          "protocol_version": 2,
+          "error": {
+            "code": "FIXED_PARAMETER_MISMATCH",
+            "message": "Fixed compatibility identity differs.",
+            "retryable": false,
+            "extra": true
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refusal-extra-body-member",
+      "kind": "refusal",
+      "input": {
+        "http_status": 409,
+        "body": {
+          "protocol_version": 2,
+          "error": {
+            "code": "FIXED_PARAMETER_MISMATCH",
+            "message": "Fixed compatibility identity differs.",
+            "retryable": false
+          },
+          "extra": true
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refusal-message-empty",
+      "kind": "refusal",
+      "input": {
+        "http_status": 409,
+        "body": {
+          "protocol_version": 2,
+          "error": {
+            "code": "FIXED_PARAMETER_MISMATCH",
+            "message": "",
+            "retryable": false
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refusal-message-too-long",
+      "kind": "refusal",
+      "input": {
+        "http_status": 409,
+        "body": {
+          "protocol_version": 2,
+          "error": {
+            "code": "FIXED_PARAMETER_MISMATCH",
+            "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "retryable": false
+          }
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "refusal-wrong-protocol",
+      "kind": "refusal",
+      "input": {
+        "http_status": 409,
+        "body": {
+          "protocol_version": 1,
+          "error": {
+            "code": "FIXED_PARAMETER_MISMATCH",
+            "message": "Fixed compatibility identity differs.",
+            "retryable": false
+          }
+        }
+      },
+      "valid": false
     }
   ]
 }

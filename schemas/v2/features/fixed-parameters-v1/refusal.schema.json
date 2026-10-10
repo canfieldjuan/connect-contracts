@@ -12,7 +12,25 @@
       "const": 409
     },
     "body": {
-      "$ref": "https://local-connect.invalid/schemas/v2/error.schema.json"
+      "allOf": [
+        {
+          "$ref": "https://local-connect.invalid/schemas/v2/error.schema.json"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "FIXED_PARAMETER_MISMATCH"
+                },
+                "retryable": {
+                  "const": false
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }
