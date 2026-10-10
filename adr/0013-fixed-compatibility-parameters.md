@@ -45,8 +45,12 @@ certificate declarations. It must not publish classifier parameters as
 editable substitutes in that response.
 
 No v1/v3 schema, route, registration, entitlement or artifact format changes.
-Negotiated response caching, if present, varies by this request header; a
-provider cannot reuse the extended response for a legacy request.
+Every legacy and negotiated manifest response MUST include
+`Vary: Local-Connect-Manifest-Features`, including when caching is not enabled
+at the provider. This appends the feature header to any existing Vary fields;
+it does not replace them. Caches therefore distinguish the absent legacy
+request value from the negotiated feature value, in either request order.
+The cache-key semantics are owned by [RFC 9111 section 4.1](https://www.rfc-editor.org/rfc/rfc9111.html#section-4.1).
 
 ## Fixed parameter owner
 
@@ -118,7 +122,9 @@ cover legacy discovery and acknowledged extended discovery, unsupported
 feature fallback, unknown-member rejection, missing acknowledgment, required
 fixed values, mismatched types, false versus zero, empty string, integer and
 string limits, missing/conflicting frozen request values, and the exact
-HTTP refusal envelope.
+HTTP refusal envelope. Cache fixtures cover both orders (negotiated then
+legacy, and legacy then negotiated) using the response-header requirement
+above; neither response may be reused for the other request variant.
 
 Contextual admission vectors must distinguish prepared old bundle/new POST,
 accepted old-bundle replay, changed-request conflict, failed old-bundle
