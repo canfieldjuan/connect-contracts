@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/v2/features/fixed-parameters-v1/refusal.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "http_status",
+    "body"
+  ],
+  "properties": {
+    "http_status": {
+      "const": 409
+    },
+    "body": {
+      "$ref": "https://local-connect.invalid/schemas/v2/error.schema.json"
+    }
+  }
+}

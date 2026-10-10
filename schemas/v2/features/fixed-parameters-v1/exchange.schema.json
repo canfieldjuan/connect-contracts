@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/v2/features/fixed-parameters-v1/exchange.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_headers",
+    "response_headers",
+    "manifest",
+    "existing_vary",
+    "from_cache"
+  ],
+  "properties": {
+    "request_headers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "response_headers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "manifest": {
+      "type": "object"
+    },
+    "existing_vary": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "from_cache": {
+      "type": "boolean"
+    }
+  }
+}

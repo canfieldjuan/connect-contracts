@@ -47,6 +47,10 @@ vendor its exact bytes, and its `PROFILE_ID` is their SHA-256.
 Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts`
 after installing the development dependencies in `requirements-dev.txt`.
 
+ADR-0013 negotiated fixed-parameter schemas and static context vectors have a
+separate conformance runner: `python3 -m unittest tests.test_fixed_parameters_contract`.
+See [the feature proof scope](fixtures/v2/features/fixed-parameters-v1/README.md).
+
 Commercial Connect authorization is a separate, signed local contract under
 `entitlements/v1/`. The feature identifiers a licence may carry are enumerated in
 `entitlements/v1/features.json`; the issuer refuses any feature not listed

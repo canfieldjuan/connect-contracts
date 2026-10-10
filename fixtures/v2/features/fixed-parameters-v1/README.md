@@ -66,4 +66,5 @@ outside worktrees. Publish a separate reviewable PR; no merge is authorized by
 this start. Dependent app work stays blocked on shared review/landing, joint
 declarations, a later assigned connect-automate owner/pin and accepted app slices.
 
-Status: implementation and verification pending.
+Status: static conformance implemented; independent review/landing and
+application/runtime proof remain pending.
