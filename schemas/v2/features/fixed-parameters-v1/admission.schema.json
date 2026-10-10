@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/v2/features/fixed-parameters-v1/admission.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest",
+    "request",
+    "existing"
+  ],
+  "properties": {
+    "manifest": {
+      "$ref": "https://local-connect.invalid/schemas/v2/features/fixed-parameters-v1/manifest.schema.json"
+    },
+    "request": {
+      "$ref": "https://local-connect.invalid/schemas/v2/job-request.schema.json"
+    },
+    "existing": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "manifest",
+            "request",
+            "status"
+          ],
+          "properties": {
+            "manifest": {
+              "$ref": "https://local-connect.invalid/schemas/v2/features/fixed-parameters-v1/manifest.schema.json"
+            },
+            "request": {
+              "$ref": "https://local-connect.invalid/schemas/v2/job-request.schema.json"
+            },
+            "status": {
+              "enum": [
+                "accepted",
+                "processing",
+                "completed",
+                "failed"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
