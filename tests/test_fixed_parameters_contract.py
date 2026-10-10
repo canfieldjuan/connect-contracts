@@ -16,7 +16,8 @@ VECTORS = feature.load(feature.FIXTURE_DIR / "golden-fixtures.json")["vectors"]
 def mismatch(vector):
     errors, actual = feature.vector_result(vector)
     return bool(errors) == vector["valid"] or (
-        not errors and not feature.wire_equal(actual, vector.get("expected_outcome"))
+        not errors
+        and not feature.frozen_json_equal(actual, vector.get("expected_outcome"))
     )
 
 
@@ -71,7 +72,9 @@ class FixedParameterContractTests(unittest.TestCase):
                 self.assertEqual(vector["valid"], not errors, errors)
                 if not errors:
                     self.assertTrue(
-                        feature.wire_equal(vector.get("expected_outcome"), outcome)
+                        feature.frozen_json_equal(
+                            vector.get("expected_outcome"), outcome
+                        )
                     )
 
     def test_legacy_inventory_remains_byte_identical(self):
@@ -190,9 +193,22 @@ class FixedParameterContractTests(unittest.TestCase):
         mutations.append(
             (
                 "collapse_bool_int_identity",
-                "wire_equal",
+                "same_request",
                 lambda left, right: left == right,
             )
+        )
+
+        def normalize_replay_output(context):
+            result = original_admission(context)
+            if result["decision"] == "replay":
+                result["bound_parameters"] = {
+                    name: float(value) if type(value) is int else value
+                    for name, value in result["bound_parameters"].items()
+                }
+            return result
+
+        mutations.append(
+            ("normalize_replay_output", "admission_outcome", normalize_replay_output)
         )
 
         def rebind_replay(context):
@@ -226,6 +242,26 @@ class FixedParameterContractTests(unittest.TestCase):
                 killed = [v["name"] for v in VECTORS if mismatch(v)]
                 MUTATION_KILLS[name] = killed
                 self.assertTrue(killed, name)
+
+    def test_frozen_request_identity_is_not_fixed_value_equality(self):
+        self.assertTrue(feature.wire_equal(1, 1.0))
+        self.assertFalse(feature.same_request({"value": 1}, {"value": 1.0}))
+
+    def test_replay_output_preserves_frozen_numeric_form(self):
+        vector = deepcopy(
+            next(v for v in VECTORS if v["name"] == "replay-frozen-integer")
+        )
+        vector["input"]["request"]["parameters"]["value"] = 1
+        with patch.object(
+            feature,
+            "admission_outcome",
+            return_value={
+                "decision": "replay",
+                "starts_work": False,
+                "bound_parameters": {"value": 1.0},
+            },
+        ):
+            self.assertTrue(mismatch(vector))
 
     def test_typed_wire_equality_boundaries(self):
         self.assertFalse(feature.wire_equal(False, 0))

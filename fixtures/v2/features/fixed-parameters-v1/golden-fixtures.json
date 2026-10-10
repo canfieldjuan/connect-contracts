@@ -6453,193 +6453,6 @@
       }
     },
     {
-      "name": "replay-integral-numeric-form",
-      "kind": "admission",
-      "input": {
-        "manifest": {
-          "protocol_version": 2,
-          "instance_id": "11111111-1111-4111-8111-111111111111",
-          "app": {
-            "id": "invoice-processor",
-            "name": "Invoice Processor",
-            "version": "0.1.0"
-          },
-          "capabilities": [
-            {
-              "id": "example.fixed",
-              "version": "1.0",
-              "action": {
-                "label": "Summarize",
-                "description": "Create a local plain-text summary of this document."
-              },
-              "accepts": [
-                {
-                  "media_type": "application/pdf",
-                  "max_bytes": 33554432
-                }
-              ],
-              "produces": [
-                "application/vnd.local-connect.invoice+json"
-              ],
-              "parameters": [
-                {
-                  "name": "value",
-                  "value_type": "integer",
-                  "required": true,
-                  "label": "Fixed value",
-                  "description": "Synthetic compatibility value.",
-                  "fixed_value": 1
-                }
-              ],
-              "effects": {
-                "external": false,
-                "confirmation_required": false
-              }
-            },
-            {
-              "id": "certificate.extract",
-              "version": "1.0",
-              "action": {
-                "label": "Summarize",
-                "description": "Create a local plain-text summary of this document."
-              },
-              "accepts": [
-                {
-                  "media_type": "application/pdf",
-                  "max_bytes": 33554432
-                }
-              ],
-              "produces": [
-                "application/vnd.local-connect.certificate+json"
-              ],
-              "parameters": [],
-              "effects": {
-                "external": false,
-                "confirmation_required": false
-              }
-            }
-          ]
-        },
-        "request": {
-          "protocol_version": 2,
-          "job_id": "33333333-3333-4333-8333-333333333333",
-          "capability": {
-            "id": "example.fixed",
-            "version": "1.0"
-          },
-          "inputs": [
-            {
-              "artifact_id": "22222222-2222-4222-8222-222222222222",
-              "media_type": "application/pdf",
-              "byte_size": 28,
-              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-              "display_name": "invoice.pdf",
-              "source_app_id": "email-watcher"
-            }
-          ],
-          "parameters": {
-            "value": 1.0
-          }
-        },
-        "existing": {
-          "manifest": {
-            "protocol_version": 2,
-            "instance_id": "11111111-1111-4111-8111-111111111111",
-            "app": {
-              "id": "invoice-processor",
-              "name": "Invoice Processor",
-              "version": "0.1.0"
-            },
-            "capabilities": [
-              {
-                "id": "example.fixed",
-                "version": "1.0",
-                "action": {
-                  "label": "Summarize",
-                  "description": "Create a local plain-text summary of this document."
-                },
-                "accepts": [
-                  {
-                    "media_type": "application/pdf",
-                    "max_bytes": 33554432
-                  }
-                ],
-                "produces": [
-                  "application/vnd.local-connect.invoice+json"
-                ],
-                "parameters": [
-                  {
-                    "name": "value",
-                    "value_type": "integer",
-                    "required": true,
-                    "label": "Fixed value",
-                    "description": "Synthetic compatibility value.",
-                    "fixed_value": 1
-                  }
-                ],
-                "effects": {
-                  "external": false,
-                  "confirmation_required": false
-                }
-              },
-              {
-                "id": "certificate.extract",
-                "version": "1.0",
-                "action": {
-                  "label": "Summarize",
-                  "description": "Create a local plain-text summary of this document."
-                },
-                "accepts": [
-                  {
-                    "media_type": "application/pdf",
-                    "max_bytes": 33554432
-                  }
-                ],
-                "produces": [
-                  "application/vnd.local-connect.certificate+json"
-                ],
-                "parameters": [],
-                "effects": {
-                  "external": false,
-                  "confirmation_required": false
-                }
-              }
-            ]
-          },
-          "request": {
-            "protocol_version": 2,
-            "job_id": "33333333-3333-4333-8333-333333333333",
-            "capability": {
-              "id": "example.fixed",
-              "version": "1.0"
-            },
-            "inputs": [
-              {
-                "artifact_id": "22222222-2222-4222-8222-222222222222",
-                "media_type": "application/pdf",
-                "byte_size": 28,
-                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                "display_name": "invoice.pdf",
-                "source_app_id": "email-watcher"
-              }
-            ],
-            "parameters": {
-              "value": 1
-            }
-          },
-          "status": "accepted"
-        }
-      },
-      "valid": true,
-      "expected_outcome": {
-        "decision": "replay",
-        "starts_work": false,
-        "bound_parameters": {
-          "value": 1
-        }
-      }
-    },
-    {
       "name": "replay-bool-integer-identity-conflict",
       "kind": "admission",
       "input": {
@@ -17190,6 +17003,480 @@
         "from_cache": true
       },
       "valid": false
+    },
+    {
+      "name": "replay-frozen-integer",
+      "kind": "admission",
+      "input": {
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "example.fixed",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [
+                {
+                  "name": "value",
+                  "value_type": "integer",
+                  "required": true,
+                  "label": "Fixed value",
+                  "description": "Synthetic compatibility value.",
+                  "fixed_value": 1
+                }
+              ],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "request": {
+          "protocol_version": 2,
+          "job_id": "33333333-3333-4333-8333-333333333333",
+          "capability": {
+            "id": "example.fixed",
+            "version": "1.0"
+          },
+          "inputs": [
+            {
+              "artifact_id": "22222222-2222-4222-8222-222222222222",
+              "media_type": "application/pdf",
+              "byte_size": 28,
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "display_name": "invoice.pdf",
+              "source_app_id": "email-watcher"
+            }
+          ],
+          "parameters": {
+            "value": 1
+          }
+        },
+        "existing": {
+          "manifest": {
+            "protocol_version": 2,
+            "instance_id": "11111111-1111-4111-8111-111111111111",
+            "app": {
+              "id": "invoice-processor",
+              "name": "Invoice Processor",
+              "version": "0.1.0"
+            },
+            "capabilities": [
+              {
+                "id": "example.fixed",
+                "version": "1.0",
+                "action": {
+                  "label": "Summarize",
+                  "description": "Create a local plain-text summary of this document."
+                },
+                "accepts": [
+                  {
+                    "media_type": "application/pdf",
+                    "max_bytes": 33554432
+                  }
+                ],
+                "produces": [
+                  "application/vnd.local-connect.invoice+json"
+                ],
+                "parameters": [
+                  {
+                    "name": "value",
+                    "value_type": "integer",
+                    "required": true,
+                    "label": "Fixed value",
+                    "description": "Synthetic compatibility value.",
+                    "fixed_value": 1
+                  }
+                ],
+                "effects": {
+                  "external": false,
+                  "confirmation_required": false
+                }
+              },
+              {
+                "id": "certificate.extract",
+                "version": "1.0",
+                "action": {
+                  "label": "Summarize",
+                  "description": "Create a local plain-text summary of this document."
+                },
+                "accepts": [
+                  {
+                    "media_type": "application/pdf",
+                    "max_bytes": 33554432
+                  }
+                ],
+                "produces": [
+                  "application/vnd.local-connect.certificate+json"
+                ],
+                "parameters": [],
+                "effects": {
+                  "external": false,
+                  "confirmation_required": false
+                }
+              }
+            ]
+          },
+          "request": {
+            "protocol_version": 2,
+            "job_id": "33333333-3333-4333-8333-333333333333",
+            "capability": {
+              "id": "example.fixed",
+              "version": "1.0"
+            },
+            "inputs": [
+              {
+                "artifact_id": "22222222-2222-4222-8222-222222222222",
+                "media_type": "application/pdf",
+                "byte_size": 28,
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "display_name": "invoice.pdf",
+                "source_app_id": "email-watcher"
+              }
+            ],
+            "parameters": {
+              "value": 1
+            }
+          },
+          "status": "accepted"
+        }
+      },
+      "valid": true,
+      "expected_outcome": {
+        "decision": "replay",
+        "starts_work": false,
+        "bound_parameters": {
+          "value": 1
+        }
+      }
+    },
+    {
+      "name": "replay-frozen-integral-float",
+      "kind": "admission",
+      "input": {
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "example.fixed",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [
+                {
+                  "name": "value",
+                  "value_type": "integer",
+                  "required": true,
+                  "label": "Fixed value",
+                  "description": "Synthetic compatibility value.",
+                  "fixed_value": 1
+                }
+              ],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "request": {
+          "protocol_version": 2,
+          "job_id": "33333333-3333-4333-8333-333333333333",
+          "capability": {
+            "id": "example.fixed",
+            "version": "1.0"
+          },
+          "inputs": [
+            {
+              "artifact_id": "22222222-2222-4222-8222-222222222222",
+              "media_type": "application/pdf",
+              "byte_size": 28,
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "display_name": "invoice.pdf",
+              "source_app_id": "email-watcher"
+            }
+          ],
+          "parameters": {
+            "value": 1.0
+          }
+        },
+        "existing": {
+          "manifest": {
+            "protocol_version": 2,
+            "instance_id": "11111111-1111-4111-8111-111111111111",
+            "app": {
+              "id": "invoice-processor",
+              "name": "Invoice Processor",
+              "version": "0.1.0"
+            },
+            "capabilities": [
+              {
+                "id": "example.fixed",
+                "version": "1.0",
+                "action": {
+                  "label": "Summarize",
+                  "description": "Create a local plain-text summary of this document."
+                },
+                "accepts": [
+                  {
+                    "media_type": "application/pdf",
+                    "max_bytes": 33554432
+                  }
+                ],
+                "produces": [
+                  "application/vnd.local-connect.invoice+json"
+                ],
+                "parameters": [
+                  {
+                    "name": "value",
+                    "value_type": "integer",
+                    "required": true,
+                    "label": "Fixed value",
+                    "description": "Synthetic compatibility value.",
+                    "fixed_value": 1
+                  }
+                ],
+                "effects": {
+                  "external": false,
+                  "confirmation_required": false
+                }
+              },
+              {
+                "id": "certificate.extract",
+                "version": "1.0",
+                "action": {
+                  "label": "Summarize",
+                  "description": "Create a local plain-text summary of this document."
+                },
+                "accepts": [
+                  {
+                    "media_type": "application/pdf",
+                    "max_bytes": 33554432
+                  }
+                ],
+                "produces": [
+                  "application/vnd.local-connect.certificate+json"
+                ],
+                "parameters": [],
+                "effects": {
+                  "external": false,
+                  "confirmation_required": false
+                }
+              }
+            ]
+          },
+          "request": {
+            "protocol_version": 2,
+            "job_id": "33333333-3333-4333-8333-333333333333",
+            "capability": {
+              "id": "example.fixed",
+              "version": "1.0"
+            },
+            "inputs": [
+              {
+                "artifact_id": "22222222-2222-4222-8222-222222222222",
+                "media_type": "application/pdf",
+                "byte_size": 28,
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "display_name": "invoice.pdf",
+                "source_app_id": "email-watcher"
+              }
+            ],
+            "parameters": {
+              "value": 1.0
+            }
+          },
+          "status": "accepted"
+        }
+      },
+      "valid": true,
+      "expected_outcome": {
+        "decision": "replay",
+        "starts_work": false,
+        "bound_parameters": {
+          "value": 1.0
+        }
+      }
+    },
+    {
+      "name": "admit-integral-form-matches-fixed-integer",
+      "kind": "admission",
+      "input": {
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "example.fixed",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [
+                {
+                  "name": "value",
+                  "value_type": "integer",
+                  "required": true,
+                  "label": "Fixed value",
+                  "description": "Synthetic compatibility value.",
+                  "fixed_value": 1
+                }
+              ],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "request": {
+          "protocol_version": 2,
+          "job_id": "33333333-3333-4333-8333-333333333333",
+          "capability": {
+            "id": "example.fixed",
+            "version": "1.0"
+          },
+          "inputs": [
+            {
+              "artifact_id": "22222222-2222-4222-8222-222222222222",
+              "media_type": "application/pdf",
+              "byte_size": 28,
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "display_name": "invoice.pdf",
+              "source_app_id": "email-watcher"
+            }
+          ],
+          "parameters": {
+            "value": 1.0
+          }
+        },
+        "existing": null
+      },
+      "valid": true,
+      "expected_outcome": {
+        "decision": "accept",
+        "starts_work": true,
+        "bound_parameters": {
+          "value": 1.0
+        }
+      }
     }
   ]
 }

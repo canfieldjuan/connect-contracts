@@ -44,6 +44,18 @@ expected decisions. Header, equality, ordering and conflict mutations must
 change golden outcomes or validity. Existing legacy schemas/fixtures remain
 byte-identical; a manifest-schema derivation check guards their single owner.
 
+## Frozen request identity and fixed-value equality
+
+Fixed-parameter validation uses typed value equality, admitting integral
+numeric forms. Replay identity remains with the existing idempotency owner;
+this feature does not normalize requests or migrate stored digests. Replay
+vectors resend an unchanged frozen request. They do not assert a universal
+replay/conflict decision for requests differing only in numeric spelling.
+The oracle compares frozen fixture snapshots through deterministic JSON
+serialization, preserving numeric forms and booleans; this test mechanism
+is not a production canonicalization or digest requirement. Expected outputs
+also preserve the admitted snapshot, rather than normalizing its values.
+
 ## Non-scope and proof limits
 
 No app, HTTP server/client, connect-automate implementation, model, database,

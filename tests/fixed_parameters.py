@@ -138,7 +138,7 @@ def exchange_errors(exchange, current_manifest=None):
                 if c["id"] != "document.classify"
                 and not any("fixed_value" in p for p in c["parameters"])
             ]
-        if exchange["manifest"] != expected:
+        if not frozen_json_equal(exchange["manifest"], expected):
             errors.append("rediscovery did not observe current declaration")
     return errors
 
@@ -183,8 +183,20 @@ def wire_equal(left, right):
     return type(left) is type(right) and left == right
 
 
+def frozen_json_equal(left, right):
+    """Compare frozen fixture snapshots, preserving numeric forms and booleans.
+
+    This deterministic test serialization is not a provider digest algorithm.
+    The vectors do not decide owner-defined numeric-spelling equivalence.
+    """
+    return json.dumps(
+        left, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ) == json.dumps(right, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+
 def same_request(left, right):
-    return wire_equal(left, right)
+    """Replay identical frozen snapshots; production identity stays owner-defined."""
+    return frozen_json_equal(left, right)
 
 
 def decision(kind, request=None):
