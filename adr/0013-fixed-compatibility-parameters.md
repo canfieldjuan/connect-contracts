@@ -45,12 +45,14 @@ certificate declarations. It must not publish classifier parameters as
 editable substitutes in that response.
 
 No v1/v3 schema, route, registration, entitlement or artifact format changes.
-Every legacy and negotiated manifest response MUST include
-`Vary: Local-Connect-Manifest-Features`, including when caching is not enabled
-at the provider. This appends the feature header to any existing Vary fields;
-it does not replace them. Caches therefore distinguish the absent legacy
-request value from the negotiated feature value, in either request order.
-The cache-key semantics are owned by [RFC 9111 section 4.1](https://www.rfc-editor.org/rfc/rfc9111.html#section-4.1).
+Every manifest response, both legacy and negotiated, MUST include
+`Cache-Control: no-store` and `Vary: Local-Connect-Manifest-Features`.
+Consumers and HTTP caches must not store or reuse manifest responses.
+Rediscovery obtains a fresh authenticated response; it does not wait for a
+cached response to expire. The Vary field remains defense in depth and appends
+the feature header to any existing Vary fields without replacing them.
+The durable selected-classifier record and recorded job admission identity
+remain governed by their owners; no-store concerns HTTP manifest responses.
 
 ## Fixed parameter owner
 
@@ -106,8 +108,10 @@ v2 error envelope with `code=FIXED_PARAMETER_MISMATCH` and `retryable=false`.
 No job is accepted, no classification executes, and no permanent document
 result is fabricated. The message is descriptive, not a machine-parsed field.
 `retryable=false` forbids blindly repeating the same immutable request.
-Rediscovery and explicit selection of compatible identity may authorize a
-new attempt; this does not mutate the refused request or an owned job.
+Mismatch recovery immediately rediscovers the current bundle under the
+negotiated-manifest response rule above, even after bundle rotation. Explicit
+selection of compatible identity may authorize a new attempt; this does not
+mutate the refused request or an owned job.
 
 Email Watcher's classifier integration maps this code to `deferred`
 (`classifier_bundle_unavailable`) until an admitted bundle is selected.
@@ -122,9 +126,13 @@ cover legacy discovery and acknowledged extended discovery, unsupported
 feature fallback, unknown-member rejection, missing acknowledgment, required
 fixed values, mismatched types, false versus zero, empty string, integer and
 string limits, missing/conflicting frozen request values, and the exact
-HTTP refusal envelope. Cache fixtures cover both orders (negotiated then
-legacy, and legacy then negotiated) using the response-header requirement
-above; neither response may be reused for the other request variant.
+HTTP refusal envelope. Response fixtures check both required headers on
+both legacy and negotiated variants, including preservation of existing Vary
+fields. Cache fixtures cover both orders (negotiated then legacy, and legacy
+then negotiated) and bundle rotation followed by mismatch recovery and immediate
+rediscovery, using the negotiated-manifest response rule above. Neither request
+order permits reuse of a manifest response, and recovery observes the current
+bundle without a cache-expiry window.
 
 Contextual admission vectors must distinguish prepared old bundle/new POST,
 accepted old-bundle replay, changed-request conflict, failed old-bundle
