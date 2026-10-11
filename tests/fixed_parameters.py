@@ -105,7 +105,9 @@ def header_values(headers):
 
 
 HTTP_TOKEN = r"[!#$%&'*+.^_`|~0-9A-Za-z-]+"
-HTTP_ARGUMENT = rf'(?:{HTTP_TOKEN}|"(?:[\x20-\x21\x23-\x5b\x5d-\x7e]|\\[\x20-\x7e])*")'
+HTTP_ARGUMENT = (
+    rf'(?:{HTTP_TOKEN}|"(?:[\x09\x20-\x21\x23-\x5b\x5d-\x7e]|\\[\x09\x20-\x7e])*")'
+)
 
 
 def freshness_fields(response):

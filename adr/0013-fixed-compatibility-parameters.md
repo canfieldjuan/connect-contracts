@@ -45,8 +45,9 @@ certificate declarations. It must not publish classifier parameters as
 editable substitutes in that response.
 
 No v1/v3 schema, route, registration, entitlement or artifact format changes.
-Feature-aware providers MUST emit Cache-Control:no-store and Vary:Local-Connect-
-Manifest-Features on both legacy and negotiated manifest responses, preserving other
+Feature-aware providers MUST emit `Cache-Control:no-store` and
+`Vary:Local-Connect-Manifest-Features` on both legacy and negotiated manifest
+responses, preserving other
 Vary fields. Consumers never store or reuse manifest responses; every discovery and
 rediscovery uses a fresh authenticated response bound to the registration's app and
 instance.
@@ -57,8 +58,8 @@ that response. Wrong, malformed, ambiguous or unsolicited acknowledgment rejects
 negotiation; it is not treated as an absent acknowledgment.
 
 A genuinely absent acknowledgment selects the strict legacy decoder. Consumer admission
-of that legacy response does not require freshness headers to exist: absent Cache-
-Control is permitted; if Cache-Control is present it must contain a valid no-store
+of that legacy response does not require freshness headers to exist: absent `Cache-Control`
+is permitted; if `Cache-Control` is present it must contain a valid no-store
 directive. Explicit storage/reuse directives without no-store, including max-age or
 s-maxage, are incompatible. A present malformed freshness header is rejected. Legacy
 Vary may be absent or may omit the feature member; this does not authorize storage or

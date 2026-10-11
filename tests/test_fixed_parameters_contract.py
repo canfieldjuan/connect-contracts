@@ -22,6 +22,18 @@ def mismatch(vector):
 
 
 class FixedParameterContractTests(unittest.TestCase):
+    def test_quoted_header_tabs_in_both_roles(self):
+        source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
+        for role in ("producer_conformance", "consumer_admission"):
+            for text in ("a\tb", "a\\\tb"):
+                with self.subTest(role=role, text=text):
+                    exchange = deepcopy(source)
+                    exchange["validation_role"] = role
+                    exchange["response_headers"]["Cache-Control"] = (
+                        f'no-store, ext="{text}"'
+                    )
+                    self.assertEqual([], feature.exchange_errors(exchange))
+
     def test_consumer_legacy_without_freshness_headers(self):
         exchange = deepcopy(
             next(
