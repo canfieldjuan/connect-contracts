@@ -22,6 +22,214 @@ def mismatch(vector):
 
 
 class FixedParameterContractTests(unittest.TestCase):
+    def test_response_directive_rules(self):
+        source = next(
+            v["input"] for v in VECTORS if v["name"] == "exchange-supported-ack"
+        )
+        for role in ("producer_conformance", "consumer_admission"):
+            for directive in (
+                "must-revalidate",
+                "must-understand",
+                "no-store",
+                "no-transform",
+                "proxy-revalidate",
+                "public",
+            ):
+                for argument, valid in (("", True), ("=x", False)):
+                    with self.subTest(
+                        role=role, directive=directive, argument=argument
+                    ):
+                        e = deepcopy(source)
+                        e["validation_role"] = role
+                        e["response_headers"]["Cache-Control"] = (
+                            "no-store, " + directive + argument
+                        )
+                        self.assertEqual(valid, not feature.exchange_errors(e))
+            for directive in ("max-age", "s-maxage"):
+                e = deepcopy(source)
+                e["validation_role"] = role
+                e["response_headers"]["Cache-Control"] = f'no-store, {directive}="10"'
+                self.assertEqual(
+                    role == "consumer_admission", not feature.exchange_errors(e)
+                )
+
+    def test_table_rows_have_both_role_outcomes(self):
+        for name, rule in feature.freshness_rules().items():
+            for role in ("producer_conformance", "consumer_admission"):
+                with self.subTest(row=name, role=role):
+                    selected = [
+                        v
+                        for v in VECTORS
+                        if v["name"].startswith(rule["vector_prefix"])
+                        and v["input"].get("validation_role") == role
+                    ]
+                    self.assertEqual({False, True}, {v["valid"] for v in selected})
+
+    def test_directive_table_mutations(self):
+        original = feature.freshness_rules()
+        for name in original:
+            if name.endswith("-list"):
+                continue
+            changed = deepcopy(original)
+            changed.pop(name)
+            with (
+                self.subTest(row=name),
+                patch.object(feature, "freshness_rules", return_value=changed),
+            ):
+                killed = [
+                    v["name"]
+                    for v in VECTORS
+                    if v["name"].startswith(original[name]["vector_prefix"])
+                    and mismatch(v)
+                ]
+                self.assertTrue(killed)
+                MUTATION_KILLS[f"missing_directive_{name}"] = killed
+
+    def test_empty_list_role_boundaries(self):
+        for source_name in ("exchange-legacy", "exchange-supported-ack"):
+            source = next(v["input"] for v in VECTORS if v["name"] == source_name)
+            for role in ("producer_conformance", "consumer_admission"):
+                for field in ("Cache-Control", "Vary"):
+                    for empties in (0, 1, 16, 17):
+                        with self.subTest(
+                            source=source_name, role=role, field=field, empties=empties
+                        ):
+                            exchange = deepcopy(source)
+                            exchange["validation_role"] = role
+                            exchange["response_headers"][field] += "," * empties
+                            expected = empties == 0 or (
+                                role == "consumer_admission" and empties <= 16
+                            )
+                            self.assertEqual(
+                                expected, not feature.exchange_errors(exchange)
+                            )
+
+    def test_empty_element_limit_mutations(self):
+        for limit in (0, 17):
+            changed = deepcopy(feature.freshness_rules())
+            for name in ("Cache-Control-list", "Vary-list"):
+                changed[name]["consumer_admission"] = f"empty-limit:{limit}"
+            with (
+                self.subTest(limit=limit),
+                patch.object(feature, "freshness_rules", return_value=changed),
+            ):
+                killed = [
+                    v["name"]
+                    for v in VECTORS
+                    if v["kind"] == "exchange" and mismatch(v)
+                ]
+                MUTATION_KILLS[f"empty_element_limit_{limit}"] = killed
+                self.assertTrue(killed)
+
+    def test_quoted_header_character_classes(self):
+        source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
+        for role in ("producer_conformance", "consumer_admission"):
+            for escaped in (False, True):
+                for code in range(257):
+                    permitted = (
+                        (code == 9 or 32 <= code <= 126 or 128 <= code <= 255)
+                        if escaped
+                        else (
+                            code in (9, 32, 33)
+                            or 35 <= code <= 91
+                            or 93 <= code <= 126
+                            or 128 <= code <= 255
+                        )
+                    )
+                    with self.subTest(role=role, escaped=escaped, code=code):
+                        exchange = deepcopy(source)
+                        exchange["validation_role"] = role
+                        text = ("\\" if escaped else "") + chr(code)
+                        exchange["response_headers"]["Cache-Control"] = (
+                            f'no-store, ext="{text}"'
+                        )
+                        self.assertEqual(
+                            permitted, not feature.exchange_errors(exchange)
+                        )
+
+    def test_token_character_classes_in_both_fields(self):
+        source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
+        tchar = "!#$%&'*+-.^_`|~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        for role in ("producer_conformance", "consumer_admission"):
+            for code in range(257):
+                for field in ("Cache-Control", "Vary"):
+                    with self.subTest(role=role, code=code, field=field):
+                        exchange = deepcopy(source)
+                        exchange["validation_role"] = role
+                        char = chr(code)
+                        value = (
+                            f"no-store, a{char}b=ok"
+                            if field == "Cache-Control"
+                            else f"Accept-Encoding, Local-Connect-Manifest-Features, a{char}b"
+                        )
+                        exchange["response_headers"][field] = value
+                        self.assertEqual(
+                            char in tchar or char == ",",
+                            not feature.exchange_errors(exchange),
+                        )
+
+    def test_quoted_header_tabs_in_both_roles(self):
+        source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
+        for role in ("producer_conformance", "consumer_admission"):
+            for text in ("a\tb", "a\\\tb"):
+                with self.subTest(role=role, text=text):
+                    exchange = deepcopy(source)
+                    exchange["validation_role"] = role
+                    exchange["response_headers"]["Cache-Control"] = (
+                        f'no-store, ext="{text}"'
+                    )
+                    self.assertEqual([], feature.exchange_errors(exchange))
+
+    def test_consumer_legacy_without_freshness_headers(self):
+        exchange = deepcopy(
+            next(
+                v["input"]
+                for v in VECTORS
+                if v["name"] == "exchange-missing-ack-legacy"
+            )
+        )
+        exchange["validation_role"] = "consumer_admission"
+        exchange["response_headers"] = {}
+        self.assertEqual([], feature.exchange_errors(exchange))
+
+    def test_exchange_roles_and_malformed_freshness_mutations(self):
+        original_exchange = feature.exchange_errors
+        original_freshness = feature.freshness_fields
+
+        def force_role(role):
+            def mutant(exchange, current_manifest=None):
+                exchange = deepcopy(exchange)
+                exchange["validation_role"] = role
+                return original_exchange(exchange, current_manifest)
+
+            return mutant
+
+        def omit_malformed(response, role="producer_conformance"):
+            errors, directives, vary = original_freshness(response, role)
+            return [], directives, vary
+
+        for name, owner, mutant in (
+            (
+                "consumer_as_producer",
+                "exchange_errors",
+                force_role("producer_conformance"),
+            ),
+            (
+                "producer_as_consumer",
+                "exchange_errors",
+                force_role("consumer_admission"),
+            ),
+            ("ignore_malformed_freshness", "freshness_fields", omit_malformed),
+        ):
+            with self.subTest(mutation=name), patch.object(feature, owner, mutant):
+                killed = [
+                    v["name"]
+                    for v in VECTORS
+                    if v["kind"] == "exchange" and mismatch(v)
+                ]
+                MUTATION_KILLS[name] = killed
+                self.assertTrue(killed)
+
     def test_fixed_declaration_schema_accepts_required_value(self):
         manifest = feature.load(feature.ROOT / "fixtures/v2/valid/manifest.json")
         parameter = manifest["capabilities"][0]["parameters"][0]

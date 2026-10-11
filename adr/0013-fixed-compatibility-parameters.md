@@ -45,14 +45,42 @@ certificate declarations. It must not publish classifier parameters as
 editable substitutes in that response.
 
 No v1/v3 schema, route, registration, entitlement or artifact format changes.
-Every manifest response, both legacy and negotiated, MUST include
-`Cache-Control: no-store` and `Vary: Local-Connect-Manifest-Features`.
-Consumers and HTTP caches must not store or reuse manifest responses.
-Rediscovery obtains a fresh authenticated response; it does not wait for a
-cached response to expire. The Vary field remains defense in depth and appends
-the feature header to any existing Vary fields without replacing them.
-The durable selected-classifier record and recorded job admission identity
-remain governed by their owners; no-store concerns HTTP manifest responses.
+Feature-aware providers MUST emit `Cache-Control:no-store` and
+`Vary:Local-Connect-Manifest-Features` on both legacy and negotiated manifest
+responses, preserving other
+Vary fields. Consumers never store or reuse manifest responses; every discovery and
+rediscovery uses a fresh authenticated response bound to the registration's app and
+instance.
+
+An exactly requested and exactly acknowledged negotiated response MUST satisfy both
+freshness headers and the extended schema. Missing or invalid freshness headers reject
+that response. Wrong, malformed, ambiguous or unsolicited acknowledgment rejects
+negotiation; it is not treated as an absent acknowledgment.
+
+A genuinely absent acknowledgment selects the strict legacy decoder. Consumer admission
+of that legacy response does not require freshness headers to exist: absent `Cache-Control`
+is permitted; if `Cache-Control` is present it must contain a valid no-store
+directive. Explicit storage/reuse directives without no-store, including max-age or
+s-maxage, are incompatible. A present malformed freshness header is rejected. Legacy
+Vary may be absent or may omit the feature member; this does not authorize storage or
+reuse. Authentication, registration attribution, bounded duplicate-safe parsing and
+strict legacy body validation remain mandatory. Fixed-identity capabilities are
+unavailable, document.classify is not exposed, and fixed identity is never synthesized
+or replaced with editable parameters. Compatible invoice.extract and certificate.extract
+remain usable.
+
+An unacknowledged provider that predates the feature and a feature-aware provider that
+declines it are not distinguishable by these headers. The consumer uses the same legacy
+admission policy for both, without inferring support from app names, versions, labels or
+installation history. A feature-aware producer still owes the response-header
+requirements above; failure of that producer's emission conformance does not by itself
+remove compatible legacy capabilities from a direct-read consumer.
+
+The sender/recipient rule table in
+`fixtures/v2/features/fixed-parameters-v1/README.md` owns role-specific list
+and recognized response-directive argument requirements. The oracle reads that
+single table. Nonempty members retain their HTTP grammar, unknown extensions
+remain generic, and all freshness requirements above still apply.
 
 ## Fixed parameter owner
 
