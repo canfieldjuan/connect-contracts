@@ -22,6 +22,53 @@ def mismatch(vector):
 
 
 class FixedParameterContractTests(unittest.TestCase):
+    def test_quoted_header_character_classes(self):
+        source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
+        for role in ("producer_conformance", "consumer_admission"):
+            for escaped in (False, True):
+                for code in range(257):
+                    permitted = (
+                        (code == 9 or 32 <= code <= 126 or 128 <= code <= 255)
+                        if escaped
+                        else (
+                            code in (9, 32, 33)
+                            or 35 <= code <= 91
+                            or 93 <= code <= 126
+                            or 128 <= code <= 255
+                        )
+                    )
+                    with self.subTest(role=role, escaped=escaped, code=code):
+                        exchange = deepcopy(source)
+                        exchange["validation_role"] = role
+                        text = ("\\" if escaped else "") + chr(code)
+                        exchange["response_headers"]["Cache-Control"] = (
+                            f'no-store, ext="{text}"'
+                        )
+                        self.assertEqual(
+                            permitted, not feature.exchange_errors(exchange)
+                        )
+
+    def test_token_character_classes_in_both_fields(self):
+        source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
+        tchar = "!#$%&'*+-.^_`|~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        for role in ("producer_conformance", "consumer_admission"):
+            for code in range(257):
+                for field in ("Cache-Control", "Vary"):
+                    with self.subTest(role=role, code=code, field=field):
+                        exchange = deepcopy(source)
+                        exchange["validation_role"] = role
+                        char = chr(code)
+                        value = (
+                            f"no-store, a{char}b=ok"
+                            if field == "Cache-Control"
+                            else f"Accept-Encoding, Local-Connect-Manifest-Features, a{char}b"
+                        )
+                        exchange["response_headers"][field] = value
+                        self.assertEqual(
+                            char in tchar or char == ",",
+                            not feature.exchange_errors(exchange),
+                        )
+
     def test_quoted_header_tabs_in_both_roles(self):
         source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
         for role in ("producer_conformance", "consumer_admission"):

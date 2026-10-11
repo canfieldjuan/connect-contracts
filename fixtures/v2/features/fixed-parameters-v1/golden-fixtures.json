@@ -23691,6 +23691,6198 @@
         "validation_role": "consumer_admission"
       },
       "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-8-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\b\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-9-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\t\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-10-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\n\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-31-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u001f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-32-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\" \"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-33-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"!\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-34-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\"\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-35-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"#\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-91-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"[\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-92-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-93-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"]\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-126-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"~\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-127-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u007f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-128-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u0080\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-255-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u00ff\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-256-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u0100\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-8-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\b\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-9-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\t\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-10-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\n\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-31-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u001f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-32-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\ \"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-33-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\!\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-34-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\"\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-35-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\#\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-91-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\[\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-92-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\\\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-93-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\]\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-126-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\~\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-127-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u007f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-quoted-byte-128-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u0080\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-255-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u00ff\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-quoted-byte-256-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u0100\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-grammar-ows-tab",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "\tno-store\t,\text=\"a,b\"\t",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-grammar-ows-vtab",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store\u000b, ext=x",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-grammar-ows-formfeed",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store\f",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-grammar-delta-zero",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=0",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-grammar-delta-nine",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, s-maxage=9",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-grammar-delta-quoted",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=\"10\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": true
+    },
+    {
+      "name": "producer_conformance-grammar-delta-empty",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=\"\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-grammar-delta-signed",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, s-maxage=+1",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-grammar-delta-decimal",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=1.0",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-grammar-delta-unicode",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=\u0661",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "producer_conformance-grammar-empty-list-member",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store,,ext=x",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "producer_conformance"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-8-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\b\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-9-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\t\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-10-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\n\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-31-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u001f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-32-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\" \"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-33-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"!\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-34-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\"\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-35-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"#\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-91-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"[\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-92-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-93-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"]\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-126-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"~\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-127-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u007f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-128-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u0080\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-255-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u00ff\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-256-escaped-False",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\u0100\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-8-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\b\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-9-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\t\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-10-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\n\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-31-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u001f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-32-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\ \"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-33-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\!\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-34-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\"\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-35-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\#\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-91-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\[\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-92-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\\\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-93-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\]\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-126-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\~\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-127-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u007f\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-quoted-byte-128-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u0080\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-255-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u00ff\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-quoted-byte-256-escaped-True",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, ext=\"\\\u0100\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-grammar-ows-tab",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "\tno-store\t,\text=\"a,b\"\t",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-grammar-ows-vtab",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store\u000b, ext=x",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-grammar-ows-formfeed",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store\f",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-grammar-delta-zero",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=0",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-grammar-delta-nine",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, s-maxage=9",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-grammar-delta-quoted",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=\"10\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": true
+    },
+    {
+      "name": "consumer_admission-grammar-delta-empty",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=\"\"",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-grammar-delta-signed",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, s-maxage=+1",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-grammar-delta-decimal",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=1.0",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-grammar-delta-unicode",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store, max-age=\u0661",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
+    },
+    {
+      "name": "consumer_admission-grammar-empty-list-member",
+      "kind": "exchange",
+      "input": {
+        "request_headers": {},
+        "response_headers": {
+          "Cache-Control": "no-store,,ext=x",
+          "Vary": "Accept-Encoding, Local-Connect-Manifest-Features"
+        },
+        "manifest": {
+          "protocol_version": 2,
+          "instance_id": "11111111-1111-4111-8111-111111111111",
+          "app": {
+            "id": "invoice-processor",
+            "name": "Invoice Processor",
+            "version": "0.1.0"
+          },
+          "capabilities": [
+            {
+              "id": "invoice.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.invoice+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            },
+            {
+              "id": "certificate.extract",
+              "version": "1.0",
+              "action": {
+                "label": "Summarize",
+                "description": "Create a local plain-text summary of this document."
+              },
+              "accepts": [
+                {
+                  "media_type": "application/pdf",
+                  "max_bytes": 33554432
+                }
+              ],
+              "produces": [
+                "application/vnd.local-connect.certificate+json"
+              ],
+              "parameters": [],
+              "effects": {
+                "external": false,
+                "confirmation_required": false
+              }
+            }
+          ]
+        },
+        "existing_vary": [
+          "Accept-Encoding"
+        ],
+        "from_cache": false,
+        "validation_role": "consumer_admission"
+      },
+      "valid": false
     }
   ]
 }

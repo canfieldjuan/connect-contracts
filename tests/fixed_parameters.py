@@ -104,54 +104,55 @@ def header_values(headers):
     return normalized
 
 
+# RFC 9110 sections 5.6.2-5.6.4; RFC 9111 section 5.2.
+# These are byte-valued HTTP fields represented as Python strings.
 HTTP_TOKEN = r"[!#$%&'*+.^_`|~0-9A-Za-z-]+"
-HTTP_ARGUMENT = (
-    rf'(?:{HTTP_TOKEN}|"(?:[\x09\x20-\x21\x23-\x5b\x5d-\x7e]|\\[\x09\x20-\x7e])*")'
-)
+HTTP_OWS = r"[ \t]*"
+HTTP_OBS_TEXT = r"\x80-\xff"
+HTTP_QDTEXT = rf"[\x09\x20\x21\x23-\x5b\x5d-\x7e{HTTP_OBS_TEXT}]"
+HTTP_QUOTED_PAIR = rf"\\[\x09\x20-\x7e{HTTP_OBS_TEXT}]"
+HTTP_QUOTED_STRING = rf'"(?:{HTTP_QDTEXT}|{HTTP_QUOTED_PAIR})*"'
+HTTP_ARGUMENT = rf"(?:{HTTP_TOKEN}|{HTTP_QUOTED_STRING})"
+HTTP_CACHE_DIRECTIVE = rf"({HTTP_TOKEN})(?:=({HTTP_ARGUMENT}))?"
+HTTP_DELTA_SECONDS = r"[0-9]+"
+
+
+def http_list_pattern(member):
+    """Nonempty emitted list grammar; frozen strict contexts reject empty members."""
+    return rf"{HTTP_OWS}(?:{member})(?:{HTTP_OWS},{HTTP_OWS}(?:{member}))*{HTTP_OWS}"
 
 
 def freshness_fields(response):
-    """Parse present freshness fields once; absence is a role policy decision."""
+    """One grammar owner; absence/freshness obligations belong to exchange_errors."""
     errors, directives, vary = [], set(), set()
-    for field in ("cache-control", "vary"):
-        if field in response and any(
-            ord(c) < 32 and c != "\t" or ord(c) > 126 for c in response[field]
-        ):
-            errors.append("malformed freshness header characters")
     if "cache-control" in response:
         value = response["cache-control"]
-        # Match each complete directive, including quoted commas, without
-        # accepting empty members, control characters or unterminated quotes.
-        pattern = re.compile(
-            rf"\s*({HTTP_TOKEN})(?:\s*=\s*({HTTP_ARGUMENT}))?\s*(,|$)", re.ASCII
-        )
-        position = 0
-        if not value:
+        if not re.fullmatch(http_list_pattern(HTTP_CACHE_DIRECTIVE), value):
             errors.append("malformed Cache-Control")
-        while position < len(value):
-            match = pattern.match(value, position)
-            if not match or match.end() == position:
-                errors.append("malformed Cache-Control")
-                break
-            name, argument, separator = match.groups()
-            name = name.lower()
-            directives.add(name)
-            if name == "no-store" and argument is not None:
-                errors.append("malformed no-store directive")
-            if name in {"max-age", "s-maxage"} and (
-                argument is None or not re.fullmatch(r'[0-9]+|"[0-9]+"', argument)
-            ):
-                errors.append("malformed cache age directive")
-            position = match.end()
-            if separator and position == len(value):
-                errors.append("malformed Cache-Control")
+        else:
+            for match in re.finditer(HTTP_CACHE_DIRECTIVE, value):
+                name, argument = match.groups()
+                name = name.lower()
+                directives.add(name)
+                if name == "no-store" and argument is not None:
+                    errors.append("malformed no-store directive")
+                if name in {"max-age", "s-maxage"} and (
+                    argument is None
+                    or not re.fullmatch(
+                        rf'{HTTP_DELTA_SECONDS}|"{HTTP_DELTA_SECONDS}"', argument
+                    )
+                ):
+                    errors.append("malformed cache age directive")
     if "vary" in response:
-        members = [part.strip() for part in response["vary"].split(",")]
-        if any(
-            not re.fullmatch(HTTP_TOKEN, member, re.ASCII) for member in members
-        ) or ("*" in members and len(members) != 1):
+        value = response["vary"]
+        if not re.fullmatch(
+            rf"{HTTP_OWS}\*{HTTP_OWS}|{http_list_pattern(HTTP_TOKEN)}", value
+        ):
             errors.append("malformed Vary")
-        vary = {member.lower() for member in members}
+        else:
+            vary = {part.strip(" \t").lower() for part in value.split(",")}
+            if "*" in vary and len(vary) != 1:
+                errors.append("malformed Vary")
     return errors, directives, vary
 
 
