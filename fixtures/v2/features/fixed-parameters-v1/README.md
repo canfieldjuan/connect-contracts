@@ -23,11 +23,12 @@ app could implement a private fixed-parameter dialect or bypass replay rules.
 
 ## Observable behavior
 
-An exact supported request and acknowledgment choose the extended decoder.
-Missing acknowledgment or an unsupported request falls back to the unchanged
-legacy decoder. Every response must have no-store and Vary, preserving any
-existing Vary members. Neither cache order permits response reuse. Rotation
-and mismatch recovery discover the current bundle immediately.
+Decoder, acknowledgment, freshness, legacy compatibility and reuse policy are
+owned by ADR-0013, Negotiated manifest. Exchange fixture context explicitly
+names `producer_conformance` or `consumer_admission`; an omitted role retains
+the original producer-conformance interpretation. This is test metadata,
+not a wire feature or a guess about provider age. The revised consumer vectors
+exercise the accepted PR65 amendment; application behavior is not proven.
 
 Fixed declarations require required=true and their declared primitive type
 and existing request-parameter bounds. Presence preserves empty strings,
@@ -80,3 +81,15 @@ declarations, a later assigned connect-automate owner/pin and accepted app slice
 
 Status: static conformance implemented; independent review/landing and
 application/runtime proof remain pending.
+
+## Accepted legacy compatibility amendment implementation contract
+
+PR65 accepted proposal f08c87d supplies the exact ADR freshness replacement.
+Required surface: exchange context role, one role-aware exchange policy owner,
+separate canonical producer/consumer vectors, direct header boundary and role
+mutation guards. Retain old producer outcomes, fixed-value/request identity
+separation, no cached response reuse and unchanged legacy protocol inventory.
+No application, provider server, persisted request or classifier changes.
+Fail-first consumer role/header regressions precede the implementation; run
+focused feature tests and the documented shared suites. Publish for independent
+review only; no merge authorization or application adoption is implied.
