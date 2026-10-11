@@ -76,11 +76,11 @@ installation history. A feature-aware producer still owes the response-header
 requirements above; failure of that producer's emission conformance does not by itself
 remove compatible legacy capabilities from a direct-read consumer.
 
-List syntax follows the sender/recipient distinction in RFC 9110 section 5.6.1.
-Producer conformance rejects empty list elements. Consumer admission ignores up to
-16 empty elements per present Cache-Control or Vary field; more than 16 rejects.
-Quoted commas are data, not list separators. Nonempty members retain their grammar
-and all freshness requirements above still apply, including negotiated feature Vary.
+The sender/recipient rule table in
+`fixtures/v2/features/fixed-parameters-v1/README.md` owns role-specific list
+and recognized response-directive argument requirements. The oracle reads that
+single table. Nonempty members retain their HTTP grammar, unknown extensions
+remain generic, and all freshness requirements above still apply.
 
 ## Fixed parameter owner
 
