@@ -38,7 +38,7 @@ No current ADR/schema/oracle/fixture mutation, dependency implementation, provid
 
 ## Assumptions and blockers
 
-Operator requires opted-in discovery to retain compatible legacy invoice/certificate capabilities. This is a shared policy proposal responding to that requirement, not unilateral consumer permission. Both owners and shared review must accept exact wording and executable contract vectors before dependency implementation. The new producer/consumer distinction must not be guessed from an unacknowledged wire response. Historical absence of all freshness headers is a synthetic version-skew test, not a verified deployed-build claim.
+Oversight proposed retaining compatible advertised legacy invoice/certificate capabilities during opted-in discovery. Exact-wording operator acceptance of this shared policy is pending. Provider concurrence is review evidence, not that acceptance or unilateral consumer permission. Both owners and shared review must accept exact wording and executable contract vectors before dependency implementation. The new producer/consumer distinction must not be guessed from an unacknowledged wire response. Historical absence of all freshness headers is a synthetic version-skew test, not a verified deployed-build claim.
 
 ## Verification contract and mutation proposal
 
