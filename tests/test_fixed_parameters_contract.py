@@ -22,6 +22,56 @@ def mismatch(vector):
 
 
 class FixedParameterContractTests(unittest.TestCase):
+    def test_consumer_legacy_without_freshness_headers(self):
+        exchange = deepcopy(
+            next(
+                v["input"]
+                for v in VECTORS
+                if v["name"] == "exchange-missing-ack-legacy"
+            )
+        )
+        exchange["validation_role"] = "consumer_admission"
+        exchange["response_headers"] = {}
+        self.assertEqual([], feature.exchange_errors(exchange))
+
+    def test_exchange_roles_and_malformed_freshness_mutations(self):
+        original_exchange = feature.exchange_errors
+        original_freshness = feature.freshness_fields
+
+        def force_role(role):
+            def mutant(exchange, current_manifest=None):
+                exchange = deepcopy(exchange)
+                exchange["validation_role"] = role
+                return original_exchange(exchange, current_manifest)
+
+            return mutant
+
+        def omit_malformed(response):
+            errors, directives, vary = original_freshness(response)
+            return [], directives, vary
+
+        for name, owner, mutant in (
+            (
+                "consumer_as_producer",
+                "exchange_errors",
+                force_role("producer_conformance"),
+            ),
+            (
+                "producer_as_consumer",
+                "exchange_errors",
+                force_role("consumer_admission"),
+            ),
+            ("ignore_malformed_freshness", "freshness_fields", omit_malformed),
+        ):
+            with self.subTest(mutation=name), patch.object(feature, owner, mutant):
+                killed = [
+                    v["name"]
+                    for v in VECTORS
+                    if v["kind"] == "exchange" and mismatch(v)
+                ]
+                MUTATION_KILLS[name] = killed
+                self.assertTrue(killed)
+
     def test_fixed_declaration_schema_accepts_required_value(self):
         manifest = feature.load(feature.ROOT / "fixtures/v2/valid/manifest.json")
         parameter = manifest["capabilities"][0]["parameters"][0]

@@ -34,6 +34,12 @@
     },
     "from_cache": {
       "type": "boolean"
+    },
+    "validation_role": {
+      "enum": [
+        "producer_conformance",
+        "consumer_admission"
+      ]
     }
   }
 }

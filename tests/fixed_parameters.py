@@ -104,6 +104,55 @@ def header_values(headers):
     return normalized
 
 
+HTTP_TOKEN = r"[!#$%&'*+.^_`|~0-9A-Za-z-]+"
+HTTP_ARGUMENT = rf'(?:{HTTP_TOKEN}|"(?:[\x20-\x21\x23-\x5b\x5d-\x7e]|\\[\x20-\x7e])*")'
+
+
+def freshness_fields(response):
+    """Parse present freshness fields once; absence is a role policy decision."""
+    errors, directives, vary = [], set(), set()
+    for field in ("cache-control", "vary"):
+        if field in response and any(
+            ord(c) < 32 and c != "\t" or ord(c) > 126 for c in response[field]
+        ):
+            errors.append("malformed freshness header characters")
+    if "cache-control" in response:
+        value = response["cache-control"]
+        # Match each complete directive, including quoted commas, without
+        # accepting empty members, control characters or unterminated quotes.
+        pattern = re.compile(
+            rf"\s*({HTTP_TOKEN})(?:\s*=\s*({HTTP_ARGUMENT}))?\s*(,|$)", re.ASCII
+        )
+        position = 0
+        if not value:
+            errors.append("malformed Cache-Control")
+        while position < len(value):
+            match = pattern.match(value, position)
+            if not match or match.end() == position:
+                errors.append("malformed Cache-Control")
+                break
+            name, argument, separator = match.groups()
+            name = name.lower()
+            directives.add(name)
+            if name == "no-store" and argument is not None:
+                errors.append("malformed no-store directive")
+            if name in {"max-age", "s-maxage"} and (
+                argument is None or not re.fullmatch(r'[0-9]+|"[0-9]+"', argument)
+            ):
+                errors.append("malformed cache age directive")
+            position = match.end()
+            if separator and position == len(value):
+                errors.append("malformed Cache-Control")
+    if "vary" in response:
+        members = [part.strip() for part in response["vary"].split(",")]
+        if any(
+            not re.fullmatch(HTTP_TOKEN, member, re.ASCII) for member in members
+        ) or ("*" in members and len(members) != 1):
+            errors.append("malformed Vary")
+        vary = {member.lower() for member in members}
+    return errors, directives, vary
+
+
 def exchange_errors(exchange, current_manifest=None):
     errors = schema_errors(FEATURE_BASE + "exchange.schema.json", exchange)
     if errors:
@@ -117,14 +166,19 @@ def exchange_errors(exchange, current_manifest=None):
     if ack is not None and (token != FEATURE or ack != FEATURE):
         errors.append("acknowledgment does not match supported request")
     extended = token == FEATURE and ack == FEATURE
-    if "no-store" not in {
-        part.strip().lower() for part in response.get("cache-control", "").split(",")
-    }:
+    freshness_errors, directives, vary = freshness_fields(response)
+    errors += freshness_errors
+    strict = (
+        exchange.get("validation_role", "producer_conformance")
+        == "producer_conformance"
+        or extended
+    )
+    if (strict or "cache-control" in response) and "no-store" not in directives:
         errors.append("manifest response must forbid storage")
-    vary = {part.strip().lower() for part in response.get("vary", "").split(",")}
-    if HEADER not in vary or not {
-        v.lower() for v in exchange["existing_vary"]
-    }.issubset(vary):
+    if strict and (
+        HEADER not in vary
+        or not {v.lower() for v in exchange["existing_vary"]}.issubset(vary)
+    ):
         errors.append("manifest Vary must include feature and preserve existing fields")
     if exchange["from_cache"]:
         errors.append("manifest response cannot be reused")
