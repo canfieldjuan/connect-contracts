@@ -117,21 +117,44 @@ HTTP_CACHE_DIRECTIVE = rf"({HTTP_TOKEN})(?:=({HTTP_ARGUMENT}))?"
 HTTP_DELTA_SECONDS = r"[0-9]+"
 
 
-def http_list_pattern(member):
-    """Nonempty emitted list grammar; frozen strict contexts reject empty members."""
-    return rf"{HTTP_OWS}(?:{member})(?:{HTTP_OWS},{HTTP_OWS}(?:{member}))*{HTTP_OWS}"
+MAX_EMPTY_LIST_ELEMENTS = 16
 
 
-def freshness_fields(response):
-    """One grammar owner; absence/freshness obligations belong to exchange_errors."""
+def http_list_members(value, member, role):
+    """One list owner counts only separators outside validated quoted members."""
+    pattern = re.compile(
+        rf"{HTTP_OWS}(?P<member>{member})?{HTTP_OWS}(?P<separator>,|\Z)"
+    )
+    position, empty_count, members = 0, 0, []
+    while True:
+        match = pattern.match(value, position)
+        if match is None:
+            raise ValueError("malformed list member")
+        item = match.group("member")
+        if item is None:
+            empty_count += 1
+            if role == "producer_conformance" or empty_count > MAX_EMPTY_LIST_ELEMENTS:
+                raise ValueError("empty list element limit exceeded")
+        else:
+            members.append(item)
+        if not match.group("separator"):
+            return members
+        position = match.end()
+
+
+def freshness_fields(response, role="producer_conformance"):
+    """One grammar owner; freshness obligations belong to exchange_errors."""
     errors, directives, vary = [], set(), set()
     if "cache-control" in response:
-        value = response["cache-control"]
-        if not re.fullmatch(http_list_pattern(HTTP_CACHE_DIRECTIVE), value):
+        try:
+            members = http_list_members(
+                response["cache-control"], HTTP_CACHE_DIRECTIVE, role
+            )
+        except ValueError:
             errors.append("malformed Cache-Control")
         else:
-            for match in re.finditer(HTTP_CACHE_DIRECTIVE, value):
-                name, argument = match.groups()
+            for member in members:
+                name, argument = re.fullmatch(HTTP_CACHE_DIRECTIVE, member).groups()
                 name = name.lower()
                 directives.add(name)
                 if name == "no-store" and argument is not None:
@@ -144,14 +167,13 @@ def freshness_fields(response):
                 ):
                     errors.append("malformed cache age directive")
     if "vary" in response:
-        value = response["vary"]
-        if not re.fullmatch(
-            rf"{HTTP_OWS}\*{HTTP_OWS}|{http_list_pattern(HTTP_TOKEN)}", value
-        ):
+        try:
+            members = http_list_members(response["vary"], HTTP_TOKEN, role)
+        except ValueError:
             errors.append("malformed Vary")
         else:
-            vary = {part.strip(" \t").lower() for part in value.split(",")}
-            if "*" in vary and len(vary) != 1:
+            vary = {member.lower() for member in members}
+            if "*" in vary and len(members) != 1:
                 errors.append("malformed Vary")
     return errors, directives, vary
 
@@ -169,13 +191,10 @@ def exchange_errors(exchange, current_manifest=None):
     if ack is not None and (token != FEATURE or ack != FEATURE):
         errors.append("acknowledgment does not match supported request")
     extended = token == FEATURE and ack == FEATURE
-    freshness_errors, directives, vary = freshness_fields(response)
+    role = exchange.get("validation_role", "producer_conformance")
+    freshness_errors, directives, vary = freshness_fields(response, role)
     errors += freshness_errors
-    strict = (
-        exchange.get("validation_role", "producer_conformance")
-        == "producer_conformance"
-        or extended
-    )
+    strict = role == "producer_conformance" or extended
     if (strict or "cache-control" in response) and "no-store" not in directives:
         errors.append("manifest response must forbid storage")
     if strict and (

@@ -22,6 +22,39 @@ def mismatch(vector):
 
 
 class FixedParameterContractTests(unittest.TestCase):
+    def test_empty_list_role_boundaries(self):
+        for source_name in ("exchange-legacy", "exchange-supported-ack"):
+            source = next(v["input"] for v in VECTORS if v["name"] == source_name)
+            for role in ("producer_conformance", "consumer_admission"):
+                for field in ("Cache-Control", "Vary"):
+                    for empties in (0, 1, 16, 17):
+                        with self.subTest(
+                            source=source_name, role=role, field=field, empties=empties
+                        ):
+                            exchange = deepcopy(source)
+                            exchange["validation_role"] = role
+                            exchange["response_headers"][field] += "," * empties
+                            expected = empties == 0 or (
+                                role == "consumer_admission" and empties <= 16
+                            )
+                            self.assertEqual(
+                                expected, not feature.exchange_errors(exchange)
+                            )
+
+    def test_empty_element_limit_mutations(self):
+        for limit in (0, 17):
+            with (
+                self.subTest(limit=limit),
+                patch.object(feature, "MAX_EMPTY_LIST_ELEMENTS", limit),
+            ):
+                killed = [
+                    v["name"]
+                    for v in VECTORS
+                    if v["kind"] == "exchange" and mismatch(v)
+                ]
+                MUTATION_KILLS[f"empty_element_limit_{limit}"] = killed
+                self.assertTrue(killed)
+
     def test_quoted_header_character_classes(self):
         source = next(v["input"] for v in VECTORS if v["name"] == "exchange-legacy")
         for role in ("producer_conformance", "consumer_admission"):
@@ -105,8 +138,8 @@ class FixedParameterContractTests(unittest.TestCase):
 
             return mutant
 
-        def omit_malformed(response):
-            errors, directives, vary = original_freshness(response)
+        def omit_malformed(response, role="producer_conformance"):
+            errors, directives, vary = original_freshness(response, role)
             return [], directives, vary
 
         for name, owner, mutant in (
