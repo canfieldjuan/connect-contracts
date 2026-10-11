@@ -22,6 +22,69 @@ def mismatch(vector):
 
 
 class FixedParameterContractTests(unittest.TestCase):
+    def test_response_directive_rules(self):
+        source = next(
+            v["input"] for v in VECTORS if v["name"] == "exchange-supported-ack"
+        )
+        for role in ("producer_conformance", "consumer_admission"):
+            for directive in (
+                "must-revalidate",
+                "must-understand",
+                "no-store",
+                "no-transform",
+                "proxy-revalidate",
+                "public",
+            ):
+                for argument, valid in (("", True), ("=x", False)):
+                    with self.subTest(
+                        role=role, directive=directive, argument=argument
+                    ):
+                        e = deepcopy(source)
+                        e["validation_role"] = role
+                        e["response_headers"]["Cache-Control"] = (
+                            "no-store, " + directive + argument
+                        )
+                        self.assertEqual(valid, not feature.exchange_errors(e))
+            for directive in ("max-age", "s-maxage"):
+                e = deepcopy(source)
+                e["validation_role"] = role
+                e["response_headers"]["Cache-Control"] = f'no-store, {directive}="10"'
+                self.assertEqual(
+                    role == "consumer_admission", not feature.exchange_errors(e)
+                )
+
+    def test_table_rows_have_both_role_outcomes(self):
+        for name, rule in feature.freshness_rules().items():
+            for role in ("producer_conformance", "consumer_admission"):
+                with self.subTest(row=name, role=role):
+                    selected = [
+                        v
+                        for v in VECTORS
+                        if v["name"].startswith(rule["vector_prefix"])
+                        and v["input"].get("validation_role") == role
+                    ]
+                    self.assertEqual({False, True}, {v["valid"] for v in selected})
+
+    def test_directive_table_mutations(self):
+        original = feature.freshness_rules()
+        for name in original:
+            if name.endswith("-list"):
+                continue
+            changed = deepcopy(original)
+            changed.pop(name)
+            with (
+                self.subTest(row=name),
+                patch.object(feature, "freshness_rules", return_value=changed),
+            ):
+                killed = [
+                    v["name"]
+                    for v in VECTORS
+                    if v["name"].startswith(original[name]["vector_prefix"])
+                    and mismatch(v)
+                ]
+                self.assertTrue(killed)
+                MUTATION_KILLS[f"missing_directive_{name}"] = killed
+
     def test_empty_list_role_boundaries(self):
         for source_name in ("exchange-legacy", "exchange-supported-ack"):
             source = next(v["input"] for v in VECTORS if v["name"] == source_name)
@@ -43,9 +106,12 @@ class FixedParameterContractTests(unittest.TestCase):
 
     def test_empty_element_limit_mutations(self):
         for limit in (0, 17):
+            changed = deepcopy(feature.freshness_rules())
+            for name in ("Cache-Control-list", "Vary-list"):
+                changed[name]["consumer_admission"] = f"empty-limit:{limit}"
             with (
                 self.subTest(limit=limit),
-                patch.object(feature, "MAX_EMPTY_LIST_ELEMENTS", limit),
+                patch.object(feature, "freshness_rules", return_value=changed),
             ):
                 killed = [
                     v["name"]

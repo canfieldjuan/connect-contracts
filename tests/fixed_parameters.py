@@ -117,14 +117,59 @@ HTTP_CACHE_DIRECTIVE = rf"({HTTP_TOKEN})(?:=({HTTP_ARGUMENT}))?"
 HTTP_DELTA_SECONDS = r"[0-9]+"
 
 
-MAX_EMPTY_LIST_ELEMENTS = 16
+def freshness_rules():
+    text = (FIXTURE_DIR / "README.md").read_text()
+    table = text.split("<!-- freshness-rule-table -->", 1)[1].split(
+        "<!-- /freshness-rule-table -->", 1
+    )[0]
+    rules = {}
+    for line in table.splitlines():
+        if not line.startswith("| "):
+            continue
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if cells[0] in {"Member", "---"}:
+            continue
+        name, sender, recipient, citation, prefix = cells
+        if name in rules:
+            raise ValueError("duplicate freshness policy row")
+        rules[name] = {
+            "producer_conformance": sender,
+            "consumer_admission": recipient,
+            "citation": citation,
+            "vector_prefix": prefix,
+        }
+    return rules
 
 
-def http_list_members(value, member, role):
+def directive_argument_valid(argument, rule, role):
+    if rule == "forbidden":
+        return argument is None
+    if argument is None:
+        return rule.startswith("optional-fields-")
+    quoted = argument.startswith('"')
+    value = re.sub(r"\\(.)", r"\1", argument[1:-1]) if quoted else argument
+    if rule.startswith("required-delta-"):
+        if quoted and rule == "required-delta-token":
+            return False
+        return re.fullmatch(HTTP_DELTA_SECONDS, value) is not None
+    if rule.startswith("optional-fields-"):
+        if not quoted and rule == "optional-fields-quoted":
+            return False
+        if value == "":
+            return True
+        try:
+            return bool(http_list_members(value, HTTP_TOKEN, role, "Vary-list"))
+        except ValueError:
+            return False
+    raise ValueError("unknown directive policy")
+
+
+def http_list_members(value, member, role, field="Cache-Control-list"):
     """One list owner counts only separators outside validated quoted members."""
     pattern = re.compile(
         rf"{HTTP_OWS}(?P<member>{member})?{HTTP_OWS}(?P<separator>,|\Z)"
     )
+    limit = int(freshness_rules()[field][role].removeprefix("empty-limit:"))
     position, empty_count, members = 0, 0, []
     while True:
         match = pattern.match(value, position)
@@ -133,7 +178,7 @@ def http_list_members(value, member, role):
         item = match.group("member")
         if item is None:
             empty_count += 1
-            if role == "producer_conformance" or empty_count > MAX_EMPTY_LIST_ELEMENTS:
+            if empty_count > limit:
                 raise ValueError("empty list element limit exceeded")
         else:
             members.append(item)
@@ -157,18 +202,14 @@ def freshness_fields(response, role="producer_conformance"):
                 name, argument = re.fullmatch(HTTP_CACHE_DIRECTIVE, member).groups()
                 name = name.lower()
                 directives.add(name)
-                if name == "no-store" and argument is not None:
-                    errors.append("malformed no-store directive")
-                if name in {"max-age", "s-maxage"} and (
-                    argument is None
-                    or not re.fullmatch(
-                        rf'{HTTP_DELTA_SECONDS}|"{HTTP_DELTA_SECONDS}"', argument
-                    )
+                rule = freshness_rules().get(name)
+                if rule is not None and not directive_argument_valid(
+                    argument, rule[role], role
                 ):
-                    errors.append("malformed cache age directive")
+                    errors.append("malformed recognized cache directive")
     if "vary" in response:
         try:
-            members = http_list_members(response["vary"], HTTP_TOKEN, role)
+            members = http_list_members(response["vary"], HTTP_TOKEN, role, "Vary-list")
         except ValueError:
             errors.append("malformed Vary")
         else:
