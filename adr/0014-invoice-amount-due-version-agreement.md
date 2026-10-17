@@ -1,7 +1,13 @@
 # ADR-0014: Invoice amount-due capability version agreement
 
-**Status:** Proposed; contract only. Oversight review and operator acceptance
-are pending. This document does not activate a provider or consumer cutover.
+**Status:** Accepted; contract only. Juan: **"Accept (Recommended)"**, relayed
+verbatim by oversight in mail `2caefb53` and [acceptance comment
+6228607997](https://github.com/canfieldjuan/connect-contracts/pull/69#issuecomment-6228607997).
+Accepted text: `694faaa17076fe819653b7b419380b3b6afbe6c5`. The selected option:
+"The agreement is accepted as written; the invoice processor continues its
+offline build, and nothing switches over until the Email Watcher follow-up
+(#278) is also done and tested." This document does not activate a provider
+or consumer cutover. Exact-head oversight review remains a separate merge gate.
 
 **Date:** 2026-10-17
 
