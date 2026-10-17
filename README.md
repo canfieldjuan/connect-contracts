@@ -21,6 +21,7 @@ Current decisions:
 - [ADR-0010: Connect v3 streamed output retrieval](adr/0010-streamed-output-retrieval.md)
 - [ADR-0011: Shared local model runtime](adr/0011-shared-local-model-runtime.md)
 - [ADR-0013: Negotiated fixed compatibility parameters (proposed)](adr/0013-fixed-compatibility-parameters.md)
+- [ADR-0014: Invoice amount-due capability version agreement (proposed)](adr/0014-invoice-amount-due-version-agreement.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
