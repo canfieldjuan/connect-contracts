@@ -25,7 +25,8 @@ The operator authorized this contract-only agreement through oversight, verbatim
 "Go ahead (Recommended)": "IP session drafts the connect-contracts agreement PR
 (contract only); I file the Email Watcher follow-up issue, scheduled after #261.
 Nothing switches over until both are agreed and tested."
-This authorizes drafting, not acceptance of this ADR or implementation elsewhere.
+That initial authorization covered drafting only. The subsequent acceptance is
+recorded in Status above; it does not authorize implementation elsewhere.
 
 ## Existing canonical contract: no schema or registry change needed
 
@@ -52,7 +53,7 @@ entire change. It does not claim that an installed SDK or consumer has passed
 cutover qualification. If a decoder change is discovered, report it to its
 owner; this agreement does not authorize an SDK patch.
 
-## Proposed identity and breaking-change rule
+## Agreed identity and breaking-change rule
 
 | Layer | Identity after the separately gated cutover |
 | --- | --- |
@@ -117,8 +118,8 @@ that runtime proof.
 
 ## Owners, evidence and landing order
 
-1. Review this draft agreement and obtain explicit operator acceptance. Record
-   the accepted exact head; no boundary implementation before acceptance.
+1. Canonical agreement acceptance is recorded in Status above. The remaining
+   consumer and product gates below still apply before boundary cutover.
 2. Email Watcher's owner handles [issue #278][watcher], scheduled after #261:
    visible saved-selection refusal/reselection, retained completed-output
    replay, version-preserving decoder proof and planned-adoption documentation.
@@ -145,9 +146,9 @@ provider or SDK proof. Check relative links and `git diff --check`; verify the
 diff contains only this ADR and the README index. No broad runtime suite is
 justified by text-only changes.
 
-**Gap audit: NOT DONE.** Canonical agreement acceptance, consumer agreement and
-product implementation/qualification are pending. No product is installed,
-promoted or qualified by this proposal.
+**Gap audit: NOT DONE.** Consumer agreement and testing ([Email Watcher
+#278][watcher]) and product implementation/qualification remain pending.
+No product is installed, promoted or qualified by this agreement.
 
 [amount-due]: https://github.com/canfieldjuan/invoice-processor/blob/a48dd72a416841f90ef424c31b8909b890cf4ba0/docs/contracts/AMOUNT-DUE.md
 [unsupported]: ../fixtures/v2/invalid/job-request-unsupported-capability-version.json
