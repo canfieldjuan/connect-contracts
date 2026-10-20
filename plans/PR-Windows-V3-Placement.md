@@ -71,15 +71,29 @@ separate mandatory goal gate.
 
 ## Implementation summary
 
-Pending the separate contract commit. The intended change is an accurate
-Windows placement index; existing v3 behavior remains unchanged.
+The separate contract commit preceded the ADR edit. ADR-0005 now lists v3
+transport and provider placement, explicitly preserves the existing shared v2
+lock, and points to ADR-0010 for the extension's ownership and cleanup rules.
+Eight affected issue bodies/tracking maps were corrected and independently
+read back; states, labels and historical text were preserved.
 
 ## Cold diff audit
 
-Pending the final documentation diff. Every changed statement must map to the
-already-present ADR-0010 extension; any new behavior is outside this contract.
+- ADR-0005 transport and provider-directory entries match ADR-0010's existing
+  version/discovery section. Its new link resolves to that section.
+- The lock paragraph points to ADR-0010 and preserves the v2 namespace even
+  for a v3-only publisher. Entitlement placement and all executable contracts,
+  fixtures, tests, profiles, dependencies and tools are unchanged from the
+  baseline, confirmed by a scoped Git diff.
+- Consequences now identify v3 without promising native implementation.
+- This plan records the correction and verification; it introduces no runtime
+  requirement. Whitespace validation passed.
+- Code tests were not rerun for this documentation-only change. The earlier
+  audit's contract-test results apply to the unchanged baseline artifacts;
+  neither those tests nor this document check prove Windows runtime behavior.
 
 ## Gap audit
 
-NOT DONE: ADR-0005 reconciliation, issue corrections and final diff checks
-remain. The Windows implementation goal is independently NOT DONE.
+NOT DONE: the documentation change and issue corrections are locally verified;
+PR review and merge remain. The Windows implementation goal is independently
+NOT DONE, including native ownership and installed-workflow qualification.
