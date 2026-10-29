@@ -5,7 +5,8 @@ Owner: connect-runtime. Parent: [accepted U1 contract](PR-Shared-Runtime-U1.md).
 This document proposes the missing licensing decision; it does not expand U1's
 symbol/asset allowlist, replace third-party terms, or grant rights in private apps.
 No LICENSE file, public repository, release, visibility change or app EULA is
-created by this documentation PR. The bracketed licensor identity must be resolved.
+created by this documentation PR. Juan identified the licensor/copyright owner as
+Juan Canfield; copyright years and source-specific rights remain to be verified.
 The wording requires legal/rights review and Juan's exact-revision acceptance;
 technical oversight is not legal clearance or assurance of enforceability.
 
@@ -16,7 +17,9 @@ shipping apps, runtime, addons and automations. His coordinating-chat messages
 were inspected at their source: "private licence they will need to pay to use
 the apps" and "Public client source, proprietary terms". The small shared client
 is the public-source exception. Public visibility does not select an open-source
-license, and client build permissions do not confer paid app-use rights.
+license, and client build permissions do not confer paid app-use rights. Juan
+also directly answered the owner-name question: "owner would be Juan Canfield".
+This records his designation, not independent proof of every source right.
 
 U1 requires anonymous source retrieval, clean CI builds and exact vendoring;
 repository visibility alone does not specify the necessary permissions. The
@@ -74,11 +77,33 @@ paid app entitlement is required for the client activity.
 | Redistribute a modified client or embed it in unrelated products/services | Separate written permission required | Only with expressly approved scope | GitHub platform and third-party rights are not narrowed by this row. |
 | Use paid apps for ordinary business work | Governed by separate app license | Governed by separate app terms | Client access/build rights do not supply an entitlement or authorize bypassing checks. |
 
-Designated products for this proposal: Document Summarizer, Email Watcher,
-Invoice Processor, and the Local Connect shared model host. Future addons,
-automations and other products are not silently added; their authorized client
-integration and distribution must be expressly designated without exposing their
-private source. Private shipping apps can still consume the exact client archive.
+### External designated-products record
+
+One licensor-maintained, versioned record owns product designations outside the
+client release. Proposed stable location:
+`https://github.com/canfieldjuan/connect-contracts/blob/main/records/shared-client-designated-products.json`.
+This is a reserved location to establish before adopting the terms, not a claim
+that a record exists there today. The record is not part of the client archive,
+vendored source tree or its file manifest. Terms refer to this stable location;
+adding a product changes only the record and that consumer's permission receipt,
+not the client terms, release hash or existing consumers' client identity.
+
+The record must retain immutable revisions, a schema version, stable product IDs,
+licensor approval and effective dates, and the applicable terms/client release
+scope for each designation. A consumer records the exact record revision/hash
+and relevant entry alongside its qualification evidence. This is permission
+provenance, not a runtime lookup or new app admission policy. Keep prior revisions
+available; additions do not revoke existing designations or force other consumers
+to requalify unchanged client bytes. Withdrawal or changed permissions require
+separate reviewed terms and authority; silently editing history is not allowed.
+
+Proposed initial entries: Document Summarizer, Email Watcher, Invoice Processor,
+and the Local Connect shared model host. These entries still require acceptance;
+this proposal does not create an operative designation. Future addons,
+automations and other products, including Connect Automate packs, require Juan's
+express designation. Product designation does not itself authorize production
+distribution, expose private source or replace separate publisher authorization.
+Private shipping apps can still consume the exact client archive.
 
 ## Proposed notice and terms — draft only
 
@@ -87,7 +112,7 @@ third-party notices. It has no effect while embedded in this proposal.
 
 > **Local Connect Shared Client — Proprietary Source and Build Terms, draft v1**
 >
-> Copyright [VERIFIED YEARS] [LICENSOR LEGAL NAME]. Rights are reserved except
+> Copyright [VERIFIED YEARS] Juan Canfield (the Licensor). Rights are reserved except
 > for the permissions expressly stated here or granted under separate terms.
 >
 > **1. Scope.** These terms cover only the licensor-controlled portions of the
@@ -109,8 +134,13 @@ third-party notices. It has no effect while embedded in this proposal.
 >
 > **3. Designated-product builds.** You may vendor the complete, unmodified,
 > hash-identified Client release in development or CI copies of the designated
-> products listed with these terms, and compile/test those integrations to the
-> extent you independently have permission to use their source. Build caches,
+> products in the Licensor's versioned designated-products record at
+> https://github.com/canfieldjuan/connect-contracts/blob/main/records/shared-client-designated-products.json,
+> and compile/test those integrations to the extent you independently have
+> permission to use their source. The record is maintained separately from this
+> Client release. Retain the applicable record revision and designation as
+> permission evidence; adding a product does not alter this release or its terms.
+> Build caches,
 > logs and Client test artifacts may be retained or shared as necessary for
 > development and review, including public CI. This permission does not authorize
 > publishing product source or distributing production app/host binaries.
@@ -189,16 +219,18 @@ third-party obligations and is not cleared by a client license review.
 
 ## Concrete operator decisions and publication gates
 
-1. Confirm the exact legal licensor/copyright owner and years to replace the
-   bracketed fields; verify employee, contractor and contributor authority for
-   each extracted source origin. A repository username is insufficient evidence.
+1. Recorded owner designation: Juan Canfield, from his direct answer. Verify
+   copyright years and employee, contractor and contributor authority for each
+   extracted source origin. The named owner does not alone prove those rights.
 2. Review the proposed permission matrix and text as a whole: free anonymous
    client development/CI, restricted production distribution, and separate paid
    app rights. No additional broad "public or private" choice is needed.
 3. Resolve contribution/commercial distribution authority and complete legal
    wording, including applicable warranty/liability/termination provisions.
-   Record approved publishers and designated products; do not infer them from
-   repository write access or a PR approval.
+   Record approved publishers separately; establish the external designated-products
+   record at the stable location above, validate its revision/history rules and
+   obtain Juan's acceptance of its initial entries. Do not infer designation or
+   distribution authority from repository write access or a PR approval.
 4. Verify the exact full release's third-party/asset closure and notice bundle,
    then obtain independent review and Juan's exact-revision acceptance of the
    final terms. The current partial candidate inventory is not that full review.
@@ -212,13 +244,24 @@ third-party obligations and is not cleared by a client license review.
 Documentation only. Reused U1 symbol/provenance inventory and inspected pinned
 dependency declarations/notices; did not re-run model/application benchmarks.
 Check relative links and source bindings, proposal-status markers, unresolved
-licensor fields, no implied app/model/host grant, full permission-matrix coverage
+copyright-year field, no implied app/model/host grant, full permission-matrix coverage
 and unchanged source allowlist. No code tests are appropriate for this proposal.
-The sole changed file owns the proposed matrix, draft wording and its review
-gates; no second license owner or active license file is introduced.
+This proposal owns the matrix, draft wording, external-record mechanism and review
+gates. The parent add-an-app checklist references that mechanism; it does not
+duplicate product entries. No active license or designation record is introduced.
+
+Review gap G1 originated in this proposal at `2b42e04`: section 3 enumerated
+products and section 4 referred to products "listed with these terms". Extending
+that list inside a hashed release would change its identity. The proposed origin
+fix replaces that coupling with one external record and adds the missing parent
+checklist step. Boundary check: an approved added product changes the external
+record/consumer receipt only; an undesignated product gains no permission from
+repository access. Existing client bytes, allowlists and transport stay unchanged.
+The previous in-release designation mechanism is removed, not supplemented.
 
 ## Gap audit
 
 NOT DONE: this is a concrete licensing proposal, not an adopted license or public
-release. Exact owner/rights, final legal wording, full third-party clearance,
+release. Source rights/years, external record and initial designations, final legal
+wording, full third-party clearance,
 independent review, exact-revision acceptance and publication authorization remain.
