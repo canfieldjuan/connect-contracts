@@ -1,3 +1,19 @@
+## Acceptance record — 2026-10-29
+
+Juan accepted the exact reviewed work order at
+`7adfab16c2cbb3dbd6766a00100090e9767e0648`, directly in the
+`connect-runtime` session: "I accept".
+Oversight also relayed his decision verbatim: "Accept 81 do the guarded merge yourself";
+oversight clarified that "Accept 81" accepts this revision and the merge phrase
+referred to document-ocr #71, not this PR.
+[Oversight CONTRACT REVIEW PASS](https://github.com/canfieldjuan/connect-contracts/pull/81#issuecomment-6489218149)
+applies to that exact revision. This acceptance record changes no work-order
+requirements. The reviewed body below is retained byte-for-byte as the proposal
+that was accepted; its historical PROPOSED/NOT DONE labels describe that revision.
+Each implementation slice retains its own contract/review gates.
+
+---
+
 # Shared runtime unification work order
 
 Status: PROPOSED, docs only. No implementation or route retirement is accepted.
