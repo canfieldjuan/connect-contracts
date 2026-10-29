@@ -1,3 +1,22 @@
+## Acceptance record — 2026-10-29
+
+Juan accepted this exact reviewed contract at
+`0982a19bf7a6e57ac00bdf39bdb010ae44910013`, directly in the
+`connect-runtime` session: "I accept 82".
+He also directly confirmed the distribution direction:
+"Public client with amended contract is what I want".
+[Oversight CONTRACT REVIEW PASS](https://github.com/canfieldjuan/connect-contracts/pull/82#issuecomment-6502096321)
+applies to that revision; oversight subsequently verified the direct operator
+direction and closed the authority concern.
+
+This record changes no contract requirements. The reviewed body below is
+retained byte-for-byte; its PROPOSED and pending-acceptance labels describe the
+historical proposal now accepted. Extraction and code still follow the
+acceptance-only delta review and guarded contract merge. Publication separately
+requires the operator's license decision and all contracted publication gates.
+
+---
+
 # U1 contract: shared Rust host client and Doc Sum attachment
 
 Status: PROPOSED; no executable work is accepted by this document.
