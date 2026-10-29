@@ -8,6 +8,14 @@ Juan's direct "We can start implementation" advances this slice within the
 parent's gates. This exact slice contract still requires review and acceptance
 before runtime edits. No U2 cutover, live inference or retirement is included.
 
+Operator distribution decision, relayed at 2026-10-29 16:05:06 UTC:
+"Public client with amended contract". This selects a public client and its
+necessary shared primitives, not private CI credentials or publication of the
+host implementation. This amendment is contract-only; no source extraction,
+public repository/release creation, credentials, runtime edits or merge is
+performed or authorized by publishing it. Exact-revision acceptance follows
+independent delta review.
+
 ## Root cause and preserved evidence
 
 Doc Sum's current native runtime couples request preparation with ownership of
@@ -28,23 +36,49 @@ Reuse the parent inventory: canonical profile/runtime/model/template, existing
 301-file source receipt, pre-production evaluation and real corpus manifests.
 Do not rebuild them. The reference input is Doc Sum's native serializer and
 framing, not Invoice's chat payload. Whole-writer quality remains ds-qualify-c9's
-responsibility. Its exact canary and qualified native request receipt are pending
-coordination and are gates for readiness/live proof, not invented fixtures.
+responsibility. Its owner confirms there is NO approved Doc Sum per-instance
+shared-host canary. U1 defines only the interface and fail-closed behavior;
+ds-qualify-c9 proposes the request/expected pair within its 32k qualification
+contract. Neither the C7 thinking diagnostic nor synthesis parity calls qualify.
+
+Preserve the owner's historical receipt alias
+`native-message-boundary-repair-20261007/production/receipt.json`, SHA-256
+`6848dd2dabcd5b60c78052c065227d3e7aac7d680089cf81554b9938c145c520`, source
+`456fa8aa9ee5e677997a3c46132c86e583777326`. These are relayed evidence bindings,
+not a new replay or rehash in this contract amendment. Historical settings were
+cache_prompt=true, n_predict=1500, temperature=0, seed=4294967295 and
+message_delimiters framing. Bind/verify the complete existing receipt before
+parity execution. Raw artifacts stay heldout; elsewhere use aliases and hashes.
+List every U1 runtime/profile/effective-setting difference explicitly. Shared-host
+results must not be labelled as this historical baseline.
 
 ## Delivery and required change surface
 
-Two sequential implementation PRs, separately reviewable, one app per PR:
+Sequential implementation PRs, one owner and one app per PR. Keep the shared
+primitive extraction separate from the new client behavior. If U1b exceeds about
+1,000 changed lines, split native-request extraction/transparency from route and
+snapshot integration; each remains independently reviewable and preserves gates.
 
-**U1a — shared Rust client in local-connect-model-host.** Create the package
-`local-connect-model-client` at `crates/model-client/` and register it as a workspace
-member. It depends on the existing host library's canonical profile and lease
-owners on Linux; no copied lease policy, secondary profile schema or app-private
-client. Changes are limited to root `Cargo.toml`/`Cargo.lock`, the new crate's
-manifest/source/tests and its contract/release documentation. Existing host
-library modules may expose the minimum existing identity/file helpers needed by
-the client, with focused tests at that owner; no host execution/admission changes.
-Extend CI to include the crate's fmt/clippy/tests so workspace defaults cannot
-silently omit it. Record client release/source/artifact/profile hashes.
+**U1a — public primitives, then public Rust client.** The canonical source home
+is a proposed public repository `canfieldjuan/local-connect-model-client`, with
+Rust packages at `crates/model-primitives/` and `crates/model-client/`. This replaces
+the initial plan to depend on the private host package. No repository is created
+by this amendment. Public release/creation needs the accepted boundary, licensing
+clearance and reviewed implementation; never expose private Git history by
+changing host visibility or pushing its branch/history to the public repository.
+
+The private host consumes the exact reviewed shared-primitives release and
+removes the extracted implementations from its former owners. During a staged
+extraction, no consumer release is ready until host and client use the same
+canonical implementation. Vendored release copies are byte-identical distribution
+artifacts, not independently maintained implementations. No app-private forks.
+Host changes are limited to those extraction seams, dependency/lock entries,
+provenance and adjacent regression tests; admission, idle and execution policies
+remain unchanged. The public crates MUST NOT depend on `local-connect-model-host`,
+its workspace, build scripts, private Git/registry sources or private assets.
+
+The public source/asset closure and consumer distribution are defined below;
+that allowlist replaces permission to expose arbitrary host helpers.
 
 **U1b — Doc Sum adapter on the reviewed U1a client revision.** Add
 `src-tauri/src/pipeline/shared_host.rs` and module wiring. Scope of existing
@@ -69,10 +103,108 @@ constructor additions may be needed in existing fixtures in `connect/ocr_consume
 Readers in `lib.rs`, `pipeline/ingest.rs`, and `tests/office_acceptance.rs` are
 verification targets; source discovery does not grant unrelated write scope.
 
-Do not carry a development filesystem path dependency into the app release.
-The Doc Sum dependency pins the reviewed client Git revision or immutable release
-artifact; source/build/artifact/profile bindings form the qualification receipt.
+Consumer manifests use only the complete vendored public release described below;
+no dependency points to a developer checkout, private Git URL or private registry.
 No Python implementation, engine plugin abstraction or proxy service in U1.
+
+## D1 origin, public boundary and distribution
+
+The original contract commit `f3f906e8114bcdd57514fe18d46e7c2260c589e7`
+introduced D1 by making the client depend on the private host crate while leaving
+consumer distribution unspecified. The empty follow-up commit changed no bytes.
+GitHub reports host PRIVATE, Doc Sum and Email Watcher PUBLIC. At host base
+`f97f2da`, Cargo.toml has one `publish=false` package and lib.rs includes profile,
+leases, ELF/runtime files, GPU and process execution. Publishing only a client
+folder would retain that private dependency. Doc Sum's pinned
+[public CI](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/.github/workflows/rust.yml)
+runs locked Cargo tests/clippy and platform release builds. This amendment fixes
+the dependency owner, not CI by adding credentials.
+
+### Complete allowed public source and asset closure
+
+This is a symbol-level extraction allowlist, not permission to export entire
+private source files. Public module names below are planned locations under the
+new repository; each extracted symbol records its original file/revision/hash.
+Any required source/asset outside this list stops extraction for Juan's explicit
+boundary decision. Never broaden it implicitly to make a build pass.
+
+| Public unit | Allowed contents / source seam | Required private remainder |
+|---|---|---|
+| `crates/model-primitives/src/profile.rs` | Pure canonical profile decoding, hash identity, data structs and read-only tier metadata/accessors from host `src/profile.rs`; no alternative profile policy. | `Tier::prepare_runtime`, `RuntimeSet::prepare`, `PreparedRuntime`, descriptor sealing and executable/library preparation remain host-owned. Host uses the shared parsed metadata through a private preparation function. |
+| `crates/model-primitives/src/files.rs` | Generic no-follow absolute/component traversal (`open_regular`, `open_private_directory`, its owner-directory helper, `open_absolute`, `walk`, `open_at`) and bounded size/hash reading from `src/files.rs`. Hash/copy has an explicit per-read budget callback; host passes its existing check at the same read boundary. | Model/store runtime admission, memfd sealing, `VerifiedRuntime`, library-directory construction and thread-local `AdmissionBudget` remain private. Do not drop or duplicate host cancellation/deadline checks while separating hashing. |
+| `crates/model-primitives/src/lease.rs` | Registration-directory admission, safe lock opening, low-level flock/unlock and client shared-lease acquisition/RAII (`RegistrationDirectory::open/lock_file/acquire_client`, `ClientLease`, CLIENT_WAIT) from `src/coordination.rs`. Host election consumes these helpers rather than keeping copies. | `try_elect` orchestration, `HostLease`, `IdleWindow`, `HostedServer`, `HostEvent`, idle grace/probe policy, shutdown and server spawn remain private. |
+| `crates/model-primitives/src/identity.rs` and `wire.rs` | Read-only process/boot identity (`Process`, `Identity`, `process`, `boot`) and server/failure wire data types from `src/host.rs`, matched to public schemas. | Record mutation/cleanup, logs and failure-tail collection, signal handling, health/probe execution and `run_host` remain private. |
+| `crates/model-primitives/src/start_request.rs` | `HostConfig` path/profile/start-id validation and argument encoding only. | Host startup composition, GPU selection and server execution remain private. |
+| `crates/model-client/src/start.rs` | The existing `launch_transient` client-side service invocation only, adapted to shared request/lease types. It requests the separately installed host service; it does not implement or bundle that service. | No `probe_entry`, `probe_store`, `run_host`, executable main, GPU/device code or runtime loader. Private callers needing the same launch helper consume the canonical client helper without a dependency cycle. |
+| `crates/model-client/src/{lib,attach,transport,canary,error}.rs` | New ADR-0011 attach/readiness, verified Unix HTTP transport, canary interface and client errors; no business payloads. | No Invoice implementation extraction here, app validators, prompts, business actions or installed configuration. |
+| `crates/model-primitives/src/{lib,error}.rs` | Module exports and common I/O/profile/integrity/lease error subset only; private host errors map at its adapter. | Runtime/GPU/supervision error internals stay private. |
+| Public profile/wire assets | Exact bytes from public connect-contracts `runtime/v1/profile.json` and `schemas/runtime/v1/{profile,server,failure}.schema.json`, with origin pins and hashes. Package them under `crates/model-primitives/assets/`; include paths remain within the release. | No runtime binaries, shared libraries, model weights, private host checkout/vendor tree, keys, local records or logs. |
+| Package/build/release closure | Root and crate Cargo manifests, lockfile, README, LICENSE/NOTICE, provenance and release manifests, public CI workflow, release verifier script, and sanitized client/primitives unit tests and synthetic local-socket fixtures. Every path/byte is listed in the release manifest. | No private fixture corpus, test helper that spawns a private host executable, hidden workspace dependency or build-time download/generated input from private source. |
+
+`src/{gpu,elf,process,model}.rs` and executable host supervision are excluded in
+full. Private file names above are provenance pointers only. No model/runtime
+artifact is made public through this client decision. The full exported set is
+reviewed before publication, including test/build dependencies, all features and
+all supported target graphs. A directory-only copy or a cargo-package listing
+without its dependency/assets closure is insufficient.
+
+### Distribution for each consumer
+
+The canonical public repository publishes a reviewed source archive containing
+the complete Rust client/primitives workspace, license/provenance, lockfile and
+assets. It is pinned by immutable public source commit plus archive SHA-256 and
+per-file manifest. Tags/URLs alone are insufficient. Release creation is a later
+reviewed action; no placeholder download may be presented as an available release.
+
+| Consumer | Required distribution and build rule |
+|---|---|
+| Doc Sum (public, U1b) | Vendor the complete reviewed Rust release at `src-tauri/vendor/local-connect-model-client/`; use repository-relative path dependencies into it, with committed Cargo.lock. CI verifies the entire vendor tree, including extra/missing files, against the pinned public release. No developer absolute path or private fetch. |
+| Private model host (U1a integration) | Vendor the same shared-primitives release under `vendor/local-connect-model-client/`; compile those exact canonical bytes and remove former duplicate owners. If its service-launch helper is used, consume the canonical client module too. The dependency direction is private host to public primitives/client, never the reverse. |
+| Email Watcher (public, U3) | Vendor the complete future public Python client source release at `vendor/local-connect-model-client-python/`, with hash/provenance and a locally built/importable package pinned by its existing dependency lock mechanism. Its release must include its entire public source/assets closure and no dependency on private Invoice/host code. U3 defines the Python extraction in its own accepted contract; no Python code is exported by U1. |
+| Invoice (U4) | Adopt that same reviewed Python release with byte-equality and transport-transparency proof. A local host-sidecar build pin is not evidence that the public client is distributable. |
+| Future apps/automation packs | Consume the matching immutable public language release through the parent checklist and their own qualification; no per-app edits to vendored client code. |
+
+### Licensing, provenance and clean public build gate
+
+No tracked LICENSE/COPYING/NOTICE file was found at the inspected host, Doc Sum
+or Invoice source pins. Public repository visibility is not a license grant.
+Before publishing extracted code, record rights/attribution for each origin,
+obtain the operator's license decision, retain notices and verify dependency/asset
+license compatibility. Do not claim exclusive ownership of inherited code or
+invent a license. License clearance blocks publication, not this contract review.
+
+The extraction receipt records original commit/symbol spans and content hashes,
+new canonical public commit, package versions, exact public asset origins/hashes,
+license identifiers/notices, archive SHA-256, file manifest, dependency graph and
+artifact hashes. Private ancestry is referenced only by approved provenance;
+it is never copied into the public Git history. All consumers verify identical
+release bytes, and fixes go to the canonical source before a new pinned release.
+
+Before U1 client or consumer-build readiness, run fresh public-consumer CI at the
+exact release pin, with no private credentials, SSH agent, credential helper,
+private registry config, pre-populated private Cargo cache or local host checkout.
+Checkout must not persist credentials; release/dependency fetch and build steps
+must succeed without repository tokens. Fetch only public sources. Record the
+resolved normal/dev/build/target dependency graph and reject private URLs,
+workspace escapes or undeclared generated inputs. A private Linux-only dependency
+is still a failure even if another target happens to compile without it.
+
+Prove: public release download/hash/complete vendor equality; standalone client
+and primitives locked tests/build; then Doc Sum's required locked test/clippy and
+normal release build at its exact consumer revision on supported CI platforms.
+Run the analogous public Email build gate when U3 supplies Python. Include
+negative verifier probes for a modified source or asset, missing/extra file and
+a disguised private dependency, plus a valid pristine release. Record cold-cache
+CI evidence and output artifact hashes; a developer's authenticated build is not
+substitute proof. No model/GPU or production service is needed for these gates.
+
+This gate proves public source/client and consumer builds, not host installation
+or model readiness. A release build must not secretly fetch a private host
+sidecar: keep the prepared/installed-host precondition explicit until a separately
+authorized host artifact/setup distribution is bound. If packaging cannot build
+without exposing another host asset, stop for Juan's decision; neither publish
+that asset nor inject credentials. No full app/runtime rollout claim until the
+host delivery and real consumer qualification gates are separately satisfied.
 
 ## Shared client and transport invariants
 
@@ -82,7 +214,19 @@ paths, canary payload/expected result, scheduling, prompts and task validation.
 Reuse ADR-0011 deadlines and file/identity rules. Never terminate or replace a
 foreign-profile host, and never terminate the shared server on app Drop/error.
 Hold the lease while model work is queued/active; close only the client's own
-handles when work ends. A failed canary never grants document readiness.
+handles when work ends. This differs from keeping an app-private model resident:
+with no other leases, current host idle grace is 10 seconds with a 2-second probe
+interval (`coordination.rs:15-17`), so idle reclamation is approximately 10–12
+seconds, not an inference measurement. The next job may pay model reload cost;
+U2 must measure cold attach/model load/canary separately from warm requests.
+Do not change idle policy or hold a dummy lease to hide that cost.
+
+The canary interface runs after verified profile/instance attachment and before
+any document request. Its persisted binding includes consumer/client/profile,
+canary request/expected-result identity and server PID/start time/boot identity.
+Missing approved pair, mismatch, failed or interrupted canary never grants
+readiness. Test-only synthetic callbacks are labelled as such; the approved
+request/expected pair remains a separate ds-qualify-c9 qualification decision.
 
 Use the actual connected Unix descriptor for the peer check. The proposed seam
 is `tokio::net::UnixStream`, peer credentials plus registered process start/boot
@@ -100,8 +244,9 @@ These dependency versions already occur in Doc Sum's pinned Cargo.lock: hyper
 Adding the necessary direct client dependencies/features is an explicit source
 manifest/lock change for this slice, not authorization to install/upgrade the
 host environment. Reuse locked versions; review any newly resolved transitive
-changes before implementation proceeds. The host crate's Linux dependency is
-platform-gated. Existing Windows routes must still build; this does not implement
+changes before implementation proceeds. Only the public primitives' Unix/Linux
+code is platform-gated; no target may depend on the private host crate. Existing
+Windows routes must still build; this does not implement
 or claim ADR-0012 Windows shared-host support.
 
 ## Immutable snapshot and selection contract
@@ -196,8 +341,11 @@ and parser work. Open #116/#126 overlap the seven runtime files; held #154/#155
 overlap Cargo.toml/lock. Whichever lands second rebases, with conflicts resolved
 through oversight and no silent deletion of the other owner's work.
 
-Before code: exact U1 review/acceptance and confirmed host-client integration
-base. Before app attachment readiness/live qualification: reviewed U1a release,
+Before code: exact amended U1 review/acceptance and confirmed host-client
+integration base. Before public source/release publication: explicit boundary and
+license clearance and reviewed extraction. Publish only a reviewed candidate at
+that gate; clean unauthenticated public CI then proves readiness before consumer
+adoption. Before app attachment readiness/live qualification: reviewed U1a release,
 Doc Sum canary request/expected result and native request receipt, exact artifact
 pins and prepared-store/sidecar binding. Those values must come from the existing
 qualification owner or an explicitly accepted new qualification; no placeholder
@@ -205,10 +353,13 @@ canary can be labelled qualified. No current blocker authorizes a scope expansio
 
 ## Implementation summary, cold diff audit and gap audit
 
-This PR adds only this proposed U1 contract. No runtime/client code, dependencies,
+This PR changes only this proposed U1 contract, including the public-client
+distribution amendment addressing D1 at its originating dependency boundary.
+No runtime/client code, dependencies,
 application settings, model files, test inputs or services change. Validate source
 citations and docs-only diff; no application/model tests are needed for prose.
 
-NOT DONE: exact-contract review/acceptance, implementation, release binding,
+NOT DONE: exact amended-contract review/acceptance, license/publication clearance,
+implementation, clean unauthenticated builds, release binding,
 canary readiness, application qualification and cutover. Parent PR81 is merged;
 that does not mark these U1 gates complete.
