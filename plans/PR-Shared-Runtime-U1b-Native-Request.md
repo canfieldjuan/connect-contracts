@@ -1,3 +1,24 @@
+# Acceptance record — U1b native framing prerequisite
+
+Juan accepted the exact reviewed revision on 2026-10-30:
+> accept 85 at c0e7ef6
+
+- Accepted revision: `c0e7ef632aae284626138c3883fbd9244bf375f0`.
+- Accepted file: `plans/PR-Shared-Runtime-U1b-Native-Request.md`.
+- Accepted body SHA-256: `2f2a0e46e3b3395ed49fc6fcfcfdcbd027d98f4801fb24a8a3886e0670fbb198`.
+- Authority provenance: Juan's verbatim decision relayed by oversight in mailbox
+  message `64f5374a` at `2026-10-30T21:53:09+00:00`.
+- Independent contract review: [oversight PASS](https://github.com/canfieldjuan/connect-contracts/pull/85#issuecomment-6534048852).
+
+This is an acceptance-only record. The accepted body below is retained
+byte-for-byte, including its historical proposed status and pending gates.
+Acceptance applies to the named revision, not to later revisions. This record
+performs no implementation or merge; acceptance-delta review and guarded merge
+remain separate steps. All qualification and live-dispatch gates in the body
+remain in force.
+
+---
+
 # U1b first implementation slice: main-based native framing prerequisite
 
 Status: PROPOSED, contract-only; no implementation or model dispatch authorized
