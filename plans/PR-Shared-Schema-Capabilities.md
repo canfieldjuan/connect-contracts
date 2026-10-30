@@ -117,9 +117,48 @@ implicitly included or declared equivalent. File references below are under
 |---|---|---|
 | Coherent synthesis: [summary/coherent.rs:6659](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary/coherent.rs#L6659), `prompt_and_schema_for_version`; `parse_response_with_limits` at6782 | `units` min/max; text minLength/maxLength; source-ID enum, min/maxItems and uniqueItems. Parser checks counts, canonical bounded text, known IDs and within-unit uniqueness at6791-6853. | Existing consumer for bounded strings/arrays, enums, closed objects and uniqueness. These are not new pattern/date requirements. Capture exact schema and projected bytes separately. |
 | Long source selection: [summary/coherent.rs:3506](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary/coherent.rs#L3506), `source_selection_prompt_and_schema`; result checks at3825-3870 | Each array has exact count, ID enum and uniqueItems; parser also rejects repeated IDs across different role arrays. | Within-array uniqueness is schema-expressible and already declared. Cross-array disjointness is a separate relational rule; do not pretend ordinary uniqueItems enforces it or replace the named semantic owner. |
-| Text admission: [summary.rs:5195](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary.rs#L5195), `canonical_bounded_text`, called at coherent.rs:6805 | Requires nonempty text, `trim() == value`, and a character ceiling. Schema already has nonempty/length bounds but not the leading/trailing whitespace constraint. | Concrete schema-expressible gap to investigate. Before selecting pattern support, prove identical Rust Unicode-whitespace semantics in schema validation and pinned decoding, including sibling length constraints; do not substitute an ASCII approximation or alter request bytes during the parity port. |
-| Native request path: [model.rs:1403](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/model.rs#L1403), `response_format` / `decoder_compatible_schema` at1435; [llama_cpp.rs:737](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/llama_cpp.rs#L737) | Projection removes uniqueItems and maxLength above MAX_DECODER_STRING_LENGTH (1536); current coherent text ceiling is1200, so that particular ceiling remains. | Confirmed lossy projection at one existing owner. Record behavior and proof before a correction; do not change it implicitly while extracting native requests. Comments about unsupported decoder behavior are hypotheses until converter qualification reproduces them. |
+| Text admission: [summary.rs:5195](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary.rs#L5195), `canonical_bounded_text`; exhaustive caller table below | Requires nonempty text, `trim() == value`, and a character ceiling. Schema already has nonempty/length bounds but not the leading/trailing whitespace constraint. | Concrete schema-expressible gap to investigate. Before selecting pattern support, prove identical Rust Unicode-whitespace semantics in schema validation and pinned decoding, including sibling length constraints; do not substitute an ASCII approximation or alter request bytes during the parity port. |
+| Native and gateway request paths: [model.rs:1403](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/model.rs#L1403), `response_format` / `decoder_compatible_schema` at1435; gateway `request_core` also calls this owner at `gateway_client.rs:707`; [llama_cpp.rs:737](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/llama_cpp.rs#L737) | Projection removes uniqueItems and maxLength above MAX_DECODER_STRING_LENGTH (1536); current coherent text ceiling is1200, so that particular ceiling remains. | Confirmed lossy projection at one existing owner. Both transports consume this one projection owner. Native U1b parity follows the native route; gateway history is separately inventoried, not silently substituted. Record behavior and proof before a correction; do not change it implicitly while extracting native requests. Comments about unsupported decoder behavior are hypotheses until converter qualification reproduces them. |
 | Analysis / verification: [summary.rs:2287](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary.rs#L2287), `analysis_output_schema` / `verification_output_schema` | Bounded collections, supplied-ID enums, bounded claim text, closed objects and verdict enum. | Include unchanged in the request inventory. No date format consumer is established. Historical synthesis in `summary/legacy_generation.rs` is cfg(test) at summary.rs:34-35 and must not be counted as an active production requirement. |
+
+### Complete caller inventory for the existing text owner
+
+This table replaces the initial single-call example introduced in `b42149c`.
+It records every `canonical_bounded_text` call in tracked pipeline Rust source
+at the inspected revision. A call on app-owned source or assembled text is not
+by itself demand to constrain a new model output field. The predicate remains
+one owner at `summary.rs:5195`; this contract introduces no second validator.
+All paths below are relative to `src-tauri/src/pipeline/` at the revision above.
+
+| Call site | Value / field | Role and schema consequence |
+|---|---|---|
+| `summary.rs:3402` | `candidate.exact_quote` | source/catalog admission; not generated text |
+| `summary.rs:3469` | `raw_item.claim_text` | model evidence[].claim_text; schema min/maxLength, whitespace absent |
+| `summary.rs:4049` | `evidence.claim_text` | persisted/versioned analysis validation; model-derived claim |
+| `summary.rs:4070` | `evidence.exact_quote` | persisted source quotation; catalog/provenance validation |
+| `summary.rs:4844` | `claim.text` | assembled/persisted summary claim; shared downstream validator |
+| `summary.rs:5472` | `quote` | cfg(test) fixture_model_output; not production |
+| `summary/coherent.rs:5373` | `claim.text` | app-added clause-reference suffix; assembly check |
+| `summary/coherent.rs:6805` | `unit.text` | model units[].text; min/maxLength declared, whitespace absent |
+| `summary/coherent.rs:7205` | `unit.text` | same model field during clipped-unit recovery; not a new schema |
+| `summary/coherent/trim.rs:56` | `retained` | derived prefix of unit text; deterministic recovery, not independent model field |
+| `summary/pages.rs:222` | `mid_word` | test completeness_and_length_boundaries_are_independent |
+| `summary/legacy_generation.rs:1017` | `raw_claim.text` | cfg(test) legacy claims[].text |
+| `summary/legacy_generation.rs:1123` | `candidate.text` | cfg(test) legacy candidate.text |
+| `summary/legacy_generation.rs:1149` | `raw_claim.text` | cfg(test) legacy claims[].text |
+
+Source verification corrects two classifications in the review's examples:
+`summary.rs:5472` is inside `#[cfg(test)] fixture_model_output`; `pages.rs:222`
+is a test assertion. They are retained in the inventory, not counted as new
+production schema demand. Existing historical generation calls are likewise
+test-only. Count/length/whitespace expression work must distinguish current
+model fields, historical restoration and deterministic app assembly.
+
+The projection's external callers are `model.rs:1432` (`response_format`, used
+by native and direct-model paths) and `gateway_client.rs:707` (`request_core`).
+Recursive calls within `decoder_compatible_schema` are its traversal, not
+independent policy owners. U1b preserves both old-route behavior and native
+request bytes; no gateway edit is granted by listing its reader here.
 
 This is an initial source inventory, **not** a full app or SC-A PASS. Semantic
 completion, source support, attribution, cross-array identity, relation and
