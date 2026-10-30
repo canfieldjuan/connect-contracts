@@ -191,6 +191,12 @@ attachment tests and real request/scoring evidence as the regression guard.
 
 Adding an app or Connect Automate pack requires all of the following:
 
+- Record the licensor's express product designation in the versioned external
+  designated-products record defined by the [proposed client terms](PR-Shared-Client-Proprietary-Terms.md#external-designated-products-record),
+  once those terms and that record are accepted. Bind its revision/hash and entry
+  in that consumer's permission evidence; do not edit the immutable client release
+  or other consumers' client pins to add a product. This proposed checklist
+  amendment grants no designation or distribution authorization by itself.
 - Depend on the released shared client for its language and vendor the exact
   profile by hash; verify the registration and instance rather than discovering
   or selecting another engine. A new language requires a separately accepted
