@@ -96,42 +96,59 @@ with a schema identity and conformance proof. No alphabetical reserialization
 or other request-byte change is bundled with capability adoption. An inherited
 serialization difference is inventoried and qualified separately, not hidden.
 
-## First capability increment
+## Consumer-led increment: Doc Sum with U1b
 
-The first increment is deliberately bounded: existing admitted app schemas,
-plus **candidate** support for `format: date` and bounded fixed-token patterns.
-Neither extension is enabled by this proposal; each must pass the gates below.
+The first increment is the schema behavior needed by **U1b, Doc Sum on the
+shared host**. No format or general fixed-token pattern extension is selected.
+The original draft proposed candidates without a demonstrated consumer; that
+scope error originated in `19530021cc6b40e6f7f83b11cf43500a79b8358b` and is removed
+here rather than covered by another admission rule. Date-checker observations
+above remain evidence of a latent risk, not a feature backlog or current app bug.
 
-- Date means an ISO full-date string, asserted with the schema validator's real
-  calendar checker. The backend can constrain lexical structure while the same
-  authoritative schema validates calendar semantics before an answer is accepted.
-  The coverage receipt must name this split; it must never claim that impossible
-  calendar dates cannot be generated. No parallel date regex is added.
-- Other formats, including `date-time`, are unsupported in this increment.
-  Adding one requires a checker availability/semantics proof and backend coverage
-  qualification, not just another allowlist entry or an optional package assumed
-  to exist. This restriction concerns the new profile, not removal of behavior
-  from an existing app route.
-- Patterns remain JSON Schema `pattern` constraints. Candidate syntax is bounded
-  ASCII fixed-token language: anchored concatenations of literal letters/digits,
-  hyphen/underscore and finite ASCII character classes with finite repetition.
-  No backreferences, lookarounds, nested repetition, unbounded quantifiers or
-  external regex check duplicating the schema. The implementation contract must
-  fix exact grammar and limits from the reused app inventory before enabling it;
-  this proposal does not claim arbitrary ECMAScript/Python/GBNF equivalence.
-- Pattern/format combined with length or other assertions must satisfy **all**
-  assertions. For this runtime, such combinations remain unsupported unless a
-  conversion proof establishes their conjunction; warning-only fallback is a
-  refusal. Full post-generation validation alone does not justify knowingly
-  dropping a constraint the decoder could enforce through a proven lowering.
-- Exact JSON parsing, duplicate-key refusal, finite/exact numeric handling,
-  nesting/size caps and existing failure classifications must survive unchanged.
-  Do not route Decimal values through binary floating point to add validation.
+### SC-A initial Doc Sum inventory
 
-A real validator/compiler is preferred over ad hoc schema or regex inspection.
-The current Rust candidate has no validator. Selecting a new dependency or
-adding a parser is a separately justified implementation-contract decision;
-there is no permission here to install one or hand-roll a partial validator.
+Inspected remote main is `7911f4375772fbc2e6c063a4e4a82aea7d638751`, independently
+confirmed against the remote. The primary dirty checkout remains `a19639a`; it
+was not edited. Qualification branches are separate revisions and are not
+implicitly included or declared equivalent. File references below are under
+`src-tauri/src/pipeline/` at that exact remote-main revision.
+
+| Current consumer / source | Current schema and out-of-schema check | Consequence for U1b and subsequent capability work |
+|---|---|---|
+| Coherent synthesis: [summary/coherent.rs:6659](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary/coherent.rs#L6659), `prompt_and_schema_for_version`; `parse_response_with_limits` at6782 | `units` min/max; text minLength/maxLength; source-ID enum, min/maxItems and uniqueItems. Parser checks counts, canonical bounded text, known IDs and within-unit uniqueness at6791-6853. | Existing consumer for bounded strings/arrays, enums, closed objects and uniqueness. These are not new pattern/date requirements. Capture exact schema and projected bytes separately. |
+| Long source selection: [summary/coherent.rs:3506](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary/coherent.rs#L3506), `source_selection_prompt_and_schema`; result checks at3825-3870 | Each array has exact count, ID enum and uniqueItems; parser also rejects repeated IDs across different role arrays. | Within-array uniqueness is schema-expressible and already declared. Cross-array disjointness is a separate relational rule; do not pretend ordinary uniqueItems enforces it or replace the named semantic owner. |
+| Text admission: [summary.rs:5195](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary.rs#L5195), `canonical_bounded_text`, called at coherent.rs:6805 | Requires nonempty text, `trim() == value`, and a character ceiling. Schema already has nonempty/length bounds but not the leading/trailing whitespace constraint. | Concrete schema-expressible gap to investigate. Before selecting pattern support, prove identical Rust Unicode-whitespace semantics in schema validation and pinned decoding, including sibling length constraints; do not substitute an ASCII approximation or alter request bytes during the parity port. |
+| Native request path: [model.rs:1403](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/model.rs#L1403), `response_format` / `decoder_compatible_schema` at1435; [llama_cpp.rs:737](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/llama_cpp.rs#L737) | Projection removes uniqueItems and maxLength above MAX_DECODER_STRING_LENGTH (1536); current coherent text ceiling is1200, so that particular ceiling remains. | Confirmed lossy projection at one existing owner. Record behavior and proof before a correction; do not change it implicitly while extracting native requests. Comments about unsupported decoder behavior are hypotheses until converter qualification reproduces them. |
+| Analysis / verification: [summary.rs:2287](https://github.com/canfieldjuan/document-summarizer/blob/7911f4375772fbc2e6c063a4e4a82aea7d638751/src-tauri/src/pipeline/summary.rs#L2287), `analysis_output_schema` / `verification_output_schema` | Bounded collections, supplied-ID enums, bounded claim text, closed objects and verdict enum. | Include unchanged in the request inventory. No date format consumer is established. Historical synthesis in `summary/legacy_generation.rs` is cfg(test) at summary.rs:34-35 and must not be counted as an active production requirement. |
+
+This is an initial source inventory, **not** a full app or SC-A PASS. Semantic
+completion, source support, attribution, cross-array identity, relation and
+provenance checks remain app-owned; JSON validity is no substitute for them.
+Every later app must receive the same inventory of current out-of-schema checks
+before its increment. Do not build speculative capabilities for Email or Invoice.
+
+### Boundary and delivery rules
+
+- Preserve the current admitted task schemas and request bytes for U1b parity.
+  Document inherited conversion losses explicitly; preserving them for a port is
+  not certifying complete schema enforcement or approving their permanent use.
+- Add a capability only for an inventoried consumer after a separate accepted
+  correction contract. `format: date`, `date-time` and the former generic
+  fixed-token pattern candidate are removed from the increment. Unknown names
+  still fail closed; no new format checker dependency is justified by this slice.
+- Constraints stay in the authoritative schema. Any proposed whitespace pattern
+  must compose with lengths and match existing Unicode semantics; otherwise its
+  implementation gate stays unresolved. No parallel regex or blanket ASCII rule.
+- Warning-only conversion fallback cannot qualify as enforcement. Capture the
+  actual original/projected schema and per-constraint decoder coverage; do not
+  label discarded constraints as semantics-preserving lowering.
+- Preserve exact JSON/numeric handling, resource limits, typed failures and app
+  validation during the port. The current Rust client has no schema validator;
+  selecting a new dependency still requires a separately justified contract.
+- Pace this work with U1b. Stop unrelated U1a extraction; remaining client attach,
+  transport and canary work is included only as the real Doc Sum path needs it.
+  Schema corrections are not permission to expand U1b's accepted no-behavior-
+  change surface. Doc Sum's 32k qualification remains with ds-qualify-c9.
 
 ## Full output admission and failure behavior
 
@@ -161,9 +178,10 @@ joint source-backed date interpretation remain owned by `resolve_document_dates`
 and its pipeline caller. A structurally valid extraction is not proof that the
 correct issue date, amount or provenance was selected.
 
-Planned differences are explicit: a new capability identity; format assertion
-only for schemas that actually declare supported formats; fail-closed conversion
-coverage; and successful-result provenance binding. No existing app schema is
+Any later adopted capability increment must list its differences explicitly:
+a capability identity, qualified conversion coverage and successful-result
+provenance binding are proposed boundaries, not changes bundled into U1b. No
+format assertion or pattern language is selected without inventoried demand. No existing app schema is
 changed in this slice. Before adoption, inventory every additional serializer,
 request, validation, error or cache difference and obtain acceptance where behavior
 changes. The existing pre-production/corpus manifests and validators remain the
@@ -171,9 +189,11 @@ parity specification; do not replace them with these synthetic boundary probes.
 
 ## Verification and bounded delivery
 
-**SC-A — contract and offline qualification:** freeze capability data and vectors,
-exact app schema/request inventory, limits, converter/validator receipts and error
-mapping. Reuse current fixtures and the existing source-binding/corpus manifests.
+**SC-A — consumer inventory and offline qualification:** start with Doc Sum
+for U1b. Inventory each active schema and current out-of-schema check, classify
+what the schema can express versus app-owned relational/semantic checks, and
+select only demonstrated demand. Then freeze exact schema/request bytes, limits,
+converter/validator receipts and error mapping. Reuse current fixtures and the existing source-binding/corpus manifests.
 Run existing validator and converter without generation where possible. The
 current packet proves only the boundary observations above; it is not SC-A PASS.
 
@@ -210,8 +230,9 @@ Durable synthetic packet alias: `schema-capability-contract-20261030`.
 The publication-safe report records their SHA-256s; no private corpus content,
 credentials or real application outputs are included.
 
-Remaining gates: independent contract review; exact operator acceptance; actual
-app schema inventory for SC-A (reuse existing receipts); explicit pattern grammar
-and budgets; selected Rust validation mechanism; converter execution proof;
+Remaining gates: independent contract review; exact operator acceptance;
+complete Doc Sum schema/request/check inventory for SC-A (reuse existing receipts);
+Unicode whitespace and uniqueness coverage proof where demanded; selected Rust
+validation mechanism only if needed for the bounded accepted correction; converter execution proof;
 then separately authorized implementation and app parity. No production service,
 profile, dependency, runtime or model changed during this contract investigation.
