@@ -1,3 +1,22 @@
+## Acceptance record — 2026-10-29
+
+Juan accepted this exact reviewed proposal at
+`9383a9cce110739b727c2d4eaabb36196869ddfd` with the direct reply "i accept"
+in the coordinating chat, after the acceptance request explicitly named that
+revision and its scope. The reply was independently read at its source.
+[Oversight delta CONTRACT REVIEW PASS](https://github.com/canfieldjuan/connect-contracts/pull/83#issuecomment-6510877794)
+applies to that revision.
+
+Acceptance covers this licensing proposal and its amendment to the parent
+add-an-app checklist. It does not adopt an operative license, create initial
+product designations, publish source, change repository visibility, authorize
+live inference or install anything. The reviewed proposal body below and the
+parent checklist are unchanged by this acceptance record. Remaining rights,
+final-wording and publication gates still apply. Historical proposal and pending
+acceptance labels in the preserved body do not supersede this scoped acceptance.
+
+---
+
 # U1 client: proposed proprietary source and build permissions
 
 Status: PROPOSAL FOR REVIEW, not an operative license or permission to publish.
