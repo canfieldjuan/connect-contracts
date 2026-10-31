@@ -1,3 +1,23 @@
+## Acceptance record — 2026-10-30
+
+Juan accepted this exact reviewed contract at
+`ef1713d4b2a56981a5f42658188f7fd122ccfdac` with the verbatim reply
+"accept 86 at ef1713d" in the oversight chat. Oversight relayed that decision
+in message `2c715485` at 2026-10-31 00:12:01 UTC.
+[Oversight CONTRACT REVIEW PASS](https://github.com/canfieldjuan/connect-contracts/pull/86#issuecomment-6536123630)
+applies to that revision.
+
+The accepted body below is preserved byte-for-byte, SHA-256
+`c57d7663b78329b772a2d697e275a35929f26b29f83e8f133e0046a7e133be44`. This record adds no requirements.
+Its historical PROPOSED and pending-acceptance labels describe the proposal
+now accepted. Acceptance covers the sequential offline service-start and
+attachment/transport/canary contracts, including the shared 15-second publication
+window; the service-start slice comes first after acceptance-delta review and
+guarded contract merge. It does not authorize live service/model execution,
+public release, application adoption, installation or cutover.
+
+---
+
 # U1a: verified attachment, byte transport and canary readiness
 
 Status: PROPOSED, contract preparation only. Owner: connect-runtime.
