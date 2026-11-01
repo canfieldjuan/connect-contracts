@@ -85,7 +85,10 @@ future slices is dispatched or accepted by this proposal.
    hashes, rendered token arrays or final numeric execution budgets. Those follow
    delivery in steps 7-9. Specify the external enrollment identity below here;
    resolve the issuer/trust mechanism before admission implementation, without
-   inventing an approval from arbitrary caller-selected hashes.
+   inventing an approval from arbitrary caller-selected hashes. Step 2 must also
+   prove the qualification entry shipped in production bytes is unreachable without
+   its permit, name the trust anchors for record and permit, and obtain the r2
+   owner's agreement to step 8's staging refinement. These remain design obligations.
 3. **Effective-settings capture — connect-runtime, private host.** After step 1,
    implement the separately reviewed host capture slice (ADR landing-order item 3)
    using the pinned server's actual reporting owners. Prove parser/schema behavior
@@ -122,6 +125,17 @@ future slices is dispatched or accepted by this proposal.
    and transport proof. Bind the accepted logical canary/checker. Identify absent
    observations explicitly. No final PASS receipt or completed live run is required
    to deliver this candidate; those are outputs of subsequent qualification.
+   **Runtime Identity Selection gate — Juan, OPEN (before step 8).** Juan must
+   decide which runtime identity G0 binds. Until that decision, request neither
+   a preflight nor a G2 annex. Steps 1-7 may continue except where they would bind
+   or freeze a specific runtime identity; today's inventory pins do not select it.
+   Oversight mail `3248f3b9` cites the operator-accepted arithmetic contract
+   `llama-moe-sandbox/CONTRACT-CANONICAL-ARITHMETIC.md`, local commit `4da6517`:
+   the canonical build is a new pinned identity, each app requalifies, and old
+   baselines do not carry over. This is a relayed citation, not a sandbox inspection
+   or an implementation/result claim. That work remains unowned and untouched here.
+   After selection, bind the chosen artifacts and derive that identity's budgets;
+   do not carry over the prior identity's accuracy evidence or time ceilings.
 8. **G1 preparation and separately authorized preflight — ds-qualify-c9.** Reuse
    the existing harness to freeze source-derived request inputs, tokenizer request
    bytes, callback/state rules and finite phase bounds from the delivered owners.
@@ -191,7 +205,7 @@ or made an approval-refusal condition by this proposal.
 [Issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88) owns the
 OPEN operator decision about unqualified execution identities. Neither hardware
 refusal nor record-only behavior is selected here. It remains open pending Juan's
-decision; do not touch or depend on the other session's arithmetic work. In the
+decision; do not touch the other session's arithmetic work. In the
 meantime, only the existing shipped binding and current-instance checks exist;
 no new real-consumer policy is implemented. Step 5's independent synthetic proof
 may proceed under its own accepted contract; dependent enforcement stays held.
@@ -207,6 +221,7 @@ lane or generic bypass here.
 ## Differences from validated work
 
 No runtime/model/prompt/quantization/cache/slot/context change is proposed.
+That scope statement does not settle the Runtime Identity Selection gate above.
 Later admission is a new trust boundary absent from synthetic tests. Later
 transport changes from the old app-owned native path to the verified shared Unix
 session, and later opt-in snapshot metadata follows U1. Each needs byte/typed-error
