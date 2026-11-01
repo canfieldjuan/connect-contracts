@@ -21,7 +21,7 @@ The local Connect Runtime investigation reproduced answer changes for byte-ident
 This exposes three gaps in what a qualification proves:
 
 1. **Implicit settings.** The argv leaves output-affecting settings to the pinned binary's defaults: logical batch, physical micro-batch, context checkpoints and prompt-cache reuse.
-2. **Support versus accuracy.** A tier's requirements list every GPU compute capability the build supports. Accuracy evidence exists for fewer. Because kernel selection depends on architecture, passing on one GPU does not qualify another.
+2. **Support versus accuracy.** A tier's requirements describe build/runtime support; the CUDA tier lists supported compute capabilities, while the Vulkan tier has its own requirements. Accuracy evidence covers only the identities actually qualified. Because kernel selection depends on architecture, passing on one GPU does not qualify another.
 3. **Intended versus effective.** Qualification evidence records the intended argv, not the settings and build the running server actually used.
 
 Out of scope:
@@ -36,11 +36,15 @@ Out of scope:
    - the `PROFILE_ID`;
    - the runtime archive SHA-256;
    - the model SHA-256;
-   - the GPU device name and compute capability;
-   - the driver and CUDA runtime versions;
+   - the selected profile tier and its backend discriminator (`cuda` for `gpu-cuda`, `vulkan` for `gpu-vulkan`), consistent with the selected runtime archive;
+   - the GPU device name and the applicable backend-specific identity:
+     - **CUDA:** device compute capability, NVIDIA driver version and CUDA runtime version;
+     - **Vulkan:** Vulkan physical-device identity, Vulkan API version and driver implementation identity/version; no CUDA compute capability or CUDA runtime field;
    - the effective server settings (Decision 2);
    - the concurrency mode (slots, and whether requests overlap);
    - the application route: the application, its capability, and its request profile or prompt version.
+
+   The qualification-record schema must model these as closed backend variants, not one set of universally required CUDA fields or an untyped bag. Bind exact observable fields and their source/encoding in the schema/capture contracts. Do not invent CUDA placeholders for Vulkan, silently omit applicable fields, or admit a mixed tier/backend/archive identity. An unavailable observation must be explicit incomplete evidence, not a qualified pass. Future offline fixtures must cover complete CUDA and Vulkan records, missing applicable fields, mixed variants and unknown backends. Representing a supported tier does not qualify it or authorize a run; installed-product behavior remains Decision 6.
 
 2. **Effective settings are measured, not assumed.** Every qualification run captures the settings the running pinned server reports, not just the argv it was given. At minimum:
    - context per slot and slot count;
@@ -53,7 +57,9 @@ Out of scope:
 
    The implementation PR fixes the exact field list from what the pinned server reports. It must not rely on documentation of defaults.
 
-3. **Explicit argv at the next profile revision.** The next profile revision that already requires a new `PROFILE_ID` makes the output-affecting settings from Decision 2 explicit in the argv. Their values equal the measured effective settings of the current pin, so the change alone does not alter outputs. This ADR does not force a standalone profile change or an application release.
+3. **Explicit argv at the next profile revision.** The next profile revision that already requires a new `PROFILE_ID` makes the output-affecting settings from Decision 2 explicit in the argv. For a settings-explicitness-only change, preserve the measured values of the same chosen runtime identity and prove output parity; changing runtime identity requires its own qualification, not inheritance of an old pass. This ADR does not force a standalone profile change or an application release.
+
+   Runtime selection remains Juan's OPEN decision under the [accepted plan's Runtime Identity Selection gate](https://github.com/canfieldjuan/connect-contracts/blob/8d1cd7f2bbe010f58ec5827c18fc369ed896ecf1/plans/PR-Shared-Runtime-U1b-Consumer-Approval.md#required-change-surface-and-sequence). This ADR's inventory and future argv rule do not choose that identity. No preflight or G2 annex is requested until that gate is settled; independent preparation cannot bind/freeze a specific runtime identity before the decision. No implementation or live authority follows from this proposal.
 
 4. **What a qualification checks.**
    - **Expected answers.** Frozen requests are scored against independently reviewed expected answers and the application's deterministic checks: dates, amounts, missing fields, claim meaning and source references. Valid JSON and a successful request are not a pass.
@@ -70,7 +76,7 @@ Out of scope:
 
    The fix goes to that owner. Downstream validators are not taught to accommodate an unstable upstream result.
 
-6. **Unqualified identities are an open product decision.** This ADR records qualification; it does not decide what an installed application does on hardware or settings outside every qualified identity. Whether it refuses, warns or runs as unqualified is a separate operator decision, tracked as an issue before any enforcement lands.
+6. **Unqualified identities are an open product decision.** This ADR records qualification; it does not decide what an installed application does on hardware or settings outside every qualified identity. Whether it refuses, warns or runs as unqualified is a separate operator decision, tracked in [issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88) before any enforcement lands. The decision remains OPEN: neither hardware refusal nor record-only behavior is selected here. Backend-specific evidence fields do not impose a hardware-admission policy.
 
 ## Consequences
 
