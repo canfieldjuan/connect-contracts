@@ -45,6 +45,11 @@ packet: `CONTRACT-PROPOSED-r2.md` SHA256
 `b0996c8b802892d8c4621576253cf18abf331eb7ec2d6364428c8bd6a9787a05`
 and `U1b-qualification-handoff-20261030.md` SHA256
 `03e18f2eafbc31a2b2c40c9567f1e229af6bd37f4a3be1b7b43210695e99c2e0`.
+Also reuse `U1b-base-dependency-answer-20261030.md`, SHA256
+`907bdb5d245ff3a27618ccdcf51d9c8ffcb33ccaffbb6a6472dda3761a526234`:
+the qualification owner integrates the delivered runtime with the held writer
+stack; held summary semantics are not a prerequisite for the main-based framing
+or client infrastructure. This does not release any held branch.
 
 The existing proposed `DS-HOST-CANARY-1` selects the approved marker from a
 synthetic record. Expected decoded bytes are exactly `CEDAR-17`; logical seed is
@@ -60,32 +65,112 @@ Actual delivered wire/token/checker binding, G2 budgets and acceptance remain pe
 
 ## Required change surface and sequence
 
-This commit changes only this proposal. Later steps are separately reviewed slices:
+This change is preparation only. The dependency owner is this sequence; other
+sections refer to its gates rather than adding another ordering. None of the
+future slices is dispatched or accepted by this proposal.
 
-1. **Qualification identity prerequisite.** Settle the existing ADR-0015 at its
-   own reviewed revision and direct operator acceptance. Then define its one
-   qualification-record schema and offline fixtures in connect-contracts.
-   Its proposed order is ADR, schema, effective host-settings capture, consumer
-   bindings. Do not silently implement its registration/profile amendment here.
-2. **Consumer approval contract.** Bind the existing proposed consumer canary through
-   the delivered native owner; obtain exact wire/checker identities, acceptance, numeric
-   exchange/body/token/deadline budgets, and frozen consumer/client artifacts.
-   Specify the sole approval issuer/enrollment owner and how accepted evidence
-   binds the trusted callback implementation. A file that merely says PASS,
-   an arbitrary success callback, or self-selected matching hashes is not authority.
-   Recommendation: immutable reviewed enrollment tied to release/consumer bytes,
-   with no user-editable approval bypass; exact API/trust delivery remains blocked
-   on accepted receipt and release delivery. No signing service or dependency is introduced.
-3. **Offline admission and adapter proof.** After that exact contract is accepted,
-   implement receipt admission at one canonical owner, then Doc Sum's bounded
-   synchronous-trait adapter using the existing native framing/decoder and shared
-   byte transport. The client owns identity/lease/readiness; Doc Sum owns business
-   prompts, decoding, qualification and task scoring. Never maintain a second
-   canary formatter or a private fork of the public client.
-4. **Separately authorized live qualification.** Freeze the combined artifact and
-   measured execution identity, approved canary and finite run budget. Preserve
-   the qualification owner's G0/G1/G2 gates; no model call follows from accepting
-   this preparation document or merging infrastructure.
+1. **Identity/schema prerequisite — connect-runtime, connect-contracts.** Settle
+   ADR-0015 through its own review and direct operator acceptance, then its one
+   qualification-record schema/fixtures. Proposed ADR landing order stays intact.
+   [Decision 6 issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88)
+   is the named product-decision prerequisite for real admission/adapter enforcement
+   in step 5 and enrollment in step 10. It does not block independent offline
+   design/synthetic proof, and no choice may be inferred while it is open.
+2. **Logical canary and trust design — ds-qualify-c9 and connect-runtime.** The
+   qualification owner supplies the existing r2 logical request/checker rule;
+   connect-runtime specifies the single issuer/enrollment/admission owner and
+   immutable binding format. Obtain exact-revision acceptance of those semantics
+   and the candidate qualification interface before their code. This is design
+   acceptance, NOT empirical approval. It does not require delivered executable
+   hashes, rendered token arrays or final numeric execution budgets. Those follow
+   delivery in steps 7-9. Specify the external enrollment identity below here;
+   resolve the issuer/trust mechanism before admission implementation, without
+   inventing an approval from arbitrary caller-selected hashes.
+3. **Effective-settings capture — connect-runtime, private host.** After step 1,
+   implement the separately reviewed host capture slice (ADR landing-order item 3)
+   using the pinned server's actual reporting owners. Prove parser/schema behavior
+   offline, preserve intended-versus-observed distinction and unavailable fields.
+   Code delivery does not authorize starting a server or reading a live model.
+   Actual observation is budgeted in step 8. No profile/argv changes bundled here.
+4. **Qualification interface — connect-runtime, client/adapter seam.** After
+   step 2's accepted design, deliver a bounded qualification-only entry used by
+   the existing preparation/budget-owner harness. Reuse private verified attachment,
+   peer checks, leases and native serialization. Its distinct, non-forgeable permit
+   represents an accepted invocation/phase and finite request budget, not a task
+   correctness PASS. It returns evidence, never a generally usable ReadyClient.
+   No public unchecked session, arbitrary endpoint, automatic replay or fake
+   production enrollment. Offline synthetic permits prove this interface before
+   any real permit exists. The exact permit/trust API belongs in step 2's reviewed
+   contract, not an improvised bypass during live testing.
+5. **Offline admission/adapter candidate — connect-runtime, Doc Sum runtime owner.**
+   After the accepted step 2 design and step 4 interface, port the bounded
+   synchronous adapter through existing framing/decoder and byte transport.
+   Step 3's schema/capture precedes its effective-settings consumer binding.
+   Use synthetic enrollment/peers for byte and typed-error parity; a real approved
+   receipt is NOT a prerequisite to building or testing this inert candidate.
+   Issue #88 must be resolved before implementing its dependent real-consumer
+   policy/enforcement; keep that behavior unimplemented while open. No route
+   activation, real enrollment or app adoption follows from the offline candidate.
+6. **Held-writer integration — ds-qualify-c9.** Integrate the delivered adapter
+   candidate into its held writer qualification stack, per the base-dependency
+   answer above. Freeze combined source only after its existing review/hold gates;
+   prove full structured C9 order/response parity there. connect-runtime supplies
+   its reviewed runtime seams, not summary logic or a blanket held-branch merge.
+7. **G0 delivery — connect-runtime supplies; ds-qualify-c9 binds.** Deliver reviewed
+   outputs of steps 3-6: candidate binaries/libraries, complete manifest hashes,
+   native owner, schema/capture interface, immutable snapshot, sidecar/store identity
+   and transport proof. Bind the accepted logical canary/checker. Identify absent
+   observations explicitly. No final PASS receipt or completed live run is required
+   to deliver this candidate; those are outputs of subsequent qualification.
+8. **G1 preparation and separately authorized preflight — ds-qualify-c9.** Reuse
+   the existing harness to freeze source-derived request inputs, tokenizer request
+   bytes, callback/state rules and finite phase bounds from the delivered owners.
+   Mock token arrays are only offline proof. Real tokenizer outputs and observed
+   settings need a separately reviewed preflight annex: Juan must explicitly accept
+   its exact revision, candidate/input bindings and numeric startup, identity-probe,
+   tokenizer/admission-call, byte/token and wall-time ceilings BEFORE any send.
+   It permits only its named operations, with zero generation allowance. A required
+   host start is not free. If request inputs depend on earlier responses, bind the
+   exact transition code and finite bounds before authorizing the phase. Preserve
+   every response and charged/uncertain send; no replay/refund. Then freeze actual
+   token/wire bytes and measurements, and review the completed G1 receipt. This is
+   an explicit proposed staging refinement to r2's separate live annex, not an
+   existing permission or a requirement to perform tokenization "offline".
+9. **G2 bounded qualification — ds-qualify-c9.** Only after reviewed G0/G1,
+   obtain Juan's exact-revision acceptance of the numeric live annex for canary,
+   stage generations, any additional startup/tokenizer calls, dynamic branches,
+   output/time ceilings and reservations. Run through the qualification interface
+   from step 4, not a production-ready handle that would already require this
+   run's PASS. Capture expected-answer scoring, exact parity and pending human
+   quality review; this produces candidate evidence, not automatic adoption.
+10. **Production enrollment — named issuer/admission owner from step 2.** After
+    qualified evidence, required human review, explicit approval and issue #88's
+    accepted resolution, create the separate enrollment against the already frozen
+    bytes. Verify shipped-versus-qualified identity below. The existing per-instance
+    canary still gates later ReadyClient construction; qualification PASS alone
+    cannot construct it. Enrollment/publication/adoption each retain their own
+    review and operator gates, and none is included in this preparation.
+
+### Enrollment identity without a self-hash
+
+The step 2 design must bind the fixed executable/library/asset manifests of the
+consumer integration and client, plus the canonical profile, definition/checker/
+expected-result and applicable limits. Build and freeze these artifacts BEFORE
+step 9. The later approval/enrollment is a separate record referring to those
+manifests and qualification evidence; it is outside the set of executable bytes
+whose digest it asserts. Do not rebuild the app/client to embed its own final
+approval or omit mutable executable bytes from the identity to make a hash fit.
+The reviewed admission trust mechanism must authenticate/pin that separate record;
+its issuer and mechanism remain an explicit step 2 design prerequisite, not a
+new signing infrastructure or self-authorizing JSON introduced by this proposal.
+
+At release, compare each shipped executable/library/asset byte with the qualified
+manifest; report packaging/enrollment differences separately. A changed executable
+is a new candidate requiring the affected proofs, never silently the qualified
+binary. ADR-0015's application-route identity stays intact; artifact hashes are
+additional U1 transport/port provenance, not a reinterpretation of that ADR field
+or a hardware policy. If the eventual packaging cannot preserve these identities,
+its exact difference needs a reviewed contract before qualification, not after it.
 
 The downstream adapter must implement the accepted U1 snapshot/selection contract
 by reference, not redefine it: explicit opt-in, unchanged existing defaults and
@@ -96,23 +181,28 @@ included in this preparation.
 
 ### Approval is not a cached live pass
 
-Separate reviewed qualification evidence from current-instance readiness.
-An admitted receipt can authorize only its exact consumer/client/profile/definition/
-checker/expected-result and measured execution identity. It cannot manufacture a
-live-ready client. The existing canary gate must still verify the bound instance,
-perform the bounded real sequence and compare the untrimmed raw result before
-business generation. Current server PID/start/boot/socket identity stays ephemeral,
-not persisted as reusable success. Missing, malformed, partial or mismatched
-approval refuses the new route before canary/business bytes; existing routes
-remain unchanged. Product behavior on otherwise unqualified hardware remains
-ADR-0015's separate operator decision, not implicitly decided by this proposal.
+The current implementation's `canary.rs::Binding` binds consumer, client, profile,
+definition, checker, expected bytes, exchange count and tokenize/completion limits.
+`Definition::admit` compares that binding and program identity; `Instance` separately
+binds the live host/server/socket/model/context/template/build. Preserve those
+existing owners and tests. No measured GPU/driver/CUDA field is added to Binding
+or made an approval-refusal condition by this proposal.
 
-Avoid circular approval: reuse the existing qualification-only r2/G1 preparation
-and budget-owner design; bind it to the delivered candidate before its G2 request.
-It produces candidate evidence without granting general business readiness. This
-proposal provides no public unchecked session, arbitrary endpoint, generic plugin
-or approval constructor to bootstrap that lane. Its candidate-specific execution
-interface and numeric authority remain required before dispatch.
+[Issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88) owns the
+OPEN operator decision about unqualified execution identities. Neither hardware
+refusal nor record-only behavior is selected here. It remains open pending Juan's
+decision; do not touch or depend on the other session's arithmetic work. In the
+meantime, only the existing shipped binding and current-instance checks exist;
+no new real-consumer policy is implemented. Step 5's independent synthetic proof
+may proceed under its own accepted contract; dependent enforcement stays held.
+
+Qualification evidence and current-instance readiness remain different states.
+After real enrollment is eventually admitted, the existing bounded canary must
+still compare the untrimmed response for the verified live instance before normal
+business generation. No persisted success, missing approval, failed canary or
+qualification-only permit manufactures ReadyClient. Steps 4 and 8-10 own the
+candidate-to-qualification-to-enrollment ordering; there is no second bootstrap
+lane or generic bypass here.
 
 ## Differences from validated work
 
@@ -122,8 +212,10 @@ transport changes from the old app-owned native path to the verified shared Unix
 session, and later opt-in snapshot metadata follows U1. Each needs byte/typed-error
 parity on the frozen inputs before behavioral experiments. Effective-setting capture
 adds observed evidence; intended argv cannot substitute. Full C9 coverage is an
-additional missing proof, not permission to project or alter its schema. Any
-other departure requires an explicit amended contract before implementation.
+additional missing proof, not permission to project or alter its schema. The staged
+tokenizer/settings preflight in step 8 and separate enrollment record
+are explicit proposed refinements requiring review/acceptance, not claimed prior
+permissions. Any other departure requires an amended contract before implementation.
 
 ## Verification plan
 
@@ -154,10 +246,12 @@ production enrollment; the framing receipt marks full C9 parity pending.
 
 UNKNOWN / REQUIRED before dependent implementation or execution: accepted
 qualification schema and measured-settings delivery; owner-approved real canary
-request/expected pair and callback/checker identity; issuer/enrollment/trust API;
-candidate-specific binding of the existing qualification lane; numeric live and
-request budgets; combined release and
-prepared-store/sidecar identity; full C9 parity and applicable quality approval.
+request/expected pair and callback/checker identity; issuer/enrollment/trust API and
+external-record identity; issue #88 operator
+decision before dependent enforcement; reviewed qualification interface, effective-
+settings capture and held-writer integration; candidate-specific preflight and G2
+numeric budgets after delivery; combined release and prepared-store/sidecar identity;
+full C9 parity and applicable quality approval.
 No absence across every other workstream is inferred from this inspected packet.
 Exact acceptance of this proposal would not fill those missing values or accept
 PR70. Prepare independent documentation while these are pending; do not weaken
