@@ -1,12 +1,15 @@
 # ADR-0012: Shared local model runtime on Windows
 
-**Status:** Proposed (accepted when this decision merges). The decisions marked
-**(measured: Mn)** bind only after that measurement passes on Windows. Until
-every measurement passes, ADR-0011's rule stands: no Windows bundle release.
+**Status:** Proposed; this reconciled revision needs operator acceptance. Windows
+ships in the first release alongside Linux. Deferring native proof does not defer
+Windows to a later release or waive its release gate. The decisions marked
+**(measured: Mn)** retain the historical evidence described below; the first
+release still requires the native Windows proof and qualification gates here.
 
-The measurements first ran on Windows 11 on 2026-10-01 (see "Results so far").
-M2 failed as first decided, so "Starting a host" now uses the candidate this
-decision named, and the revised start passed.
+The measurements first ran in a Windows 11 CPU-only VM on 2026-10-01 (see
+"Results so far"). M2 failed as first decided, so "Starting a host" now uses
+the candidate this decision named, and the revised start passed in that VM.
+These are historical mechanism results, not native GPU or installed-app proof.
 
 **Date:** 2026-10-01
 
@@ -55,6 +58,67 @@ Windows unchanged:
 **Scope.** Windows 10 version 1803 or later, and Windows 11, on x86-64, with
 per-user installs that keep the real `%LOCALAPPDATA%` (see "Packaging"). Not
 covered: ARM64, MSIX and Store packages, and macOS.
+
+## Reconciliation with the accepted qualification plan
+
+**Release requirement and proof venue (Juan, 2026-11-01).** Windows is part of
+the first release. Its native proof runs later on Juan's own physical Windows
+box, not a VM. No test is dispatched by this documentation. The box's OS build,
+GPU/backend, driver and eventual runtime identity must be recorded, not assumed.
+The existing Windows 10 22H2 and Windows 11 obligations below remain: a result on
+one OS does not satisfy the other. Missing coverage stays an explicit release
+gap; this instruction does not authorize a VM substitute or silently narrow the
+supported OS matrix.
+
+**One dependency owner.** The [accepted U1b plan at its merge](https://github.com/canfieldjuan/connect-contracts/blob/8d1cd7f2bbe010f58ec5827c18fc369ed896ecf1/plans/PR-Shared-Runtime-U1b-Consumer-Approval.md#required-change-surface-and-sequence)
+owns preparation, delivery, preflight, qualification and enrollment ordering.
+Its acceptance was order and ownership only. [ADR-0015 at its merge](https://github.com/canfieldjuan/connect-contracts/blob/69b357cdad8e2a6dc7ec8cca9d8e245a18b658db/adr/0015-runtime-accuracy-qualification-identity.md)
+was accepted as what a qualification records only; neither acceptance authorizes
+implementation or execution. Their unchanged historical "Proposed" status text
+is read with the exact-revision acceptance records on
+[PR87](https://github.com/canfieldjuan/connect-contracts/pull/87#issuecomment-6562064157)
+and [PR70](https://github.com/canfieldjuan/connect-contracts/pull/70#issuecomment-6563625383).
+This Windows amendment supplies platform obligations to that sequence, not a
+second qualification path or permission to bypass a prerequisite.
+
+**Runtime choice is OPEN and belongs to Juan.** The old `c1d0e7a`/b10621
+references and MODEL-SETUP evidence below are historical inventory, not a
+selection of the first-release Windows or Linux runtime. No candidate artifact
+may be bound or frozen to a specific runtime identity before the plan's Runtime Identity Selection gate. Do
+not request preflight or a G2 annex before that choice. A new identity requires
+its own qualification; Linux passes, VM results and old accuracy/time budgets
+do not transfer. All execution budgets remain OPEN. Later Windows mechanism
+and app proofs need their own reviewed, exact-revision authorization and finite
+budgets; host startup, identity probes and tokenizer calls are not free or
+implicitly authorized. This change authorizes no implementation, builds,
+tokenizer or live calls, installation, production or Ollama changes.
+
+**Qualification is separate from platform support.** Reuse ADR-0015's one
+qualification-record schema and capture owner: platform/profile and Windows
+archive/model/template identity, applicable CUDA or Vulkan device/driver/runtime
+identity, observed settings (including request-owned values), concurrency mode
+and application route must be bound to each result. No invented CUDA fields for
+Vulkan and no inferred observations. The historical CPU probe below does not
+add a CPU tier to the planned qualification schema. M1-M6 prove platform
+mechanisms; they do not prove task accuracy, output parity, canary approval or
+production enrollment. Reuse each app's existing fixtures, independent scoring,
+byte-parity and required human quality review through the accepted plan.
+[Issue88](https://github.com/canfieldjuan/connect-contracts/issues/88) still owns
+hardware behavior outside qualified identities: neither refusal nor record-only
+behavior is selected. Existing path/store/peer safety refusals below do not
+settle that product decision.
+
+**Evidence inventory and differences.** Preserve the historical Windows VM
+result table and [its recorded runtime/model/method](https://github.com/canfieldjuan/connect-contracts/pull/58#issuecomment-5946034020):
+b10621 CPU runtime (`c1d0e7a00`), `Qwen3.5-4B-Q4_K_M.gguf`, Win32 probes and
+non-generation health/identity endpoints. Its recorded hash-verification claims
+are historical, not a fresh artifact verification here. The accepted plan owns
+the current Qwen3.5-9B-Q4_K_M inventory and real-app fixture receipts; reuse those
+without rebuilding inventories. The differences are explicit: native physical
+hardware instead of the VM; a later chosen Windows runtime/backend instead of
+that CPU probe; actual host/client/app artifacts instead of mechanism probes;
+and separate app accuracy/parity qualification instead of endpoint success.
+No new performance, accuracy or compatibility result is claimed by this edit.
 
 ## Placement
 
@@ -214,6 +278,20 @@ tiers have their own runtime pins (see "Profile").
 **Files.** `server.key`, `server.json` and `failure.json` take their protection
 from the registration directory's owner-private DACL, not from POSIX modes.
 
+**Identity schema prerequisite.** Before a Windows host can publish either
+`server.json` or `failure.json`, a separately reviewed contract must make both
+canonical schemas and their readers platform-aware. They currently require
+Linux `pid`, `start_time`, `boot_id`, reject extra fields and cap PID at Linux's
+4194304. Use closed platform variants with explicit units/encoding and native
+PID bounds: preserve the Linux shape; Windows records PID plus FILETIME creation
+time, without a fabricated boot id. Compose this with the existing unselected
+`starting` variant, not a parallel relaxed reader. The schema/client versioning
+and rollout must cover old readers that reject unknown fields, both registration
+and failure paths, and Linux regression, valid Windows, missing/mixed/unknown
+platform fixtures before the Windows host port. The exact wire schema is future
+work, not introduced here. Process liveness identity is distinct from ADR-0015's
+accuracy qualification identity.
+
 **Identity and liveness.**
 - **Identity:** `server.json` records each process by its process id and its
   creation time (a `FILETIME`, in 100-nanosecond units). There is no boot id. A
@@ -350,8 +428,15 @@ So the canonical profile is one file per platform:
 - All applications on one machine run one platform, so ADR-0011's refusal
   between different profiles is unchanged.
 - **The schema change.** The profile schema gains a required `platform` field,
-  `linux-x64` or `windows-x64`. It lands in the profile PR, before either file
-  exists.
+  `linux-x64` or `windows-x64`, in a separately reviewed migration. The Linux
+  profile already exists without that field, and the current closed schema does
+  not admit it. Adding it changes the Linux `PROFILE_ID`: coordinate the canonical
+  profile, host vendored bytes and provenance, and every affected application's
+  vendored copy; review old/new reader compatibility and fail-closed mismatch
+  behavior before rollout. Do not silently add the field to installed profiles.
+  This is a future migration obligation, not a profile revision in this ADR.
+  ADR-0015 Decision 3 owns explicit settings and same-identity parity at that
+  revision; a changed runtime still needs independent qualification.
 
 **What each Windows tier holds:**
 - **The same as Linux:** the model pin, the context, the chat-template pin, and
@@ -359,10 +444,11 @@ So the canonical profile is one file per platform:
 - **Different placeholders:**
   - `<model>` is the GGUF's absolute store path, pinned as above;
   - `<socket>` is the Windows path of `server.sock`.
-- **Its own runtime-set pins.** Which builds those are is Invoice Processor
-  MODEL-SETUP's decision, qualified on Windows under its MS-PIN-4. The pinned
-  release publishes Windows x86-64 builds for CUDA 12.4 (with a separate CUDA
-  runtime archive), CUDA 13.3, Vulkan and the CPU.
+- **Its own runtime-set pins.** Juan's OPEN runtime choice above controls which
+  candidate may be bound; MODEL-SETUP/MS-PIN-4 is reusable historical evidence,
+  not authority to select it. The historical b10621 release listed Windows
+  x86-64 CUDA 12.4 (with a separate runtime archive), CUDA 13.3, Vulkan and CPU
+  builds. Availability is neither selection nor accuracy qualification.
 - **A self-contained runtime set.** A Windows runtime set holds every library its
   binaries import that Windows does not provide. The server's `PATH` is only the
   set's directory and `System32`.
@@ -387,9 +473,12 @@ The shared store and registration need applications that see the same
 
 ## Measurements before a Windows release
 
-**Where they run:** on Windows 10 22H2 and Windows 11, x86-64, with the pinned
-release's Windows builds. Each result goes into the host's evidence, and a
-failed measurement revises this decision before any Windows release.
+**Where they run:** later, natively on Juan's own Windows box, not a VM, under
+the reconciliation and authorization gates above. Windows 10 22H2 and Windows
+11 coverage remains required; record any unavailable OS/backend as pending.
+Bind the chosen Windows artifacts and ADR-0015 execution identity once selected.
+Each result goes into durable host evidence; a failure must be resolved at its
+owner before release. No native measurement has been performed by this edit.
 
 - **M1, transport.**
   - `llama-server` listens on `--host <...>\model\v1\server.sock`, and answers
@@ -431,7 +520,7 @@ failed measurement revises this decision before any Windows release.
   probe interval (2 seconds) on an idle machine. The delay under load is
   recorded.
 
-**Results so far: Windows 11, 2026-10-01.** Run on Windows 11 Enterprise LTSC
+**Results so far: historical VM evidence only, Windows 11, 2026-10-01.** Run on Windows 11 Enterprise LTSC
 24H2 (build 26100.1742, ANSI code page 1252, NTFS), in a virtual machine with no
 GPU. The runtime was the pinned release's Windows CPU build (b10621), with the
 Visual C++ runtime in its set, and the model was MODEL-SETUP's CPU-tier model.
@@ -445,11 +534,17 @@ Visual C++ runtime in its set, and the model was MODEL-SETUP's CPU-tier model.
 | M5 | Passed. The pinned server ended 265 to 327 ms after its host was killed, 8 of 8 times. With a probe server, it also passed with the host running in its task. Not run: graphics memory, since there is no GPU. |
 | M6 | Passed. A lease was released within 7 ms idle (200 kills), and within 115 ms under CPU and disk load (100 kills). |
 
-Still owed before a Windows release:
-- all six on Windows 10 22H2;
+Still owed before the first release's Windows gate:
+- native M1-M6 on Juan's own Windows box for the chosen release identity; retain
+  separate Windows 10 22H2 and Windows 11 coverage, with missing coverage pending;
 - M4 on a volume that does not enforce sharing modes;
-- M5's graphics memory, on a machine with a GPU;
-- the CUDA and Vulkan tiers' qualification.
+- M5's graphics-memory recovery on the actual GPU;
+- CUDA and Vulkan qualification for the intended shipped tiers, independently
+  bound to the actual Windows identities, not inherited from Linux or the VM;
+- real host/client/app attachment, transport and app task qualification through
+  the accepted plan, plus required human review and shipped-byte identity proof.
+Historical mechanism passes remain in the table; none completes these native
+or application release obligations.
 
 ## Conformance and landing gates on Windows
 
@@ -468,13 +563,27 @@ Still owed before a Windows release:
   job object. Where the task cannot be registered or run, attaching reports the
   runtime unavailable, and never starts the host as a child.
 
-**Landing order:**
-1. this ADR;
-2. the profile schema's `platform` field, then `runtime/v1/profile.windows-x64.json`
-   once its tiers qualify on Windows;
-3. the host's Windows port, in `local-connect-model-host`, with M1 to M6;
-4. attaching on Windows, one application per PR;
-5. the Windows bundle installer.
+**Landing dependencies (within the accepted U1b sequence above):**
+- Accept this reconciled ADR at an exact revision; documentation acceptance is
+  not permission to implement or run its proofs.
+- Complete ADR-0015's qualification schema/fixtures before dependent host
+  capture. Complete the platform-aware registration/failure schema and reader
+  contract above before the Windows host publishes those records. Review the
+  coordinated profile migration before changing any profile/vendor bytes.
+- Review the Windows host/client mechanisms and per-app attachment contracts;
+  use the accepted plan's design/interface, offline proof and candidate-delivery
+  steps. No real-consumer policy while issue88 is open; independent preparation
+  must not freeze a runtime before Juan's choice.
+- Once runtime choice is settled, bind candidate Windows profile/archive and
+  consumer artifacts for separately authorized native proof and qualification.
+  A candidate profile is not a qualified or released profile. Reuse the plan's
+  preflight, G2 and external enrollment gates; do not require a PASS to deliver
+  the candidate that will produce it, or grant readiness merely by delivering it.
+- Publish/enroll/adopt only after native M1-M6, app qualification, required human
+  review and shipped-versus-qualified identity checks pass under their own gates.
+  The Windows bundle installer is part of the first release; Linux completion
+  alone cannot satisfy the combined release. No installer or release is
+  authorized by this documentation commit.
 
 ## Rejected alternatives
 
