@@ -38,6 +38,26 @@ fixtures and native owner. The wire matrix covers analyze/synthesize/verify,
 text and explicitly non-C9 structured inputs, with legacy/qualified-open/qualified-closed
 policies. It does not prove full C9 schema parity or summary quality.
 
+### Existing consumer handoff (proposed, not executable)
+
+Reuse the qualification owner's `host-32k-qualification-contract-20261029`
+packet: `CONTRACT-PROPOSED-r2.md` SHA256
+`b0996c8b802892d8c4621576253cf18abf331eb7ec2d6364428c8bd6a9787a05`
+and `U1b-qualification-handoff-20261030.md` SHA256
+`03e18f2eafbc31a2b2c40c9567f1e229af6bd37f4a3be1b7b43210695e99c2e0`.
+
+The existing proposed `DS-HOST-CANARY-1` selects the approved marker from a
+synthetic record. Expected decoded bytes are exactly `CEDAR-17`; logical seed is
+4294967295, output cap 1500, decoder schema null. Preserve the owner's verbatim
+system/user strings, production framing, historical temperature 0/cache_prompt
+true, normal-stop/full-envelope check and no trim or answer-forcing grammar.
+Those are proposal parameters, not a live allowance or measured effective state.
+The handoff names the existing writer preparation/budget-owner harness for G1,
+then a separate G2 numeric annex with exact-revision operator acceptance.
+The earlier 509 bound is explicitly not a new budget. No canary/request redesign
+or new qualification harness is needed to replace this existing design.
+Actual delivered wire/token/checker binding, G2 budgets and acceptance remain pending.
+
 ## Required change surface and sequence
 
 This commit changes only this proposal. Later steps are separately reviewed slices:
@@ -47,15 +67,15 @@ This commit changes only this proposal. Later steps are separately reviewed slic
    qualification-record schema and offline fixtures in connect-contracts.
    Its proposed order is ADR, schema, effective host-settings capture, consumer
    bindings. Do not silently implement its registration/profile amendment here.
-2. **Consumer approval contract.** Obtain the real consumer-owned canary definition,
-   native request sequence, raw response checker, exact expected bytes, numeric
+2. **Consumer approval contract.** Bind the existing proposed consumer canary through
+   the delivered native owner; obtain exact wire/checker identities, acceptance, numeric
    exchange/body/token/deadline budgets, and frozen consumer/client artifacts.
    Specify the sole approval issuer/enrollment owner and how accepted evidence
    binds the trusted callback implementation. A file that merely says PASS,
    an arbitrary success callback, or self-selected matching hashes is not authority.
    Recommendation: immutable reviewed enrollment tied to release/consumer bytes,
    with no user-editable approval bypass; exact API/trust delivery remains blocked
-   on the receipt/consumer handoff. No signing service or dependency is introduced.
+   on accepted receipt and release delivery. No signing service or dependency is introduced.
 3. **Offline admission and adapter proof.** After that exact contract is accepted,
    implement receipt admission at one canonical owner, then Doc Sum's bounded
    synchronous-trait adapter using the existing native framing/decoder and shared
@@ -87,11 +107,12 @@ approval refuses the new route before canary/business bytes; existing routes
 remain unchanged. Product behavior on otherwise unqualified hardware remains
 ADR-0015's separate operator decision, not implicitly decided by this proposal.
 
-Avoid circular approval: the qualification owner must specify a separately
-reviewed, explicitly budgeted qualification lane that produces candidate evidence
-without granting general business readiness. This proposal provides no public
-unchecked session, arbitrary endpoint, generic plugin or approval constructor to
-bootstrap that lane. Its exact design and authority are a required handoff item.
+Avoid circular approval: reuse the existing qualification-only r2/G1 preparation
+and budget-owner design; bind it to the delivered candidate before its G2 request.
+It produces candidate evidence without granting general business readiness. This
+proposal provides no public unchecked session, arbitrary endpoint, generic plugin
+or approval constructor to bootstrap that lane. Its candidate-specific execution
+interface and numeric authority remain required before dispatch.
 
 ## Differences from validated work
 
@@ -134,7 +155,8 @@ production enrollment; the framing receipt marks full C9 parity pending.
 UNKNOWN / REQUIRED before dependent implementation or execution: accepted
 qualification schema and measured-settings delivery; owner-approved real canary
 request/expected pair and callback/checker identity; issuer/enrollment/trust API;
-qualification-only lane; numeric live and request budgets; combined release and
+candidate-specific binding of the existing qualification lane; numeric live and
+request budgets; combined release and
 prepared-store/sidecar identity; full C9 parity and applicable quality approval.
 No absence across every other workstream is inferred from this inspected packet.
 Exact acceptance of this proposal would not fill those missing values or accept
