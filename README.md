@@ -22,6 +22,7 @@ Current decisions:
 - [ADR-0011: Shared local model runtime](adr/0011-shared-local-model-runtime.md)
 - [ADR-0013: Negotiated fixed compatibility parameters (proposed)](adr/0013-fixed-compatibility-parameters.md)
 - [ADR-0014: Invoice amount-due capability version agreement](adr/0014-invoice-amount-due-version-agreement.md)
+- [ADR-0015: Runtime accuracy qualification identity (proposed)](adr/0015-runtime-accuracy-qualification-identity.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
