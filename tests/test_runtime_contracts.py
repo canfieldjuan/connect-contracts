@@ -212,9 +212,17 @@ class RuntimeContractTests(unittest.TestCase):
     def test_fixture_inventory_is_complete(self):
         index = load(FIXTURES / "index.json")
         listed = {case["fixture"] for case in index}
+        self.assertEqual(len(index), len(listed))
+        # Qualification cases need raw record + profile + expected-instance inputs.
+        # Keep this the one exhaustive fixture inventory owner; do not exclude a
+        # whole directory and silently allow unlisted evidence.
+        qualification = load(FIXTURES / "qualification/index.json")
+        self.assertEqual(len(qualification), len({case["record"] for case in qualification}))
+        listed.add("qualification/index.json")
+        listed.update("qualification/" + case[key]
+                      for case in qualification for key in ("record", "profile"))
         present = {str(path.relative_to(FIXTURES)) for path in FIXTURES.glob("*/*.json")}
         self.assertEqual(listed, present)
-        self.assertEqual(len(index), len(listed))
 
     def test_fixtures_match_their_expected_validity(self):
         for case in load(FIXTURES / "index.json"):

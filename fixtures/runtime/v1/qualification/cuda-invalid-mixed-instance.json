@@ -1,0 +1,218 @@
+{
+  "record_version": 1,
+  "profile_id": "8eeb2cdb63997777607df7498c5d53c23c90a0aa3bce8292f7d1faebfad53e2c",
+  "platform": "linux-x64",
+  "tier": "gpu-cuda",
+  "backend": "cuda",
+  "runtime_archive_sha256": "57903935f0250469813450f4cbda124b20ccff966339d6b24dd3a7d3cb449d71",
+  "model_sha256": "6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a",
+  "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7",
+  "application_route": {
+    "application": "synthetic-consumer",
+    "capability": "synthetic.extract",
+    "request_profile": "synthetic-request-v1"
+  },
+  "device": {
+    "name": {
+      "state": "observed",
+      "value": "Synthetic device",
+      "source": {
+        "kind": "device",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "6575cad3d4de5ea629121449d3b8fc334f38347b51637ffe563f9ef1f4ad9881",
+        "alias": "device-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "compute_capability": {
+      "state": "observed",
+      "value": {
+        "major": 8,
+        "minor": 6
+      },
+      "source": {
+        "kind": "device",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "6575cad3d4de5ea629121449d3b8fc334f38347b51637ffe563f9ef1f4ad9881",
+        "alias": "device-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "nvidia_driver_version": {
+      "state": "observed",
+      "value": "synthetic-driver",
+      "source": {
+        "kind": "device",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "6575cad3d4de5ea629121449d3b8fc334f38347b51637ffe563f9ef1f4ad9881",
+        "alias": "device-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "cuda_runtime_version": {
+      "state": "observed",
+      "value": "synthetic-cuda-runtime",
+      "source": {
+        "kind": "device",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "6575cad3d4de5ea629121449d3b8fc334f38347b51637ffe563f9ef1f4ad9881",
+        "alias": "device-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    }
+  },
+  "effective_settings": {
+    "context_per_slot": {
+      "state": "observed",
+      "value": 32768,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "slots": {
+      "state": "observed",
+      "value": 1,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "logical_batch": {
+      "state": "observed",
+      "value": 2048,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "physical_micro_batch": {
+      "state": "observed",
+      "value": 512,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "a7dca7f6d368512a6e5a9364771e92d1cdce9042fa0c22c98bd6e923e62ec593"
+      }
+    },
+    "context_checkpoints": {
+      "state": "observed",
+      "value": 0,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "prompt_cache_reuse": {
+      "state": "observed",
+      "value": false,
+      "source": {
+        "kind": "request",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "cfa5d9e2ac09f09ca963be1a444fd4b058fc55549ff6e41db19bfcd3a8f4bfb2",
+        "alias": "request-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "flash_attention": {
+      "state": "observed",
+      "value": false,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "kv_cache_type_k": {
+      "state": "observed",
+      "value": "synthetic-cache",
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "kv_cache_type_v": {
+      "state": "observed",
+      "value": "synthetic-cache",
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "offloaded_layers": {
+      "state": "observed",
+      "value": 0,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    }
+  },
+  "concurrency": {
+    "slots": {
+      "state": "observed",
+      "value": 1,
+      "source": {
+        "kind": "server",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "311ec9342177e1f93d3f284b90e65276d12eba4fdae24a3be7e4a616a18477d4",
+        "alias": "server-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    },
+    "requests_overlap": {
+      "state": "observed",
+      "value": false,
+      "source": {
+        "kind": "workload",
+        "binding_sha256": "e2e0f89cc6fe65de21dfdae500d2bd04f1a6bef683ea63a0a59bfcefd6b1eb29",
+        "artifact_sha256": "520c76a23b115c08aef9efcdbe76136b84133678240fce51582df156f403c1f0",
+        "alias": "workload-evidence",
+        "instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7"
+      }
+    }
+  },
+  "intended": {
+    "profile": {
+      "alias": "linux-x64-profile-binding.json",
+      "sha256": "8eeb2cdb63997777607df7498c5d53c23c90a0aa3bce8292f7d1faebfad53e2c"
+    },
+    "requests": [
+      {
+        "alias": "synthetic-request-bytes",
+        "sha256": "14a90e6d8ffa63fc9ab54784cb64e0afe66d6758f37db09b4111817379278a90"
+      }
+    ]
+  },
+  "task_evidence": [
+    {
+      "alias": "synthetic-failed-task-and-pending-review",
+      "sha256": "2722a59c0a377b3dc7e2a23b5c872fe466bdfa523267128f3d7e19b02152b179"
+    }
+  ]
+}

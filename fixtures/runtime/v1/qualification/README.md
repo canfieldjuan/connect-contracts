@@ -74,6 +74,8 @@ Run `python3 -m unittest tests.test_runtime_qualification` for this slice and
 `python3 -m unittest tests.test_runtime_contracts` for the unchanged adjacent
 runtime documents. No model, GPU, network, installed app or host is used.
 Use the existing jsonschema dependency; no new packages or workflow changes.
+The existing runtime fixture inventory guard accounts for this directory's
+record/profile pairs through `index.json`; it still refuses unlisted JSON files.
 
 Cover both backend variants and platforms; incomplete evidence; every required
 field/closed object; mixed backend fields; each binding comparison; restart-spliced
@@ -92,4 +94,6 @@ registration format, trust/permit design or production hardware policy changes.
 The existing shared transport byte-order guard is unchanged; this implementation
 never imports the apps or transport and does not qualify their output parity.
 Exact fixture hashes, test receipts and cold diff audit live in the durable PR
-packet. Implementation and independent review are pending at this spec commit.
+packet. The specification was committed before implementation. Offline shape
+proof does not complete capture integration, full profile admission, live
+qualification, human task-quality review or production enrollment.

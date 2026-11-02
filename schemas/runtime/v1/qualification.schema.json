@@ -1,0 +1,699 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/qualification.schema.json",
+  "title": "ADR-0015 offline execution evidence; not qualification approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_version",
+    "profile_id",
+    "platform",
+    "tier",
+    "backend",
+    "runtime_archive_sha256",
+    "model_sha256",
+    "instance_id",
+    "application_route",
+    "device",
+    "effective_settings",
+    "concurrency",
+    "intended",
+    "task_evidence"
+  ],
+  "properties": {
+    "record_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "profile_id": {
+      "$ref": "#/$defs/sha256"
+    },
+    "platform": {
+      "$ref": "#/$defs/platform"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "gpu-cuda",
+        "gpu-vulkan"
+      ]
+    },
+    "backend": {
+      "type": "string",
+      "enum": [
+        "cuda",
+        "vulkan"
+      ]
+    },
+    "runtime_archive_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "model_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "instance_id": {
+      "$ref": "#/$defs/sha256"
+    },
+    "application_route": {
+      "$ref": "#/$defs/route"
+    },
+    "device": {},
+    "effective_settings": {
+      "$ref": "#/$defs/settings"
+    },
+    "concurrency": {
+      "$ref": "#/$defs/concurrency"
+    },
+    "intended": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "requests"
+      ],
+      "properties": {
+        "profile": {
+          "$ref": "#/$defs/artifact"
+        },
+        "requests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        }
+      }
+    },
+    "task_evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "backend": {
+          "const": "cuda"
+        },
+        "tier": {
+          "const": "gpu-cuda"
+        },
+        "device": {
+          "$ref": "#/$defs/cuda_device"
+        }
+      }
+    },
+    {
+      "properties": {
+        "backend": {
+          "const": "vulkan"
+        },
+        "tier": {
+          "const": "gpu-vulkan"
+        },
+        "device": {
+          "$ref": "#/$defs/vulkan_device"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "alias": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9._-]*(?![\\s\\S])"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "\\S"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "positive_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "linux-x64",
+        "windows-x64"
+      ]
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "major",
+        "minor"
+      ],
+      "properties": {
+        "major": {
+          "$ref": "#/$defs/count"
+        },
+        "minor": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alias",
+        "sha256"
+      ],
+      "properties": {
+        "alias": {
+          "$ref": "#/$defs/alias"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "binding_sha256",
+        "artifact_sha256",
+        "alias",
+        "instance_id"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "server",
+            "device",
+            "request",
+            "workload"
+          ]
+        },
+        "binding_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "artifact_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "alias": {
+          "$ref": "#/$defs/alias"
+        },
+        "instance_id": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "observed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "value",
+        "source"
+      ],
+      "properties": {
+        "state": {
+          "const": "observed"
+        },
+        "value": {},
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      }
+    },
+    "unavailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "reason"
+      ],
+      "properties": {
+        "state": {
+          "const": "unavailable"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "not_collected",
+            "not_reported",
+            "source_error"
+          ]
+        }
+      }
+    },
+    "server_positive": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/positive_count"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "server"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "server_count": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/count"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "server"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "server_bool": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "server"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "server_label": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/label"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "server"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "request_bool": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "request"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "workload_bool": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "workload"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "device_label": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/label"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "device"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "device_capability": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/observed"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/capability"
+                },
+                "source": {
+                  "properties": {
+                    "kind": {
+                      "const": "device"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/unavailable"
+        }
+      ]
+    },
+    "cuda_device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "compute_capability",
+        "nvidia_driver_version",
+        "cuda_runtime_version"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/device_label"
+        },
+        "compute_capability": {
+          "$ref": "#/$defs/device_capability"
+        },
+        "nvidia_driver_version": {
+          "$ref": "#/$defs/device_label"
+        },
+        "cuda_runtime_version": {
+          "$ref": "#/$defs/device_label"
+        }
+      }
+    },
+    "vulkan_device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "physical_device_identity",
+        "api_version",
+        "driver_implementation",
+        "driver_version"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/device_label"
+        },
+        "physical_device_identity": {
+          "$ref": "#/$defs/device_label"
+        },
+        "api_version": {
+          "$ref": "#/$defs/device_label"
+        },
+        "driver_implementation": {
+          "$ref": "#/$defs/device_label"
+        },
+        "driver_version": {
+          "$ref": "#/$defs/device_label"
+        }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_per_slot",
+        "slots",
+        "logical_batch",
+        "physical_micro_batch",
+        "context_checkpoints",
+        "prompt_cache_reuse",
+        "flash_attention",
+        "kv_cache_type_k",
+        "kv_cache_type_v",
+        "offloaded_layers"
+      ],
+      "properties": {
+        "context_per_slot": {
+          "$ref": "#/$defs/server_positive"
+        },
+        "slots": {
+          "$ref": "#/$defs/server_positive"
+        },
+        "logical_batch": {
+          "$ref": "#/$defs/server_positive"
+        },
+        "physical_micro_batch": {
+          "$ref": "#/$defs/server_positive"
+        },
+        "context_checkpoints": {
+          "$ref": "#/$defs/server_count"
+        },
+        "prompt_cache_reuse": {
+          "$ref": "#/$defs/request_bool"
+        },
+        "flash_attention": {
+          "$ref": "#/$defs/server_bool"
+        },
+        "kv_cache_type_k": {
+          "$ref": "#/$defs/server_label"
+        },
+        "kv_cache_type_v": {
+          "$ref": "#/$defs/server_label"
+        },
+        "offloaded_layers": {
+          "$ref": "#/$defs/server_count"
+        }
+      }
+    },
+    "concurrency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slots",
+        "requests_overlap"
+      ],
+      "properties": {
+        "slots": {
+          "$ref": "#/$defs/server_positive"
+        },
+        "requests_overlap": {
+          "$ref": "#/$defs/workload_bool"
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "application",
+        "capability",
+        "request_profile"
+      ],
+      "properties": {
+        "application": {
+          "$ref": "#/$defs/label"
+        },
+        "capability": {
+          "$ref": "#/$defs/label"
+        },
+        "request_profile": {
+          "$ref": "#/$defs/label"
+        }
+      }
+    },
+    "profile_binding": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "platform",
+        "tiers"
+      ],
+      "properties": {
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
+        "tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "id",
+              "device_class",
+              "model",
+              "runtime"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "gpu-cuda",
+                  "gpu-vulkan"
+                ]
+              },
+              "device_class": {
+                "type": "string",
+                "enum": [
+                  "nvidia-cuda",
+                  "vulkan-discrete"
+                ]
+              },
+              "model": {
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "sha256"
+                ],
+                "properties": {
+                  "sha256": {
+                    "$ref": "#/$defs/sha256"
+                  }
+                }
+              },
+              "runtime": {
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "archive"
+                ],
+                "properties": {
+                  "archive": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "required": [
+                      "sha256"
+                    ],
+                    "properties": {
+                      "sha256": {
+                        "$ref": "#/$defs/sha256"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
