@@ -9,6 +9,25 @@ Parent authorities: [U1](PR-Shared-Runtime-U1.md),
 This proposal neither accepts nor implements [ADR-0015 / PR70](https://github.com/canfieldjuan/connect-contracts/pull/70).
 The existing ADR is the qualification-identity owner; do not create another one.
 
+## Recorded v1 product decisions — 2026-11-01
+
+Juan's v1 decisions are:
+
+- **Hardware floor:** NVIDIA RTX GPUs with at least 8 GB VRAM. This is a product
+  requirement, not evidence of qualification on 8 GB hardware or proof that a
+  particular model/runtime configuration fits or runs correctly there.
+- **Model-call concurrency:** sequential model calls, one slot.
+- **Model:** "We're going to ship the first version with the 9b model."
+
+These decisions do not select quantization or runtime build, accept
+any other budget, or authorize execution. Runtime build selection remains OPEN
+under the Runtime Identity Selection gate below. [Issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88)
+remains OPEN: the hardware floor does not choose refusal, warning or record-only
+behavior for unqualified execution identities. Existing qualification, acceptance,
+review, enrollment and release gates remain unchanged. No implementation,
+builds, tests, benchmarks, tokenizer/model calls or live changes are authorized
+by this record.
+
 ## Root cause
 
 The missing capability is deliberate, not an application defect. The merged
