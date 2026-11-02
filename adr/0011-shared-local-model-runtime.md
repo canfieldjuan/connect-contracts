@@ -109,6 +109,12 @@ exits 0 and changes nothing.
 mechanics:
 - It runs the server and its libraries only from sealed, read-only copies of
   files verified against the pins.
+- It retains an open descriptor for the verified library directory and sets
+  the child's working directory through that descriptor before execution.
+  The pinned native registry searches only `/proc/self/cwd` for backends;
+  executable-directory fallback and `GGML_BACKEND_PATH` are disabled in this
+  build. This keeps discovery bound to the verified directory even if its
+  original pathname is renamed or replaced.
 - It opens the GGUF without following links, and holds a kernel read lease on
   it (`F_SETLEASE`) until the server has exited. The server receives the model
   through that descriptor (the argv's `<model>`).
@@ -122,7 +128,9 @@ mechanics:
 - It gives the server an allow-listed environment and nothing else:
   - `HOME`, `LANG` and `CUDA_DEVICE_ORDER=PCI_BUS_ID`;
   - exactly one `LD_LIBRARY_PATH`, which the host builds to point only at its
-    private directory of sealed library copies, and never inherits.
+    retained library directory descriptor (`/proc/self/fd/<directory-fd>`),
+    and never inherits. The host keeps that descriptor available to the child
+    for its lifetime.
 
   In particular it passes no `LLAMA_*`, `GGML_*` or `CUDA_VISIBLE_DEVICES`.
 - It writes a random bearer key to `server.key` (0600) and passes it by file,
@@ -159,8 +167,19 @@ left, in this order:
 2. **A stale socket.** `server.sock` is removed only after that, and only when
    a `connect()` to it fails.
 
-Then, before any file check or tier probe, the host writes `state: starting`
-with a `ready_by` deadline at most 300 seconds away. That budget covers:
+Then, before any profile or store file check or tier probe, the host writes
+`state: starting` with a `ready_by` deadline at most 300 seconds away.
+At this point `tier`, `device`, `server`, `model_sha256`, `context_tokens`,
+`build_commit` and `chat_template_sha256` are all `null`: no runtime has been
+selected yet. The other fields are already known, including the client's
+expected `profile_id`; that id does not claim the profile bytes were admitted.
+The null group is allowed only in `starting`, and only as a complete group.
+After profile admission and tier choice, the host atomically replaces it with
+the selected runtime details; `server` stays null until the child exists.
+Fully selected `starting`, `ready` and `stopping` records keep their existing
+requirements. A starting record never authorizes an inference request.
+
+That budget covers:
 - its file checks, including a re-hash when a file's identity changed;
 - the tier choice;
 - the server's start.

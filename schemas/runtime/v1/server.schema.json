@@ -40,13 +40,7 @@
     "profile_id": {
       "$ref": "#/$defs/sha256"
     },
-    "tier": {
-      "enum": [
-        "gpu-cuda",
-        "gpu-vulkan",
-        "cpu"
-      ]
-    },
+    "tier": {},
     "device": {
       "type": [
         "string",
@@ -89,19 +83,10 @@
       "minLength": 1,
       "maxLength": 512
     },
-    "model_sha256": {
-      "$ref": "#/$defs/sha256"
-    },
-    "context_tokens": {
-      "const": 32768
-    },
-    "build_commit": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{40}$"
-    },
-    "chat_template_sha256": {
-      "$ref": "#/$defs/sha256"
-    }
+    "model_sha256": {},
+    "context_tokens": {},
+    "build_commit": {},
+    "chat_template_sha256": {}
   },
   "$defs": {
     "sha256": {
@@ -143,6 +128,64 @@
           "$ref": "#/$defs/uuid"
         }
       }
+    },
+    "selected_runtime": {
+      "type": "object",
+      "properties": {
+        "tier": {
+          "enum": [
+            "gpu-cuda",
+            "gpu-vulkan",
+            "cpu"
+          ]
+        },
+        "model_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "context_tokens": {
+          "const": 32768
+        },
+        "build_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "chat_template_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
     }
-  }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/selected_runtime"
+    },
+    {
+      "properties": {
+        "state": {
+          "const": "starting"
+        },
+        "tier": {
+          "type": "null"
+        },
+        "model_sha256": {
+          "type": "null"
+        },
+        "context_tokens": {
+          "type": "null"
+        },
+        "build_commit": {
+          "type": "null"
+        },
+        "chat_template_sha256": {
+          "type": "null"
+        },
+        "device": {
+          "type": "null"
+        },
+        "server": {
+          "type": "null"
+        }
+      }
+    }
+  ]
 }

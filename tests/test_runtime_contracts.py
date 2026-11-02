@@ -5,6 +5,7 @@ import json
 import re
 import unittest
 from datetime import datetime
+from itertools import product
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 
@@ -160,7 +161,7 @@ def server_semantic_errors(document):
     errors = timestamp_errors("ready_by", document["ready_by"])
     if document["state"] == "ready" and document["server"] is None:
         errors.append("a ready registration names its server")
-    if (document["tier"] == "cpu") != (document["device"] is None):
+    if document["tier"] is not None and (document["tier"] == "cpu") != (document["device"] is None):
         errors.append("a GPU tier names exactly one device, and the cpu tier none")
     if document["server"] is not None and document["server"]["pid"] == document["host"]["pid"]:
         errors.append("the server and the host are one process")
@@ -373,6 +374,40 @@ class RuntimeContractTests(unittest.TestCase):
         for name, (document, valid) in cases.items():
             with self.subTest(case=name):
                 self.assertEqual(not errors_for("server.schema.json", document), valid)
+
+    def test_starting_before_profile_admission(self):
+        selected = load(FIXTURES / "valid/server-starting.json")
+        selection_keys = ("tier", "model_sha256", "context_tokens", "build_commit",
+                          "chat_template_sha256")
+        pending = dict(selected, device=None, server=None,
+                       **{key: None for key in selection_keys})
+        validator = Draft202012Validator(load(SCHEMAS / "server.schema.json"))
+        self.assertEqual(list(validator.iter_errors(pending)), [])
+        self.assertEqual(errors_for("server.schema.json", pending), [])
+        for mask in product((False, True), repeat=len(selection_keys)):
+            document = dict(pending)
+            for key, known in zip(selection_keys, mask):
+                if known:
+                    document[key] = selected[key]
+            if all(mask):
+                document["device"] = selected["device"]
+            valid = not any(mask) or all(mask)
+            with self.subTest(selection=mask):
+                self.assertEqual(validator.is_valid(document), valid)
+                self.assertEqual(not errors_for("server.schema.json", document), valid)
+        for state in ("ready", "stopping", "", None, False):
+            with self.subTest(state=state):
+                self.assertFalse(validator.is_valid(dict(pending, state=state)))
+        for key in selection_keys + ("device", "server"):
+            for value in ("", False, 0):
+                with self.subTest(key=key, value=value):
+                    self.assertFalse(validator.is_valid(dict(pending, **{key: value})))
+            missing = dict(pending)
+            del missing[key]
+            with self.subTest(missing=key):
+                self.assertFalse(validator.is_valid(missing))
+        self.assertFalse(validator.is_valid(dict(pending, device="CUDA0")))
+        self.assertFalse(validator.is_valid(dict(pending, server={"pid": 4243, "start_time": 2})))
 
     def test_failure_log_tail_boundaries(self):
         base = load(FIXTURES / "valid/failure-server-failed.json")

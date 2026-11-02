@@ -21,6 +21,9 @@ Current decisions:
 - [ADR-0010: Connect v3 streamed output retrieval](adr/0010-streamed-output-retrieval.md)
 - [ADR-0011: Shared local model runtime](adr/0011-shared-local-model-runtime.md)
 - [ADR-0012: Shared local model runtime on Windows](adr/0012-shared-local-model-runtime-windows.md) (proposed)
+- [ADR-0013: Negotiated fixed compatibility parameters (proposed)](adr/0013-fixed-compatibility-parameters.md)
+- [ADR-0014: Invoice amount-due capability version agreement](adr/0014-invoice-amount-due-version-agreement.md)
+- [ADR-0015: Runtime accuracy qualification identity (proposed)](adr/0015-runtime-accuracy-qualification-identity.md)
 
 The first provider's standalone summary artifact is implemented and verified,
 so Connect v1 remains frozen as executable JSON Schemas and conformance
@@ -39,11 +42,17 @@ remain unchanged. Runtime support requires separate provider and consumer PRs.
 ADR-0011's shared model runtime is not a Connect wire protocol. Its documents
 live in their own family: the schemas for the canonical profile, the host's
 `server.json` and its `failure.json` are under `schemas/runtime/v1/`, and their
-synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itself,
-`runtime/v1/profile.json`, lands once its tiers qualify on the ADR's exact argv.
+synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itself is
+`runtime/v1/profile.json`. It carries only tiers that qualified on the ADR's exact argv
+(invoice-processor MODEL-SETUP MS-PIN-4): today `gpu-cuda` and `gpu-vulkan`. Applications
+vendor its exact bytes, and its `PROFILE_ID` is their SHA-256.
 
 Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts`
 after installing the development dependencies in `requirements-dev.txt`.
+
+ADR-0013 negotiated fixed-parameter schemas and static context vectors have a
+separate conformance runner: `python3 -m unittest tests.test_fixed_parameters_contract`.
+See [the feature proof scope](fixtures/v2/features/fixed-parameters-v1/README.md).
 
 Commercial Connect authorization is a separate, signed local contract under
 `entitlements/v1/`. The feature identifiers a licence may carry are enumerated in

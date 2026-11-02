@@ -4,7 +4,7 @@
 ships in the first release alongside Linux. Deferring native proof does not defer
 Windows to a later release or waive its release gate. The decisions marked
 **(measured: Mn)** retain the historical evidence described below; the first
-release still requires the native Windows proof and qualification gates here.
+release still requires the Windows proof and qualification gates here.
 
 The measurements first ran in a Windows 11 CPU-only VM on 2026-10-01 (see
 "Results so far"). M2 failed as first decided, so "Starting a host" now uses
@@ -61,14 +61,28 @@ covered: ARM64, MSIX and Store packages, and macOS.
 
 ## Reconciliation with the accepted qualification plan
 
-**Release requirement and proof venue (Juan, 2026-11-01).** Windows is part of
-the first release. Its native proof runs later on Juan's own physical Windows
-box, not a VM. No test is dispatched by this documentation. The box's OS build,
-GPU/backend, driver and eventual runtime identity must be recorded, not assumed.
-The existing Windows 10 22H2 and Windows 11 obligations below remain: a result on
-one OS does not satisfy the other. Missing coverage stays an explicit release
-gap; this instruction does not authorize a VM substitute or silently narrow the
-supported OS matrix.
+**Release requirement and proof venues (Juan, 2026-11-01).** Windows is part of
+the first release; both Windows 10 22H2 and Windows 11 coverage remain required.
+Windows 11 proof runs later natively on Juan's own PC booted into Windows, not a
+VM. Juan identified its GPU as an RTX 3090; this is operator-provided inventory,
+not an observed Windows execution identity or qualification result. During that
+boot Linux and its services/sessions are down. The later proof plan must use
+Windows-accessible evidence inputs and durable output paths, retaining byte
+hashes and provenance; it cannot depend on a running Linux session or on Linux
+paths being usable from Windows.
+
+Windows 10 proof is HELD until Juan installs Windows 10 locally with a licence.
+Its venue is pending Juan: neither a VM nor a separate disk is selected here.
+This records his latest words relayed by oversight, superseding the intermediate
+VM/dual-Windows-boot interpretations. If a VM without a GPU is later selected,
+it proves mechanisms only: Windows 10 M5 graphics-memory recovery and GPU-tier
+qualification remain named gaps until proved with a real GPU available there.
+No installation, reboot, VM or test is dispatched by this documentation.
+
+Each OS proof records its own OS build, GPU/backend, driver and chosen runtime
+identity. A pass on one does not qualify the other. Missing OS/backend coverage
+stays an explicit first-release gap; the Windows 10 hold does not waive it or
+move Windows to a later release.
 
 **One dependency owner.** The [accepted U1b plan at its merge](https://github.com/canfieldjuan/connect-contracts/blob/8d1cd7f2bbe010f58ec5827c18fc369ed896ecf1/plans/PR-Shared-Runtime-U1b-Consumer-Approval.md#required-change-surface-and-sequence)
 owns preparation, delivery, preflight, qualification and enrollment ordering.
@@ -114,9 +128,10 @@ b10621 CPU runtime (`c1d0e7a00`), `Qwen3.5-4B-Q4_K_M.gguf`, Win32 probes and
 non-generation health/identity endpoints. Its recorded hash-verification claims
 are historical, not a fresh artifact verification here. The accepted plan owns
 the current Qwen3.5-9B-Q4_K_M inventory and real-app fixture receipts; reuse those
-without rebuilding inventories. The differences are explicit: native physical
-hardware instead of the VM; a later chosen Windows runtime/backend instead of
-that CPU probe; actual host/client/app artifacts instead of mechanism probes;
+without rebuilding inventories. The differences are explicit: native Windows 11
+on Juan's PC instead of the historical VM, with Windows 10 held pending its
+licensed installation and venue decision; a later chosen Windows runtime/backend
+instead of that CPU probe; actual host/client/app artifacts instead of mechanism probes;
 and separate app accuracy/parity qualification instead of endpoint success.
 No new performance, accuracy or compatibility result is claimed by this edit.
 
@@ -434,9 +449,17 @@ So the canonical profile is one file per platform:
   profile, host vendored bytes and provenance, and every affected application's
   vendored copy; review old/new reader compatibility and fail-closed mismatch
   behavior before rollout. Do not silently add the field to installed profiles.
-  This is a future migration obligation, not a profile revision in this ADR.
-  ADR-0015 Decision 3 owns explicit settings and same-identity parity at that
-  revision; a changed runtime still needs independent qualification.
+  **This coordinated migration must land before G0 binds any candidate on either
+  Linux or Windows.** After Juan's runtime choice, combine the `platform` field
+  and ADR-0015 Decision 3's explicit output-affecting settings in the same profile
+  revision: one new `PROFILE_ID` per affected platform profile, not a later
+  second identity change after qualification. Host provenance and consumer
+  vendored bytes must bind that final revision before G0; no G1/G2 qualification
+  may use a pre-migration candidate as proof for the post-migration profile.
+  ADR-0015 owns same-runtime settings parity; a changed runtime still needs its
+  own qualification. Existing passes remain evidence only for their original
+  identities. This future prerequisite selects no runtime, values or budget and
+  does not change any profile in this documentation commit.
 
 **What each Windows tier holds:**
 - **The same as Linux:** the model pin, the context, the chat-template pin, and
@@ -473,9 +496,10 @@ The shared store and registration need applications that see the same
 
 ## Measurements before a Windows release
 
-**Where they run:** later, natively on Juan's own Windows box, not a VM, under
-the reconciliation and authorization gates above. Windows 10 22H2 and Windows
-11 coverage remains required; record any unavailable OS/backend as pending.
+**Where they run:** later, under the [proof venues and hold](#reconciliation-with-the-accepted-qualification-plan)
+and authorization gates above: Windows 11 natively on Juan's PC; Windows 10
+22H2 held pending a licensed local installation and Juan's venue decision.
+Both versions remain required; record any unavailable OS/backend as pending.
 Bind the chosen Windows artifacts and ADR-0015 execution identity once selected.
 Each result goes into durable host evidence; a failure must be resolved at its
 owner before release. No native measurement has been performed by this edit.
@@ -535,15 +559,15 @@ Visual C++ runtime in its set, and the model was MODEL-SETUP's CPU-tier model.
 | M6 | Passed. A lease was released within 7 ms idle (200 kills), and within 115 ms under CPU and disk load (100 kills). |
 
 Still owed before the first release's Windows gate:
-- native M1-M6 on Juan's own Windows box for the chosen release identity; retain
-  separate Windows 10 22H2 and Windows 11 coverage, with missing coverage pending;
+- M1-M6 for each OS's chosen release identity, following the proof venues and
+  Windows 10 hold above; keep missing OS/backend coverage pending;
 - M4 on a volume that does not enforce sharing modes;
 - M5's graphics-memory recovery on the actual GPU;
 - CUDA and Vulkan qualification for the intended shipped tiers, independently
   bound to the actual Windows identities, not inherited from Linux or the VM;
 - real host/client/app attachment, transport and app task qualification through
   the accepted plan, plus required human review and shipped-byte identity proof.
-Historical mechanism passes remain in the table; none completes these native
+Historical mechanism passes remain in the table; none completes these OS-specific
 or application release obligations.
 
 ## Conformance and landing gates on Windows
@@ -569,17 +593,19 @@ or application release obligations.
 - Complete ADR-0015's qualification schema/fixtures before dependent host
   capture. Complete the platform-aware registration/failure schema and reader
   contract above before the Windows host publishes those records. Review the
-  coordinated profile migration before changing any profile/vendor bytes.
+  coordinated [profile migration](#profile) before changing any profile/vendor
+  bytes, and complete its single revision before G0 binds either platform.
 - Review the Windows host/client mechanisms and per-app attachment contracts;
   use the accepted plan's design/interface, offline proof and candidate-delivery
   steps. No real-consumer policy while issue88 is open; independent preparation
   must not freeze a runtime before Juan's choice.
-- Once runtime choice is settled, bind candidate Windows profile/archive and
-  consumer artifacts for separately authorized native proof and qualification.
+- Once runtime choice is settled and the profile migration gate above is complete,
+  bind candidate Windows profile/archive and consumer artifacts for separately
+  authorized proof and qualification at the recorded venues.
   A candidate profile is not a qualified or released profile. Reuse the plan's
   preflight, G2 and external enrollment gates; do not require a PASS to deliver
   the candidate that will produce it, or grant readiness merely by delivering it.
-- Publish/enroll/adopt only after native M1-M6, app qualification, required human
+- Publish/enroll/adopt only after the required OS-specific M1-M6, app qualification, required human
   review and shipped-versus-qualified identity checks pass under their own gates.
   The Windows bundle installer is part of the first release; Linux completion
   alone cannot satisfy the combined release. No installer or release is
