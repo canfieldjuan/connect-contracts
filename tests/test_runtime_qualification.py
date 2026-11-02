@@ -66,6 +66,76 @@ class QualificationContractTests(unittest.TestCase):
         Draft202012Validator.check_schema(schema)
         self.assertIs(schema['additionalProperties'], False)
 
+    def test_schema_only_observation_discriminators(self):
+        # The reader's state/source access must not mask a lost schema guard.
+        validator = Draft202012Validator(json.loads(SCHEMA.read_text()))
+        for base, _ in pairs():
+            observed = base['device']['name']
+            unavailable = {'state': 'unavailable', 'reason': 'not_reported'}
+            for valid in (observed, unavailable):
+                record = copy.deepcopy(base)
+                record['device']['name'] = valid
+                self.assertTrue(validator.is_valid(record))
+            corruptions = [
+                ('missing unavailable state', {'reason': 'not_reported'}),
+                ('missing unavailable reason', {'state': 'unavailable'}),
+                ('unknown unavailable state', dict(unavailable, state='garbage')),
+                ('wrong unavailable state', dict(unavailable, state='observed')),
+                ('unknown observed state', dict(observed, state='garbage')),
+                ('wrong observed state', dict(observed, state='unavailable')),
+            ]
+            for key in ('state', 'value', 'source'):
+                missing = copy.deepcopy(observed)
+                del missing[key]
+                corruptions.append(('missing observed ' + key, missing))
+            for name, observation in corruptions:
+                with self.subTest(backend=base['backend'], case=name):
+                    record = copy.deepcopy(base)
+                    record['device']['name'] = observation
+                    self.assertFalse(validator.is_valid(record))
+
+    def test_schema_only_backend_tier_and_platform_discrimination(self):
+        schema = json.loads(SCHEMA.read_text())
+        validator = Draft202012Validator(schema)
+        for base, _ in pairs():
+            self.assertTrue(validator.is_valid(base))
+            other = 'vulkan' if base['backend'] == 'cuda' else 'cuda'
+            for key, value in [('backend', other), ('tier', 'gpu-' + other),
+                               ('backend', 'unknown'), ('tier', 'unknown'),
+                               ('platform', 'unknown')]:
+                with self.subTest(backend=base['backend'], field=key, value=value):
+                    record = copy.deepcopy(base)
+                    record[key] = value
+                    self.assertFalse(validator.is_valid(record))
+        # The enums are redundant under root oneOf; exercise their canonical
+        # definitions directly instead of inventing a root-level counterexample.
+        for key, accepted in [('backend', ('cuda', 'vulkan')),
+                              ('tier', ('gpu-cuda', 'gpu-vulkan'))]:
+            field_validator = Draft202012Validator(schema['properties'][key])
+            for value in accepted:
+                self.assertTrue(field_validator.is_valid(value))
+            for value in ('unknown', '', False, 0, None):
+                with self.subTest(field=key, value=value):
+                    self.assertFalse(field_validator.is_valid(value))
+
+    def test_nonfinite_constants_fail_at_reader_ingestion(self):
+        base, profile = next(pairs())
+        for token in ('NaN', 'Infinity', '-Infinity'):
+            record = copy.deepcopy(base)
+            record['effective_settings']['context_checkpoints']['value'] = float(token)
+            # Replacing this constant with zero would produce a valid record.
+            profile_with_constant = json.loads(profile)
+            profile_with_constant['outside_comparison_surface'] = float(token)
+            bound_record = copy.deepcopy(base)
+            bound_profile = bind_profile(bound_record, profile_with_constant)
+            inputs = [(token.encode(), profile), (raw(base), token.encode()),
+                      (raw(record), profile), (raw(bound_record), bound_profile)]
+            for number, (record_bytes, profile_bytes) in enumerate(inputs):
+                with self.subTest(token=token, input=number):
+                    with self.assertRaisesRegex(EvidenceError, '^non-JSON numeric constant$'):
+                        inspect_record(record_bytes, profile_bytes=profile_bytes,
+                                       expected_instance_id=EXPECTED_INSTANCE)
+
     def test_frozen_fixture_inventory(self):
         index = json.loads((FIXTURES / 'index.json').read_bytes())
         # The exhaustive file inventory remains test_runtime_contracts' owner.
