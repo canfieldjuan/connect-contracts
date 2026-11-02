@@ -1,0 +1,29 @@
+{
+  "platform": "windows-x64",
+  "tiers": [
+    {
+      "id": "gpu-cuda",
+      "device_class": "nvidia-cuda",
+      "model": {
+        "sha256": "6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a"
+      },
+      "runtime": {
+        "archive": {
+          "sha256": "57903935f0250469813450f4cbda124b20ccff966339d6b24dd3a7d3cb449d71"
+        }
+      }
+    },
+    {
+      "id": "gpu-vulkan",
+      "device_class": "vulkan-discrete",
+      "model": {
+        "sha256": "6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a"
+      },
+      "runtime": {
+        "archive": {
+          "sha256": "40fd534f48ef8f8027781b2c648f80ff7334a243aea1ff029542279230d55c52"
+        }
+      }
+    }
+  ]
+}

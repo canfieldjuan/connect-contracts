@@ -1,0 +1,44 @@
+[
+  {
+    "record": "cuda-complete.json",
+    "profile": "linux-x64-profile-binding.json",
+    "expected_instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7",
+    "valid": true,
+    "complete": true
+  },
+  {
+    "record": "cuda-incomplete.json",
+    "profile": "linux-x64-profile-binding.json",
+    "expected_instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7",
+    "valid": true,
+    "complete": false
+  },
+  {
+    "record": "cuda-invalid-mixed-backend.json",
+    "profile": "linux-x64-profile-binding.json",
+    "expected_instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7",
+    "valid": false,
+    "error": "record shape invalid"
+  },
+  {
+    "record": "cuda-invalid-mixed-instance.json",
+    "profile": "linux-x64-profile-binding.json",
+    "expected_instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7",
+    "valid": false,
+    "error": "observation instance mismatch"
+  },
+  {
+    "record": "vulkan-complete.json",
+    "profile": "windows-x64-profile-binding.json",
+    "expected_instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7",
+    "valid": true,
+    "complete": true
+  },
+  {
+    "record": "vulkan-incomplete.json",
+    "profile": "windows-x64-profile-binding.json",
+    "expected_instance_id": "264d4d688e073c05a1d8e91c7e2f8893f35a969c25ed21d098d29ae73f3060c7",
+    "valid": true,
+    "complete": false
+  }
+]
