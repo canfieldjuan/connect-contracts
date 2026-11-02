@@ -385,8 +385,15 @@ matched too.
 
 **Starting a host**, in place of `systemd-run --user`, runs a Task Scheduler
 task on demand **(measured: M2)**.
-- **The task.** Each application registers one per-user task for its own host
-  entry point, named `LocalConnect Model Host (<application id>)`. The task:
+- **The task identity.** Each application registers one task per user for its
+  host entry point, named `LocalConnect Model Host (<user SID>, <application id>)`.
+  `<user SID>` is the current user's token SID in the canonical string form
+  returned by `ConvertSidToStringSidW`, not a display name or profile path.
+  The root task folder is machine-wide; the task's principal alone does not
+  namespace its name. This one SID-qualified identity is used for lookup,
+  registration, definition comparison/replacement, start, stop and uninstall.
+  Never fall back to the old application-only name or another user's task.
+  The task:
   - is in the root task folder, for the current user, with an interactive token
     and least privilege. It stores no password and requests no elevation;
   - has no trigger. Only an attaching client runs it;
@@ -397,8 +404,9 @@ task on demand **(measured: M2)**.
   - takes ADR-0011's arguments as `$(Arg0)` to `$(Arg5)`: the profile path and
     its SHA-256, a fresh `start_id`, and the store, registration and log
     directories as the client resolved them.
-- **How it starts.** The client registers the task, replacing it when its
-  definition differs. It then runs the task through the Task Scheduler API,
+- **How it starts.** The client looks up and registers the task using the task
+  identity above, replacing only that task when its definition differs. It then
+  runs that same task through the Task Scheduler API,
   with the arguments. A non-elevated process can do both.
 - **Where the host runs.** In the job Task Scheduler creates for the task,
   outside every application's job. The server's kill-on-close job nests inside
@@ -425,7 +433,8 @@ task on demand **(measured: M2)**.
   be registered or run, attaching reports it, as on Linux without a user service
   manager. One example is a policy that disables Task Scheduler. The host is
   never started as a child.
-- **Removal.** Uninstalling an application removes its task.
+- **Removal.** Uninstalling an application removes only the current user's task
+  identified by the task identity above; other users' tasks remain untouched.
 - **No autostart.** The host is never started at login, since its task has no
   trigger. It ends when it exits, and its task returns to ready. ADR-0011's "No
   autostart" holds.
@@ -527,6 +536,16 @@ owner before release. No native measurement has been performed by this edit.
     whether or not that job allows breakaway, when that job closes;
   - **from a background provider:** from a provider started by ADR-0007's Task
     Scheduler task, when that task stops.
+  - **Two-account identity isolation (still owed):** two non-elevated Windows
+    accounts on the same machine install the same application. Each registers,
+    looks up and starts its own SID-qualified task without colliding with or
+    replacing the other's task. Changing a definition replaces only that user's
+    task. Stopping or uninstalling for either account leaves the other account's
+    task, definition and host unaffected; repeat with the accounts reversed.
+    Record both task identities and outcomes under separately accepted finite
+    proof budgets; none is granted here.
+    The historical M2 result below did not establish this case; it remains pending
+    on each required Windows version under its existing venue and hold gates.
 - **M3, peer.** `SIO_AF_UNIX_GETPEERPID` returns the server's process id on a
   client's connection.
 - **M4, pinning.**
