@@ -144,6 +144,7 @@ future slices is dispatched or accepted by this proposal.
    and transport proof. Bind the accepted logical canary/checker. Identify absent
    observations explicitly. No final PASS receipt or completed live run is required
    to deliver this candidate; those are outputs of subsequent qualification.
+   G0 binding on either Linux or Windows is also gated by the [coordinated profile migration in ADR-0012](../adr/0012-shared-local-model-runtime-windows.md#profile).
    **Runtime Identity Selection gate — Juan, OPEN (before step 8).** Juan must
    decide which runtime identity G0 binds. Until that decision, request neither
    a preflight nor a G2 annex. Steps 1-7 may continue except where they would bind
