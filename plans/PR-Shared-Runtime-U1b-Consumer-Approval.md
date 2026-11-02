@@ -17,8 +17,9 @@ Juan's v1 decisions are:
   requirement, not evidence of qualification on 8 GB hardware or proof that a
   particular model/runtime configuration fits or runs correctly there.
 - **Model-call concurrency:** sequential model calls, one slot.
+- **Model:** "We're going to ship the first version with the 9b model."
 
-These decisions do not select a model, quantization or runtime build, accept
+These decisions do not select quantization or runtime build, accept
 any other budget, or authorize execution. Runtime build selection remains OPEN
 under the Runtime Identity Selection gate below. [Issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88)
 remains OPEN: the hardware floor does not choose refusal, warning or record-only
