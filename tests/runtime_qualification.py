@@ -36,11 +36,28 @@ def _constant(_value):
     raise EvidenceError('non-JSON numeric constant')
 
 
+def _integer(token):
+    # json's scanner owns syntax. Bound conversion before Python's configurable
+    # int-string limit can raise ValueError; field-specific bounds stay in schema.
+    digits = len(token) - 1 if token.startswith('-') else len(token)
+    if digits > 20 or token == '-0':
+        raise EvidenceError('invalid evidence integer')
+    value = int(token)
+    if not -(2**63) <= value <= 2**64 - 1:
+        raise EvidenceError('invalid evidence integer')
+    return value
+
+
+def _fraction(_token):
+    raise EvidenceError('integer JSON notation required')
+
+
 def _parse(raw):
     if not isinstance(raw, bytes):
         raise EvidenceError('raw UTF-8 JSON bytes required')
     try:
-        return json.loads(raw.decode('utf-8'), object_pairs_hook=_object, parse_constant=_constant)
+        return json.loads(raw.decode('utf-8'), object_pairs_hook=_object,
+                          parse_constant=_constant, parse_int=_integer, parse_float=_fraction)
     except (UnicodeError, json.JSONDecodeError, RecursionError) as error:
         raise EvidenceError('invalid UTF-8 JSON') from error
 

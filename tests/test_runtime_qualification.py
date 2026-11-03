@@ -7,13 +7,13 @@ import unittest
 
 from jsonschema import Draft202012Validator
 
-from tests.runtime_qualification import DuplicateMember, EvidenceError, inspect_record
+from tests.runtime_qualification import DuplicateMember, EvidenceError, _parse, inspect_record
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / 'schemas/runtime/v1/qualification.schema.json'
 FIXTURES = ROOT / 'fixtures/runtime/v1/qualification'
 MAX = 9007199254740991
-EXPECTED_INSTANCE = json.loads((FIXTURES / 'cuda-complete.json').read_bytes())['instance_id']
+EXPECTED_INSTANCE = _parse((FIXTURES / 'cuda-complete.json').read_bytes())['instance_id']
 
 
 def raw(value):
@@ -22,7 +22,7 @@ def raw(value):
 
 def pairs():
     for backend, platform in [('cuda', 'linux-x64'), ('vulkan', 'windows-x64')]:
-        yield (json.loads((FIXTURES / (backend + '-complete.json')).read_bytes()),
+        yield (_parse((FIXTURES / (backend + '-complete.json')).read_bytes()),
                (FIXTURES / (platform + '-profile-binding.json')).read_bytes())
 
 
@@ -124,7 +124,7 @@ class QualificationContractTests(unittest.TestCase):
             record = copy.deepcopy(base)
             record['effective_settings']['context_checkpoints']['value'] = float(token)
             # Replacing this constant with zero would produce a valid record.
-            profile_with_constant = json.loads(profile)
+            profile_with_constant = _parse(profile)
             profile_with_constant['outside_comparison_surface'] = float(token)
             bound_record = copy.deepcopy(base)
             bound_profile = bind_profile(bound_record, profile_with_constant)
@@ -280,7 +280,7 @@ class QualificationContractTests(unittest.TestCase):
             inspect(record, original_profile)
         for case in ('duplicate', 'missing', 'backend'):
             record = copy.deepcopy(base)
-            profile = json.loads(original_profile)
+            profile = _parse(original_profile)
             if case == 'duplicate':
                 profile['tiers'].append(copy.deepcopy(profile['tiers'][0]))
             elif case == 'missing':
@@ -295,9 +295,9 @@ class QualificationContractTests(unittest.TestCase):
 
     def test_profile_comparison_surface_types_and_required_fields(self):
         base, original = next(pairs())
-        for path in objects(json.loads(original)):
-            for key in at(json.loads(original), path):
-                profile = json.loads(original)
+        for path in objects(_parse(original)):
+            for key in at(_parse(original), path):
+                profile = _parse(original)
                 del at(profile, path)[key]
                 record = copy.deepcopy(base)
                 encoded = bind_profile(record, profile)
@@ -308,7 +308,7 @@ class QualificationContractTests(unittest.TestCase):
             with self.assertRaises(EvidenceError):
                 inspect(record, bind_profile(record, profile))
         record = copy.deepcopy(base)
-        profile = json.loads(original)
+        profile = _parse(original)
         profile['not_part_of_binding_validation'] = 'retained but not admitted'
         self.assertTrue(inspect(record, bind_profile(record, profile)).complete)
 
@@ -317,7 +317,7 @@ class QualificationContractTests(unittest.TestCase):
             for platform in ('linux-x64', 'windows-x64'):
                 with self.subTest(backend=base['backend'], platform=platform):
                     record = copy.deepcopy(base)
-                    profile = json.loads(original)
+                    profile = _parse(original)
                     record['platform'] = profile['platform'] = platform
                     self.assertTrue(inspect(record, bind_profile(record, profile)).complete)
 
@@ -345,11 +345,11 @@ class QualificationContractTests(unittest.TestCase):
         self.assertEqual(result.record, record)
         self.assertEqual(list(result.record), list(record))
         # Parsed-profile equality must not make a changed byte stream share its digest.
-        same_profile = raw(json.loads(profile))
+        same_profile = raw(_parse(profile))
         self.assertNotEqual(same_profile, profile)
         with self.assertRaisesRegex(EvidenceError, '^profile digest mismatch$'):
             inspect(record, same_profile)
-        self.assertTrue(inspect(record, bind_profile(record, json.loads(profile))).complete)
+        self.assertTrue(inspect(record, bind_profile(record, _parse(profile))).complete)
 
     def test_complete_evidence_is_not_task_pass_and_no_outcome_is_lost(self):
         record, profile = next(pairs())

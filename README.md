@@ -47,12 +47,14 @@ synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itsel
 (invoice-processor MODEL-SETUP MS-PIN-4): today `gpu-cuda` and `gpu-vulkan`. Applications
 vendor its exact bytes, and its `PROFILE_ID` is their SHA-256.
 
-Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts tests.test_runtime_qualification`
+Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts tests.test_runtime_qualification tests.test_runtime_companion tests.test_runtime_numeric_ingestion`
 after installing the development dependencies in `requirements-dev.txt`.
 
 The [qualification-record fixtures](fixtures/runtime/v1/qualification/README.md)
 check offline evidence shape and bindings only; they do not approve an execution
 identity or exercise a model, GPU, host, or application.
+The [numeric-ingestion fixtures](fixtures/runtime/v1/numeric-ingestion/README.md)
+pin raw number admission separately from schema-only and task-quality outcomes.
 
 ADR-0013 negotiated fixed-parameter schemas and static context vectors have a
 separate conformance runner: `python3 -m unittest tests.test_fixed_parameters_contract`.

@@ -13,6 +13,8 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 from referencing.exceptions import NoSuchResource, Unresolvable
 
+from tests.runtime_qualification import _parse
+
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / 'schemas/runtime/v1'
 NAMES = ('companion', 'instance', 'host-snapshot')
@@ -41,7 +43,7 @@ CASES = {
 def fixture(name):
     if name not in CASES:
         raise ValueError('fixture is not in the fixed allowlist')
-    return json.loads((FIXTURES / name).read_bytes())
+    return _parse((FIXTURES / name).read_bytes())
 
 
 def documents():
@@ -161,7 +163,7 @@ class CompanionSchemaTests(unittest.TestCase):
                 self.assertEqual(sha256(raw).hexdigest(), case['sha256'])
                 self.assertIs(type(case['valid']), bool)
                 self.assertTrue(case['constraint'])
-                value = json.loads(raw)
+                value = _parse(raw)
                 if case['valid']:
                     self.assert_valid(schema, value)
                 else:
@@ -256,14 +258,14 @@ class CompanionSchemaTests(unittest.TestCase):
 
     def test_observation_reuse_keeps_original_meaning(self):
         for backend in ('cuda', 'vulkan'):
-            prior = json.loads((FIXTURES.parent / 'qualification' / (backend + '-complete.json')).read_bytes())
+            prior = _parse((FIXTURES.parent / 'qualification' / (backend + '-complete.json')).read_bytes())
             for platform in ('linux', 'windows'):
                 new = fixture('snapshot-' + platform + '-' + backend + '.json')
                 for group in ('device', 'effective_settings', 'concurrency'):
                     for field, value in prior[group].items():
                         if field not in ('prompt_cache_reuse', 'requests_overlap'):
                             self.assertEqual(new[group][field], value)
-            incomplete = json.loads((FIXTURES.parent / 'qualification' / (backend + '-incomplete.json')).read_bytes())
+            incomplete = _parse((FIXTURES.parent / 'qualification' / (backend + '-incomplete.json')).read_bytes())
             snapshot = fixture('snapshot-linux-' + backend + '.json')
             reused = 0
             for group in ('device', 'effective_settings', 'concurrency'):

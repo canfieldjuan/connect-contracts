@@ -1,0 +1,646 @@
+[
+  {
+    "fixture": "zero.json",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "bytes": 2,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "0"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "one.json",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "bytes": 2,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "1"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": true
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "negative-one.json",
+    "sha256": "ee3aa64bb94a50845d5024cd4bd20202a4567aed5cd5328c0d97e9920775fc28",
+    "bytes": 3,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "-1"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "sequence-max.json",
+    "sha256": "e713b6bcff7750474627ed671354bc097fd0ce37b9d0803493049762e1b1bb97",
+    "bytes": 17,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "9007199254740991"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": true
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "sequence-over.json",
+    "sha256": "39ec82d0fadb4e41acd3f99b1db1b7cc8001df98ad73ab63b819eda9b8636ccb",
+    "bytes": 17,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "9007199254740992"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "i64-min.json",
+    "sha256": "6597fb5664deb37b5413ea87a2566ffb9da2fb1376d820e4a40dd30c05aa8b04",
+    "bytes": 21,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "-9223372036854775808"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "i64-min-plus-one.json",
+    "sha256": "a16b800e94d71e92d371c09e24cbde2903cb0e24030ad30663f2b8b7f7f71a6c",
+    "bytes": 21,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "-9223372036854775807"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "i64-max.json",
+    "sha256": "26d928ca7798882c482edb82cf892a2036308dff7482080e65ac947719112ef2",
+    "bytes": 20,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "9223372036854775807"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "u64-max.json",
+    "sha256": "f01cedc887ef3f800ffcf67e544b5b16cca680844255ccd759d5af6cf0ecd2e5",
+    "bytes": 21,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "18446744073709551615"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "u64-max-minus-one.json",
+    "sha256": "7825e3d916e0cdbedb4eb0fbd58c11b44e822de73f676d930c9d5249494761c3",
+    "bytes": 21,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "18446744073709551614"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "false.json",
+    "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0",
+    "bytes": 6,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "false"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "null.json",
+    "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+    "bytes": 5,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "null"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "empty-string.json",
+    "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184",
+    "bytes": 3,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "\"\""
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": false
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "i64-under.json",
+    "sha256": "0d332f4f4049903bb1596fbb361ba0302f4d62d58e4041e348fb5c007d898038",
+    "bytes": 21,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "u64-over.json",
+    "sha256": "83077236f263ff36ad5a9ac304ebdb19e9f7024a67d533c50f075c967eb89b19",
+    "bytes": 21,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "negative-zero.json",
+    "sha256": "dde762c792f326de5677fd0629e0a0d9541a153228dd46781c4aeb5e842f460e",
+    "bytes": 3,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "positive-21-digits.json",
+    "sha256": "2fd28f5d071235710e03d2b22fa03695dc92f627dec5eba8ffb22f14ac6901b0",
+    "bytes": 22,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "negative-21-digits.json",
+    "sha256": "52cc6608f54266c277bc2f4182387f0361b43d90bbd296988bd1093696ebe12d",
+    "bytes": 23,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "positive-4301-digits.json",
+    "sha256": "6b5b3fce817a98a42eb47e0206710ed2329ba33ec74743219ea2599e62cc7b4d",
+    "bytes": 4302,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "negative-4301-digits.json",
+    "sha256": "d902a7592969d21edbf13ede10164892b357b04709493e79041e356edcecd63e",
+    "bytes": 4303,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "decimal-one.json",
+    "sha256": "5717e7c840171019a4eeab5b79a7f894a4986eaff93d04ec5b12c9a189f594bf",
+    "bytes": 4,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "exponent.json",
+    "sha256": "41a3a34550c73f1de9b42a4f5dc39cb01c3350c31a27ae5b4b9248a4735be9fc",
+    "bytes": 4,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "uppercase-exponent.json",
+    "sha256": "ef1ca93d213a4071ff20d41a817503b2351edf54ab2383052ea65326ac841b68",
+    "bytes": 4,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "decimal-negative-zero.json",
+    "sha256": "8c64e3f449e2b457b1c47e9e2864d25e03e9f4bd6cd0883819d67b45c584a73d",
+    "bytes": 5,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "rounded-sequence.json",
+    "sha256": "ec289e3124ef6243588d8c228e0c3cad8dc24f8c3e5727005a932242a43b1761",
+    "bytes": 19,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "rounded-one.json",
+    "sha256": "92985da7da5b745a3b41e8864e52a909274d26acbf2a0de743c9f7e944d56e60",
+    "bytes": 22,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "exponent-overflow.json",
+    "sha256": "04318dc42b0d79c7af8860ee015bb843cd40134fc72f47b5877dc8c843176105",
+    "bytes": 6,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "exponent-underflow.json",
+    "sha256": "0bf00bd19f72b9c6d948180b7c8570589c84cc03346cf32b1e2c66e63b075b93",
+    "bytes": 7,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "leading-zero.json",
+    "sha256": "43fd56f56bb9bb18bc9c33966325732b2d7e58bfe2504a2c5c164b071c1b8653",
+    "bytes": 3,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid UTF-8 JSON"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "plus-sign.json",
+    "sha256": "2be5b899a1b7fe4a747baeb088f0b554b89c67772af1a62dbb8b6b890e5e85aa",
+    "bytes": 3,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid UTF-8 JSON"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "trailing.json",
+    "sha256": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a",
+    "bytes": 4,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid UTF-8 JSON"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "empty.json",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "bytes": 1,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid UTF-8 JSON"
+    },
+    "schema": {
+      "kind": "sequence",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "nested-valid.json",
+    "sha256": "537e152c8c1d69ab0f26754f351e587f4d659196f0653332333d7bb52e7b6a4d",
+    "bytes": 67,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "{\"values\":[0,-9223372036854775808,{\"value\":18446744073709551615}]}"
+    },
+    "schema": {
+      "kind": "none",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "nested-invalid.json",
+    "sha256": "352c0c692ef7eeb658c5c8ea4c74fcb0bdf4e14550c1be7ef31f746fc44a4ff5",
+    "bytes": 29,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "none",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "strings.json",
+    "sha256": "fcc5c609417302bf9f2d30023c730aa4a5f0206f586d603e1f58c7b97ace78a4",
+    "bytes": 4352,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "[\"-0\", \"1.0\", \"1e400\", \"18446744073709551616\", \"11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\"]"
+    },
+    "schema": {
+      "kind": "none",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "nested-duplicate.json",
+    "sha256": "758276063c6dd1f2adfafbddb0071fc99d81cdd7cc83afa6526799a1f338e42f",
+    "bytes": 27,
+    "ingestion": {
+      "accepted": false,
+      "error": "duplicate JSON member"
+    },
+    "schema": {
+      "kind": "none",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "nan.json",
+    "sha256": "238e685bce9e9e12824c7e396b009ad5fab1c9c907568956894dfe463b966a41",
+    "bytes": 19,
+    "ingestion": {
+      "accepted": false,
+      "error": "non-JSON numeric constant"
+    },
+    "schema": {
+      "kind": "none",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "infinity.json",
+    "sha256": "fa0cce124473feb6888bf01e96f04894eb3f23eaf770bbe6244060cf8b3b219a",
+    "bytes": 24,
+    "ingestion": {
+      "accepted": false,
+      "error": "non-JSON numeric constant"
+    },
+    "schema": {
+      "kind": "none",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "negative-infinity.json",
+    "sha256": "2eca38f7bba3ee63caa00de32036c870de2e251a6efdba10c8bdf77cb4338479",
+    "bytes": 25,
+    "ingestion": {
+      "accepted": false,
+      "error": "non-JSON numeric constant"
+    },
+    "schema": {
+      "kind": "none",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "manifest-rounded-sequence.json",
+    "sha256": "b91c03dec2c0e2addafc43f9812e61a8997361870cf91a51cf4ac4c3cb4c8810",
+    "bytes": 519,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "companion",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "manifest-rounded-one.json",
+    "sha256": "d0b8c854d54591e26619e06abf77cb893882f75119948e78f3efe2cfb88ca316",
+    "bytes": 522,
+    "ingestion": {
+      "accepted": false,
+      "error": "integer JSON notation required"
+    },
+    "schema": {
+      "kind": "companion",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "manifest-max.json",
+    "sha256": "241aa0cc7ff49919da8e28344754ae84cc90a8df0c304489eb0db57465800e0a",
+    "bytes": 517,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "{\n  \"companion_version\": 1,\n  \"sequence\": 9007199254740991,\n  \"instance_id\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n  \"instance\": {\n    \"sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"bytes\": 1\n  },\n  \"snapshot\": {\n    \"sha256\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n    \"bytes\": 1\n  },\n  \"bindings\": {\n    \"sha256\": \"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\n    \"bytes\": 1\n  },\n  \"sources\": []\n}"
+    },
+    "schema": {
+      "kind": "companion",
+      "valid": true
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "profile-extra-min.json",
+    "sha256": "804216b9c4a5f4dafda8e519de1e53153282beaca86c65631947f2a9f3a0755c",
+    "bytes": 757,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "{\n  \"platform\": \"linux-x64\",\n  \"tiers\": [\n    {\n      \"id\": \"gpu-cuda\",\n      \"device_class\": \"nvidia-cuda\",\n      \"model\": {\n        \"sha256\": \"6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a\"\n      },\n      \"runtime\": {\n        \"archive\": {\n          \"sha256\": \"57903935f0250469813450f4cbda124b20ccff966339d6b24dd3a7d3cb449d71\"\n        }\n      }\n    },\n    {\n      \"id\": \"gpu-vulkan\",\n      \"device_class\": \"vulkan-discrete\",\n      \"model\": {\n        \"sha256\": \"6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a\"\n      },\n      \"runtime\": {\n        \"archive\": {\n          \"sha256\": \"40fd534f48ef8f8027781b2c648f80ff7334a243aea1ff029542279230d55c52\"\n        }\n      }\n    }\n  ]\n,\"extra\":{\"values\":[0,-9223372036854775808]}}"
+    },
+    "schema": {
+      "kind": "profile",
+      "valid": true
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "profile-extra-max.json",
+    "sha256": "302dd4eb2ff234b060424bddf9fb4a9247c7af6eb2afa875fee59255f66ef615",
+    "bytes": 757,
+    "ingestion": {
+      "accepted": true,
+      "expected_json": "{\n  \"platform\": \"linux-x64\",\n  \"tiers\": [\n    {\n      \"id\": \"gpu-cuda\",\n      \"device_class\": \"nvidia-cuda\",\n      \"model\": {\n        \"sha256\": \"6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a\"\n      },\n      \"runtime\": {\n        \"archive\": {\n          \"sha256\": \"57903935f0250469813450f4cbda124b20ccff966339d6b24dd3a7d3cb449d71\"\n        }\n      }\n    },\n    {\n      \"id\": \"gpu-vulkan\",\n      \"device_class\": \"vulkan-discrete\",\n      \"model\": {\n        \"sha256\": \"6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a\"\n      },\n      \"runtime\": {\n        \"archive\": {\n          \"sha256\": \"40fd534f48ef8f8027781b2c648f80ff7334a243aea1ff029542279230d55c52\"\n        }\n      }\n    }\n  ]\n,\"extra\":{\"values\":[0,18446744073709551615]}}"
+    },
+    "schema": {
+      "kind": "profile",
+      "valid": true
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "profile-extra-under.json",
+    "sha256": "9982ea9d4e1e064a71ca278c70b3e77bfe4735ef23dba675fa0fd37896466a3a",
+    "bytes": 757,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "profile",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  },
+  {
+    "fixture": "profile-extra-over.json",
+    "sha256": "9a8464aa305a018c8c7e8ba2998ec911e17cf1cabd4ca6a004e80020a9bec188",
+    "bytes": 757,
+    "ingestion": {
+      "accepted": false,
+      "error": "invalid evidence integer"
+    },
+    "schema": {
+      "kind": "profile",
+      "valid": null
+    },
+    "semantic": "not exercised; raw ingestion/schema only"
+  }
+]
