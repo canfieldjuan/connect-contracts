@@ -98,6 +98,15 @@ def positive_cases():
             yield schema, fixture(name)
 
 
+def platform_process_cases():
+    """One input owner for direct pairing negatives and their mutation controls."""
+    for branch, (platform, other) in enumerate((('linux', 'windows'), ('windows', 'linux'))):
+        for backend in ('cuda', 'vulkan'):
+            original = fixture('instance-' + platform + '-' + backend + '.json')
+            # Keep both complete process objects; change only the platform.
+            yield branch, backend, original, dict(original, platform=other + '-x64')
+
+
 class CompanionSchemaTests(unittest.TestCase):
     def assert_valid(self, schema, value, docs=None):
         self.assertEqual(list(validator(schema, docs).iter_errors(value)), [])
@@ -200,16 +209,11 @@ class CompanionSchemaTests(unittest.TestCase):
                     self.assert_rejected('instance.schema.json', wrong, [process], 'additionalProperties')
 
     def test_platform_process_pairing_both_directions(self):
-        for platform, other in (('linux', 'windows'), ('windows', 'linux')):
-            for backend in ('cuda', 'vulkan'):
-                with self.subTest(process_shape=platform, backend=backend):
-                    original = fixture('instance-' + platform + '-' + backend + '.json')
-                    self.assert_valid('instance.schema.json', original)
-                    # Keep both complete process objects; change only the platform.
-                    # Mixed-field probes alone cannot detect a missing discriminator.
-                    relabeled = dict(original, platform=other + '-x64')
-                    self.assert_rejected('instance.schema.json', relabeled,
-                                         ['platform'], 'const')
+        for branch, backend, original, relabeled in platform_process_cases():
+            with self.subTest(branch=branch, backend=backend):
+                self.assert_valid('instance.schema.json', original)
+                # Mixed-field probes alone cannot detect a missing discriminator.
+                self.assert_rejected('instance.schema.json', relabeled, ['platform'], 'const')
 
     def test_every_scalar_rejects_wrong_types_at_its_field(self):
         for schema, base in positive_cases():
@@ -420,13 +424,13 @@ class CompanionSchemaTests(unittest.TestCase):
              lambda d: d['properties']['instance']['allOf'][1]['properties']['bytes'].pop('maximum')),
             ('instance.schema.json', dict(pair, backend='vulkan'), ['backend'], 'const',
              lambda d: d['allOf'].pop(0)),
-            ('instance.schema.json', dict(pair, platform='windows-x64'), ['platform'], 'const',
-             lambda d: d['allOf'][1]['oneOf'][0]['properties']['platform'].pop('const')),
-            ('instance.schema.json', dict(fixture('instance-windows-cuda.json'), platform='linux-x64'), ['platform'], 'const',
-             lambda d: d['allOf'][1]['oneOf'][1]['properties']['platform'].pop('const')),
             ('host-snapshot.schema.json', placeholder, ['effective_settings', 'prompt_cache_reuse'], 'const',
              lambda d: d['properties']['effective_settings']['allOf'].pop(1)),
         ]
+        probes.extend(
+            ('instance.schema.json', relabeled, ['platform'], 'const',
+             lambda d, branch=branch: d['allOf'][1]['oneOf'][branch]['properties']['platform'].pop('const'))
+            for branch, _, _, relabeled in platform_process_cases())
         for schema, bad, path, keyword, mutate in probes:
             with self.subTest(schema=schema, keyword=keyword):
                 self.assert_rejected(schema, bad, path, keyword)
