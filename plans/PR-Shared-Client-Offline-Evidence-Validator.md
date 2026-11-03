@@ -1,7 +1,8 @@
 # Shared-client offline evidence validator contract
 
-Status: PROPOSED; documentation only. Owner: connect-runtime.
-Exact-revision acceptance and a separate implementation go precede executable
+Status: Original contract accepted and merged in PR97; numeric-ingestion amendment
+PROPOSED, documentation only. Owner: connect-runtime. Exact-revision acceptance
+of this amendment and separate implementation authorization precede its executable
 changes. Runtime choice, [issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88),
 live budgets and qualification remain OPEN. No builds, model/tokenizer calls,
 Ollama or production changes are authorized by this document.
@@ -14,8 +15,8 @@ does not establish agreement between retained bytes, hashes, instance identity
 and observation references. That missing semantic owner is the next increment;
 it is not a diagnosis or correction of inference arithmetic.
 
-The inspected canonical client checkout is the clean local candidate
-`f841cde2b44ec99bc860359a88d06d6ae27309da`. It has no configured `origin` remote;
+The original PR97 inventory inspected the clean local client candidate
+`f841cde2b44ec99bc860359a88d06d6ae27309da`. At that inspection it had no `origin` remote;
 it is not represented as a verified current upstream checkout. Its
 `PROVENANCE.json` calls it a local candidate not cleared for publication. Resolve
 the implementation base and distribution pin before a later code PR; do not
@@ -48,7 +49,10 @@ native Windows behavior and any new task or performance result.
 
 ## Required change surface and increment boundary
 
-This PR adds only this document. The later implementation is confined to:
+The original PR97 added this document. This amendment edits only this document
+and the parent interface's numeric-policy pointer. The later client implementation
+is confined to the following surface; the prerequisite oracle change is specified
+separately under numeric ingestion below:
 
 | Canonical client path | Responsibility |
 | --- | --- |
@@ -103,15 +107,150 @@ only through the pinned local registry. An unknown resource fails without networ
 retrieval; do not replace a missing evaluator with permissive parsing, parallel
 regexes or a hand-maintained schema clone. The later PR must identify and pin the
 real evaluator, demonstrate required keyword/reference behavior and justify any
-new dependency before coding. This document selects no library or version.
+new dependency before coding. The conditional evaluator pin and measured dependency
+delta are recorded in the proposed numeric-ingestion amendment below.
 
 Metadata parsing rejects invalid UTF-8, BOM, trailing data, duplicate members at
 every depth, NaN/Infinity and excessive nesting. Detect duplicates before a map
 can discard them. Use a bounded parser visitor, not a text/regex pre-scan; reject
 container depth beyond 32 while descending, before allocating an unbounded tree.
-Root container is level 1. Preserve exact integers and JSON Schema integer
-semantics; no float round-trip may admit an out-of-range sequence or change an
-identity. Declared byte counts are checked against original byte lengths.
+Root container is level 1. Preserve exact integers under the proposed raw-token
+policy below, then apply JSON Schema semantics to the admitted values; no float
+round-trip may admit an out-of-range sequence or change an identity. Declared byte
+counts are checked against original byte lengths.
+
+### Proposed numeric-ingestion amendment
+
+**Origin and evidence.** At PR97 merge
+`efe88ef5996e4f914c3f69a77b69be7aa2aee41d`,
+[`tests/runtime_qualification.py::_parse`](../tests/runtime_qualification.py)
+uses `json.loads` without `parse_float` or checked `parse_int` hooks. Companion
+fixture ingestion in
+[`tests/test_runtime_companion.py`](../tests/test_runtime_companion.py) does likewise.
+The retained isolated evaluator probe reproduced acceptance of raw sequence
+`9007199254740991.1` and `1.0000000000000000001` after Python/plain Rust rounded
+them into schema-valid integers. Schema validation cannot recover lost digits.
+Plain serde_json also falls back to floating point for oversized integer tokens;
+rejecting only decimal/exponent spelling or accepting an already rounded Number
+as an integer does not enforce exact representation. This amendment corrects the admission
+contract at that origin; no downstream numeric filter or attachment-decoder
+patch is proposed.
+
+**Scope and deliberately changed behavior.** Apply the following policy to every
+JSON numeric token, recursively, in raw qualification records, companion manifests,
+instances, snapshots and independently admitted profile bytes parsed for evidence
+comparison. Include extra profile members allowed by `profile_binding`'s
+`additionalProperties: true`; schema-independent representation checks cannot be
+bypassed through an unused member. This is evidence-metadata ingestion, not profile
+admission or a change to the apps' request/response schemas. Opaque binding/source
+bytes are not parsed. JSON strings, including `U64Text`, retain their existing
+rules. Model request bytes, property order, prompts and settings are untouched.
+
+At numeric admission, no lossy value is ever admitted:
+
+- Accept only JSON integer spelling: `0`, a nonzero decimal digit followed by
+  decimal digits, or minus followed by that nonzero form. Refuse fractions,
+  exponents and `-0`; JSON syntax already refuses plus signs and leading zeros.
+- Check negative tokens as signed 64-bit integers and zero/positive tokens as
+  unsigned 64-bit integers. The inclusive representation domain is
+  `[-9223372036854775808, 18446744073709551615]`, independent of the destination
+  schema. Refuse overflow without admitting a floating-point fallback; never round
+  or clamp an admitted value.
+- Then run the unchanged canonical schemas and semantic owners. A representable
+  integer can still fail a field's type, sign, constant or smaller bound. Accepting
+  the signed minimum at ingestion does not make it a valid sequence or byte count.
+
+This deliberately narrows raw evidence JSON compared with JSON Schema's integer
+semantics: `1.0` and `1e2` are refused even when mathematically integral. Numeric
+token failures map to `Malformed` in the future client, and `EvidenceError` in the
+Python oracle, with static diagnostics. Literal NaN/Infinity retain their existing
+nonfinite category; duplicate-member, syntax, byte/depth caps and canonical-instance
+checks remain distinct. `1e400` is refused at ingestion, never admitted as infinity.
+No resource-limit or cancellation category is repurposed.
+
+**Conditional dependency selection.** The selected proposal is
+`jsonschema = "=0.58.6"`, `default-features = false`, no optional features.
+Require `serde_json = "=1.0.151"` as a target-independent dependency for the
+evidence module. The original client manifest pins it only under Linux dependencies
+and has a Linux dev-dependency `serde_json = "1"`; the later client PR must make
+the exact pin canonical for this module and its tests, without a divergent dev pin.
+The plain probe closure includes serde_json `float_roundtrip`; that feature effect
+is recorded and accepted by oversight, not hidden. `arbitrary-precision` is rejected:
+its Number map visitor changed the copied client's `Nullable<Integer>` decoder to
+accept an object as a number. Do not enable it or patch that decoder downstream.
+The plain lock delta has 53 additions, no removals and unchanged existing versions
+and checksums. This is conditional selection, not client adoption or full numeric
+qualification. Retained artifacts, cited by alias and SHA-256:
+
+| Artifact alias | SHA-256 |
+| --- | --- |
+| evaluator-probe-results | `85379d063a92394581611426c1ce263a13384a5145a5653b744b2dd576b49047` |
+| plain-candidate-lock | `897e81b0b9df3f98588cbe05734ef5dcf3c524d1dfb671c289406de22c6694b2` |
+
+The probe report's pending-review wording is historical. Oversight accepted its
+evidence in mail `3835ebcc` and the signed/unsigned policy in `6ebcd1eb`. Neither
+message supplies operator acceptance of this amendment. Preserve the original
+report, raw mismatches and feature/decoder receipts; do not rewrite or rescore them.
+
+**Separate future change and proof.** After exact-revision acceptance and separate
+authorization, first fix the contracts oracle at `_parse`: use the JSON parser's
+`parse_float` refusal and checked `parse_int` hooks as the one numeric owner, not
+regex/text pre-scanning or a post-parse filter. Before calling `int()`, the
+`parse_int` hook must reject more than 20 digits (excluding the optional minus)
+with `EvidenceError`, then enforce `-0` refusal and the exact signed/unsigned bounds.
+Do not rely on Python's configurable integer-conversion limit: oversight reproduced
+a plain uncaught `ValueError` for an oversized integer with the default 4300-digit
+limit; `_parse` currently catches only Unicode/JSON-decode/recursion errors. The
+hook must own that refusal, not merely catch the exception after conversion.
+Route evidence-input loaders in
+`tests/test_runtime_qualification.py` and `tests/test_runtime_companion.py` through
+that owner (including `pairs`, `fixture`, frozen evidence and profile inputs).
+Keep canonical schema/index loading and direct constructed-value schema tests
+separate; raw admission must not mask a missing schema guard.
+
+The later Rust bounded evidence visitor must admit numbers only through
+`visit_u64`/`visit_i64`, refuse every `visit_f64` and number-range parse error, and
+never construct an admitted value from f64. Use these structured callbacks, not
+a new tokenizer or text scan. In pinned serde_json `src/de.rs`, `parse_integer`
+routes unsigned overflow through `parse_long_integer` to F64; `parse_number`
+routes fractions, exponents, negative overflow and `-0` to F64; `ParserNumber::visit`
+dispatches to the matching typed visitor. An internal float conversion is allowed
+only on the refusal path: no lossy value may enter the admitted evidence tree.
+The `-0`, both overflow and exact-boundary fixture rows below pin that routing,
+including under the recorded `float_roundtrip` feature unification. Any future
+parser upgrade must re-prove it. These are source-grounded requirements, not a
+claim that a new visitor has been implemented or tested. Client implementation,
+remote creation, host changes and model calls require separate authorization.
+
+Add separately inventoried raw-text cases under
+`fixtures/runtime/v1/numeric-ingestion/` in that future oracle PR, with a README
+and index recording original bytes/digests, ingestion outcome and separate
+schema/semantic expectations. Extend
+`tests/test_runtime_contracts.py::test_fixture_inventory_is_complete` for those
+leaves; do not change existing fixture bytes or their schema-only expectations.
+The regression matrix must include:
+
+| Raw token or case | Ingestion expectation / subsequent distinction |
+| --- | --- |
+| `0`, `1`, `9007199254740991` | Admit exactly; schema-specific zero refusal remains separate. |
+| `9007199254740992` | Admit exactly, then refuse in a sequence bounded below it. |
+| `-9223372036854775808`, `18446744073709551615` | Admit exactly at the representation boundaries; include an allowed profile-extra control. |
+| `-9223372036854775809`, `18446744073709551616` | Refuse without admitting f64, including profile extras; pin Rust callback routing. |
+| `1.0`, `1e2`, `-0`, `9007199254740991.1`, `1.0000000000000000001`, `1e400` | Refuse at numeric ingestion; retain both original rounding reproductions. |
+| 21-digit integer; 4,301-digit integer, each positive and negative | Python hook refuses with `EvidenceError` before `int()`; no leaked conversion-limit `ValueError`. Rust refuses with `Malformed`, whether routed through f64 or a number-range parse error. |
+| `01`, `+1` | Refuse as JSON syntax. |
+| Nested mixed valid/invalid numbers; the same spellings inside strings | Refuse the numeric token at any depth; preserve strings unchanged for their own schema. |
+| Duplicate members, NaN/Infinity, malformed/trailing input, depth/byte boundaries | Existing failure owners remain effective; numeric hooks cannot hide them. |
+
+Show fail-before/pass-after for the rounding reproductions, both overflow sides,
+the oversized-token uncaught-exception case and valid opposite controls. Run the
+conversion-limit regression with a recorded finite interpreter limit below the
+oversized token length; do not change a shared process's interpreter setting.
+Preserve frozen schema-only outcomes; record intentional
+raw-ingestion changes explicitly instead of claiming unchanged oracle behavior.
+Afterward, a separately authorized isolated differential replay must demonstrate
+the corrected Python/Rust admission agreement before client qualification. No
+new broad harness, live calls or change to model arithmetic is part of this fix.
 
 Binding tables and raw source artifacts are opaque byte slices here, not arbitrary
 JSON fed to the metadata parser. Their selected-engine format and interpretation
@@ -186,12 +325,14 @@ Reader/OS/cancellation/history variants must not acquire invented pure meanings.
 
 ## Differences from validated work and explicit non-scope
 
-The only proposed additions are bounded raw bundle admission, canonical instance
+The original proposed additions were bounded raw bundle admission, canonical instance
 checks and cross-object consistency in the named shared owner. Existing shape
 fixtures need not be internally consistent bundles: preserve their bytes and
 schema outcomes. New synthetic matched bundles are separately inventoried; the
 existing semantic-overflow, manifest-mismatch and reversed-window examples stay
-schema-valid and must now fail at their named semantic origin.
+schema-valid and must now fail at their named semantic origin. The numeric amendment
+adds the explicit raw-token narrowing and representation domain above; these are
+intentional differences from the former float-based oracle, not silent parity.
 
 The oracle has no companion input and no canonical instance serialization. Port
 its shared comparisons without changing their meaning; do not claim direct
@@ -247,19 +388,22 @@ Later authorized implementation must provide:
 
 ## Assumptions, blockers, implementation summary and gap audit
 
-DONE by this proposal: source inventory and a single pure bundle-owner contract,
-with explicit parser, integrity, incomplete-evidence and authority boundaries.
-The only repository change is this document. Cold-diff review must show no
+DONE by PR97: the accepted single pure bundle-owner contract and source inventory.
+This amendment proposes raw numeric admission, its conditional evaluator pin and
+the separate oracle correction/proof surface. Only this document and the parent
+interface pointer change. Cold-diff review must show no
 implementation, fixture, schema, workflow or dependency edits.
 
-NOT DONE: independent review/exact-revision acceptance; implementation go;
-confirmed canonical implementation/distribution base and evaluator dependency pin;
+NOT DONE: amendment review/exact-revision acceptance; oracle implementation go;
+corrected numeric admission/parity; confirmed canonical implementation/distribution
+base and adoption of the conditional evaluator pin; client implementation go;
 implementation or parity tests; full record-binding port; authenticated reader;
 selected-runtime source/interval annex; capture; G0 and consumer approval;
 native-platform proof; live/task qualification and human quality review.
 
-The evaluator choice/pin and any necessary dependency delta must be made concrete
-and reviewed before code, not deferred to an unreviewed install. Scope expansion
+The conditional evaluator choice and measured delta do not authorize adoption or
+an install. Client implementation, remote creation, host changes and model calls
+remain separately authorized operations. Scope expansion
 beyond the paths/responsibilities above needs a contract amendment. Publication
 and rights clearance remain separate from permission to prepare local code.
 
