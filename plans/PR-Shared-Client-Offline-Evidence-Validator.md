@@ -131,8 +131,8 @@ The retained isolated evaluator probe reproduced acceptance of raw sequence
 `9007199254740991.1` and `1.0000000000000000001` after Python/plain Rust rounded
 them into schema-valid integers. Schema validation cannot recover lost digits.
 Plain serde_json also falls back to floating point for oversized integer tokens;
-rejecting only decimal/exponent spelling or inspecting an already parsed Number
-does not enforce exact representation. This amendment corrects the admission
+rejecting only decimal/exponent spelling or accepting an already rounded Number
+as an integer does not enforce exact representation. This amendment corrects the admission
 contract at that origin; no downstream numeric filter or attachment-decoder
 patch is proposed.
 
@@ -146,7 +146,7 @@ admission or a change to the apps' request/response schemas. Opaque binding/sour
 bytes are not parsed. JSON strings, including `U64Text`, retain their existing
 rules. Model request bytes, property order, prompts and settings are untouched.
 
-At the numeric-token boundary, before any floating-point conversion:
+At numeric admission, no lossy value is ever admitted:
 
 - Accept only JSON integer spelling: `0`, a nonzero decimal digit followed by
   decimal digits, or minus followed by that nonzero form. Refuse fractions,
@@ -154,7 +154,8 @@ At the numeric-token boundary, before any floating-point conversion:
 - Check negative tokens as signed 64-bit integers and zero/positive tokens as
   unsigned 64-bit integers. The inclusive representation domain is
   `[-9223372036854775808, 18446744073709551615]`, independent of the destination
-  schema. Refuse overflow before fallback to floating point; never round or clamp.
+  schema. Refuse overflow without admitting a floating-point fallback; never round
+  or clamp an admitted value.
 - Then run the unchanged canonical schemas and semantic owners. A representable
   integer can still fail a field's type, sign, constant or smaller bound. Accepting
   the signed minimum at ingestion does not make it a valid sequence or byte count.
@@ -164,11 +165,15 @@ semantics: `1.0` and `1e2` are refused even when mathematically integral. Numeri
 token failures map to `Malformed` in the future client, and `EvidenceError` in the
 Python oracle, with static diagnostics. Literal NaN/Infinity retain their existing
 nonfinite category; duplicate-member, syntax, byte/depth caps and canonical-instance
-checks remain distinct. `1e400` is refused as exponent notation, before it can
-become infinity. No resource-limit or cancellation category is repurposed.
+checks remain distinct. `1e400` is refused at ingestion, never admitted as infinity.
+No resource-limit or cancellation category is repurposed.
 
 **Conditional dependency selection.** The selected proposal is
 `jsonschema = "=0.58.6"`, `default-features = false`, no optional features.
+Require `serde_json = "=1.0.151"` as a target-independent dependency for the
+evidence module. The original client manifest pins it only under Linux dependencies
+and has a Linux dev-dependency `serde_json = "1"`; the later client PR must make
+the exact pin canonical for this module and its tests, without a divergent dev pin.
 The plain probe closure includes serde_json `float_roundtrip`; that feature effect
 is recorded and accepted by oversight, not hidden. `arbitrary-precision` is rejected:
 its Number map visitor changed the copied client's `Nullable<Integer>` decoder to
@@ -190,14 +195,32 @@ report, raw mismatches and feature/decoder receipts; do not rewrite or rescore t
 **Separate future change and proof.** After exact-revision acceptance and separate
 authorization, first fix the contracts oracle at `_parse`: use the JSON parser's
 `parse_float` refusal and checked `parse_int` hooks as the one numeric owner, not
-regex/text pre-scanning or a post-parse filter. Route evidence-input loaders in
+regex/text pre-scanning or a post-parse filter. Before calling `int()`, the
+`parse_int` hook must reject more than 20 digits (excluding the optional minus)
+with `EvidenceError`, then enforce `-0` refusal and the exact signed/unsigned bounds.
+Do not rely on Python's configurable integer-conversion limit: oversight reproduced
+a plain uncaught `ValueError` for an oversized integer with the default 4300-digit
+limit; `_parse` currently catches only Unicode/JSON-decode/recursion errors. The
+hook must own that refusal, not merely catch the exception after conversion.
+Route evidence-input loaders in
 `tests/test_runtime_qualification.py` and `tests/test_runtime_companion.py` through
 that owner (including `pairs`, `fixture`, frozen evidence and profile inputs).
 Keep canonical schema/index loading and direct constructed-value schema tests
-separate; raw admission must not mask a missing schema guard. The later Rust
-evidence parser must enforce the same token policy before serde_json's lossy
-fallback, within its bounded structured parser. This does not authorize client
-implementation, remote creation, host changes or model calls.
+separate; raw admission must not mask a missing schema guard.
+
+The later Rust bounded evidence visitor must admit numbers only through
+`visit_u64`/`visit_i64`, refuse every `visit_f64` and number-range parse error, and
+never construct an admitted value from f64. Use these structured callbacks, not
+a new tokenizer or text scan. In pinned serde_json `src/de.rs`, `parse_integer`
+routes unsigned overflow through `parse_long_integer` to F64; `parse_number`
+routes fractions, exponents, negative overflow and `-0` to F64; `ParserNumber::visit`
+dispatches to the matching typed visitor. An internal float conversion is allowed
+only on the refusal path: no lossy value may enter the admitted evidence tree.
+The `-0`, both overflow and exact-boundary fixture rows below pin that routing,
+including under the recorded `float_roundtrip` feature unification. Any future
+parser upgrade must re-prove it. These are source-grounded requirements, not a
+claim that a new visitor has been implemented or tested. Client implementation,
+remote creation, host changes and model calls require separate authorization.
 
 Add separately inventoried raw-text cases under
 `fixtures/runtime/v1/numeric-ingestion/` in that future oracle PR, with a README
@@ -212,14 +235,18 @@ The regression matrix must include:
 | `0`, `1`, `9007199254740991` | Admit exactly; schema-specific zero refusal remains separate. |
 | `9007199254740992` | Admit exactly, then refuse in a sequence bounded below it. |
 | `-9223372036854775808`, `18446744073709551615` | Admit exactly at the representation boundaries; include an allowed profile-extra control. |
-| `-9223372036854775809`, `18446744073709551616` | Refuse before conversion, including profile extras. |
+| `-9223372036854775809`, `18446744073709551616` | Refuse without admitting f64, including profile extras; pin Rust callback routing. |
 | `1.0`, `1e2`, `-0`, `9007199254740991.1`, `1.0000000000000000001`, `1e400` | Refuse at numeric ingestion; retain both original rounding reproductions. |
+| 21-digit integer; 4,301-digit integer, each positive and negative | Python hook refuses with `EvidenceError` before `int()`; no leaked conversion-limit `ValueError`. Rust refuses with `Malformed`, whether routed through f64 or a number-range parse error. |
 | `01`, `+1` | Refuse as JSON syntax. |
 | Nested mixed valid/invalid numbers; the same spellings inside strings | Refuse the numeric token at any depth; preserve strings unchanged for their own schema. |
 | Duplicate members, NaN/Infinity, malformed/trailing input, depth/byte boundaries | Existing failure owners remain effective; numeric hooks cannot hide them. |
 
-Show fail-before/pass-after for the rounding reproductions, both overflow sides
-and valid opposite controls. Preserve frozen schema-only outcomes; record intentional
+Show fail-before/pass-after for the rounding reproductions, both overflow sides,
+the oversized-token uncaught-exception case and valid opposite controls. Run the
+conversion-limit regression with a recorded finite interpreter limit below the
+oversized token length; do not change a shared process's interpreter setting.
+Preserve frozen schema-only outcomes; record intentional
 raw-ingestion changes explicitly instead of claiming unchanged oracle behavior.
 Afterward, a separately authorized isolated differential replay must demonstrate
 the corrected Python/Rust admission agreement before client qualification. No
@@ -376,7 +403,7 @@ native-platform proof; live/task qualification and human quality review.
 
 The conditional evaluator choice and measured delta do not authorize adoption or
 an install. Client implementation, remote creation, host changes and model calls
-remain on hold under the current work order. Scope expansion
+remain separately authorized operations. Scope expansion
 beyond the paths/responsibilities above needs a contract amendment. Publication
 and rights clearance remain separate from permission to prepare local code.
 
