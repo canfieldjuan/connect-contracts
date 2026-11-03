@@ -1,0 +1,21 @@
+{
+  "instance_version": 1,
+  "platform": "windows-x64",
+  "start_id": "12345678-1234-4234-abcd-123456789abc",
+  "registration_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id": "3a67a701b14c2bf782f6a2970d3ecbb02be68d6b4694ec1eb8417c4300acc887",
+  "tier": "gpu-vulkan",
+  "backend": "vulkan",
+  "runtime_archive_sha256": "40fd534f48ef8f8027781b2c648f80ff7334a243aea1ff029542279230d55c52",
+  "model_sha256": "6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a",
+  "build_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "chat_template_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "host": {
+    "pid": "100",
+    "creation_filetime": "1"
+  },
+  "server": {
+    "pid": "101",
+    "creation_filetime": "1"
+  }
+}

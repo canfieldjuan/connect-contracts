@@ -221,6 +221,10 @@ class RuntimeContractTests(unittest.TestCase):
         listed.add("qualification/index.json")
         listed.update("qualification/" + case[key]
                       for case in qualification for key in ("record", "profile"))
+        companion = load(FIXTURES / "companion/index.json")
+        self.assertEqual(len(companion), len({case["fixture"] for case in companion}))
+        listed.add("companion/index.json")
+        listed.update("companion/" + case["fixture"] for case in companion)
         present = {str(path.relative_to(FIXTURES)) for path in FIXTURES.glob("*/*.json")}
         self.assertEqual(listed, present)
 

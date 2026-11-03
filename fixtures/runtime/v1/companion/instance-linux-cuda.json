@@ -1,0 +1,23 @@
+{
+  "instance_version": 1,
+  "platform": "linux-x64",
+  "start_id": "12345678-1234-4234-abcd-123456789abc",
+  "registration_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id": "8eeb2cdb63997777607df7498c5d53c23c90a0aa3bce8292f7d1faebfad53e2c",
+  "tier": "gpu-cuda",
+  "backend": "cuda",
+  "runtime_archive_sha256": "57903935f0250469813450f4cbda124b20ccff966339d6b24dd3a7d3cb449d71",
+  "model_sha256": "6ec637d29947d5494d89be4d6a9b6226afe38402be999fdc8c4b1276b924a61a",
+  "build_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "chat_template_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "host": {
+    "pid": "100",
+    "start_ticks": "0",
+    "boot_id": "12345678-1234-1234-abcd-123456789abc"
+  },
+  "server": {
+    "pid": "101",
+    "start_ticks": "0",
+    "boot_id": "12345678-1234-1234-abcd-123456789abc"
+  }
+}

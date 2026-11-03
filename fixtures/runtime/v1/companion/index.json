@@ -1,0 +1,174 @@
+[
+  {
+    "fixture": "instance-linux-cuda.json",
+    "schema": "instance.schema.json",
+    "sha256": "2fd6cec990127f323dea087a2a445a0a1b00c89153ebd61b5f4c52434677118c",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "instance-linux-vulkan.json",
+    "schema": "instance.schema.json",
+    "sha256": "c424be3a6ac41e7b4ac1b5c89a161babe876665b3a4d694227add124f2c0a1ba",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "instance-windows-cuda.json",
+    "schema": "instance.schema.json",
+    "sha256": "f7ca6cc68727d73e06242e5575d7e38fd0b691ccb0043f92809463d28a19594e",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "instance-windows-vulkan.json",
+    "schema": "instance.schema.json",
+    "sha256": "5ec1e35f00af0d7cd6d9baca0b9106113c3de08c5d71a7509c488b4c0922491b",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "snapshot-linux-cuda.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "812ea361ab540baca9fc34689a09c5936655c6a2461db818746ca3979c8bbfd4",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "snapshot-windows-cuda.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "6219826c603e3bf76f73bbb31d61045b89457d175077c8d8ff646eb01789a476",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "snapshot-unavailable-cuda.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "a3bf71d33c872dc79b2adf4c0098a79fc7da83456ee6e86a5a136574c26de229",
+    "valid": true,
+    "constraint": "valid incomplete host observations"
+  },
+  {
+    "fixture": "snapshot-linux-vulkan.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "c18454268d8b33e961cc0afd44416dfd67efbe9a732bd50c0d004ab385979dcf",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "snapshot-windows-vulkan.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "912f486103ba44be28dbab148bf9064c96b08531a49c8556f7cf8328cd98e36b",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "snapshot-unavailable-vulkan.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "42404f1f9469e5a2bfb0fe7990baeebed845d5d27649eff2868443eb9268ff72",
+    "valid": true,
+    "constraint": "valid incomplete host observations"
+  },
+  {
+    "fixture": "manifest-empty.json",
+    "schema": "companion.schema.json",
+    "sha256": "8f919d81c3eaac4e03d1777b4d976cc00d1112c96418742d0833fcbb505f3921",
+    "valid": true,
+    "constraint": "empty sources permitted"
+  },
+  {
+    "fixture": "manifest-sources.json",
+    "schema": "companion.schema.json",
+    "sha256": "60a6fb40959a6a19497873bf977a484925f12ddd4cd019c2216ec8a88ed4885e",
+    "valid": true,
+    "constraint": "valid wire shape"
+  },
+  {
+    "fixture": "manifest-invalid-bytes.json",
+    "schema": "companion.schema.json",
+    "sha256": "2870f585e96174a40b3a205e928cd6da92bd05bd522812fb7b094310f577f8e8",
+    "valid": false,
+    "constraint": "positive object size",
+    "error": {
+      "path": [
+        "instance",
+        "bytes"
+      ],
+      "keyword": "minimum"
+    }
+  },
+  {
+    "fixture": "instance-invalid-pair.json",
+    "schema": "instance.schema.json",
+    "sha256": "3052633c12946c23560fe2dcf00f6f4460aaa2090215d557b3ef3934f374f8b7",
+    "valid": false,
+    "constraint": "tier and backend must agree",
+    "error": {
+      "path": [
+        "backend"
+      ],
+      "keyword": "const"
+    }
+  },
+  {
+    "fixture": "instance-invalid-process.json",
+    "schema": "instance.schema.json",
+    "sha256": "a870aa4a67e49b68701d3eb29d77bf6c2c76057fb627899b8cb760cf2dae7b6b",
+    "valid": false,
+    "constraint": "no Windows field in Linux process",
+    "error": {
+      "path": [
+        "host"
+      ],
+      "keyword": "additionalProperties"
+    }
+  },
+  {
+    "fixture": "snapshot-invalid-placeholder.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "1c88c506701764550fbc0732702d98ff223f0c0ee1f29d76eedfc6fbd6c020c8",
+    "valid": false,
+    "constraint": "host cannot observe request cache reuse",
+    "error": {
+      "path": [
+        "effective_settings",
+        "prompt_cache_reuse"
+      ],
+      "keyword": "const"
+    }
+  },
+  {
+    "fixture": "snapshot-invalid-device.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "7c20e7abf3ce3daeb277c310f3e2ea90307d90452a6524eb3c25700200562b72",
+    "valid": false,
+    "constraint": "no mixed device shape",
+    "error": {
+      "path": [
+        "device"
+      ],
+      "keyword": "additionalProperties"
+    }
+  },
+  {
+    "fixture": "instance-semantic-overflow.json",
+    "schema": "instance.schema.json",
+    "sha256": "a53575cd03673aa6320d9e73ad7f69c9321c7ac8667759a499c969dc008477f9",
+    "valid": true,
+    "constraint": "shape valid; later unsigned64 overflow rejection required"
+  },
+  {
+    "fixture": "manifest-semantic-mismatch.json",
+    "schema": "companion.schema.json",
+    "sha256": "cfb19abd23f4c9e79f9e76f1f46cb294562638eb8086cf63fe02630cf861b18a",
+    "valid": true,
+    "constraint": "shape valid; later instance digest mismatch rejection required"
+  },
+  {
+    "fixture": "snapshot-semantic-reversed.json",
+    "schema": "host-snapshot.schema.json",
+    "sha256": "22b8a5e96d8a4c8d50b8c0274812ffbfa49e9f34b86f04a5d02ec09b24df585d",
+    "valid": true,
+    "constraint": "shape valid; later window ordering rejection required"
+  }
+]
