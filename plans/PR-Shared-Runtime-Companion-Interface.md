@@ -104,6 +104,12 @@ Hashes always cover the complete original object bytes. Only the instance artifa
 has a unique canonical serialization (below); do not canonicalize request bytes,
 raw reports, profiles or general metadata to calculate their hashes.
 
+The [proposed numeric-ingestion amendment](PR-Shared-Client-Offline-Evidence-Validator.md#proposed-numeric-ingestion-amendment)
+is the single owner of the raw evidence-number policy, including profile comparison
+extras, checked representation and its intentional narrowing of JSON Schema integer
+notation. It requires its own exact-revision acceptance before implementation;
+it does not change `U64Text` strings or model request/schema bytes.
+
 `Digest` and observation `Alias` reuse qualification schema definitions. `U64Text`
 is a decimal ASCII string, `0` or a nonzero digit followed by digits, no leading
 zeros/sign/whitespace/exponent, at most 20 characters, parsed as an unsigned
