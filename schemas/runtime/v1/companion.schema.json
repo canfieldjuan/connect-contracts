@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/companion.schema.json",
+  "title": "Companion manifest shape only; not integrity or instance admission",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "companion_version",
+    "sequence",
+    "instance_id",
+    "instance",
+    "snapshot",
+    "bindings",
+    "sources"
+  ],
+  "properties": {
+    "companion_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "sequence": {
+      "$ref": "qualification.schema.json#/$defs/positive_count"
+    },
+    "instance_id": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "instance": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object_ref"
+        },
+        {
+          "properties": {
+            "bytes": {
+              "maximum": 16384
+            }
+          }
+        }
+      ]
+    },
+    "snapshot": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object_ref"
+        },
+        {
+          "properties": {
+            "bytes": {
+              "maximum": 65536
+            }
+          }
+        }
+      ]
+    },
+    "bindings": {
+      "$ref": "#/$defs/object_ref"
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "alias",
+          "object"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "server",
+              "device"
+            ]
+          },
+          "alias": {
+            "$ref": "qualification.schema.json#/$defs/alias"
+          },
+          "object": {
+            "$ref": "#/$defs/object_ref"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "object_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "sha256": {
+          "$ref": "qualification.schema.json#/$defs/sha256"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 262144
+        }
+      }
+    }
+  }
+}

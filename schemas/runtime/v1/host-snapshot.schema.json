@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/host-snapshot.schema.json",
+  "title": "Host observation shape only; not a qualified record or authenticated bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "snapshot_version",
+    "instance_id",
+    "binding_sha256",
+    "sequence",
+    "capture_window",
+    "device",
+    "effective_settings",
+    "concurrency"
+  ],
+  "properties": {
+    "snapshot_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "instance_id": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "binding_sha256": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "sequence": {
+      "$ref": "qualification.schema.json#/$defs/positive_count"
+    },
+    "capture_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clock",
+        "start",
+        "end"
+      ],
+      "properties": {
+        "clock": {
+          "type": "string",
+          "enum": [
+            "linux-boottime-ns",
+            "windows-uptime-ms"
+          ]
+        },
+        "start": {
+          "$ref": "instance.schema.json#/$defs/u64_text"
+        },
+        "end": {
+          "$ref": "instance.schema.json#/$defs/u64_text"
+        }
+      }
+    },
+    "device": {
+      "oneOf": [
+        {
+          "$ref": "qualification.schema.json#/$defs/cuda_device"
+        },
+        {
+          "$ref": "qualification.schema.json#/$defs/vulkan_device"
+        }
+      ]
+    },
+    "effective_settings": {
+      "allOf": [
+        {
+          "$ref": "qualification.schema.json#/$defs/settings"
+        },
+        {
+          "properties": {
+            "prompt_cache_reuse": {
+              "const": {
+                "state": "unavailable",
+                "reason": "not_collected"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "concurrency": {
+      "allOf": [
+        {
+          "$ref": "qualification.schema.json#/$defs/concurrency"
+        },
+        {
+          "properties": {
+            "requests_overlap": {
+              "const": {
+                "state": "unavailable",
+                "reason": "not_collected"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

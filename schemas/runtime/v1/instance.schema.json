@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/instance.schema.json",
+  "title": "Companion instance shape only; canonical bytes and numeric ranges need semantic validation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "instance_version",
+    "platform",
+    "start_id",
+    "registration_sha256",
+    "profile_id",
+    "tier",
+    "backend",
+    "runtime_archive_sha256",
+    "model_sha256",
+    "build_commit",
+    "chat_template_sha256",
+    "host",
+    "server"
+  ],
+  "properties": {
+    "instance_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "platform": {
+      "$ref": "qualification.schema.json#/$defs/platform"
+    },
+    "start_id": {
+      "$ref": "#/$defs/uuid_v4"
+    },
+    "registration_sha256": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "profile_id": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "gpu-cuda",
+        "gpu-vulkan"
+      ]
+    },
+    "backend": {
+      "type": "string",
+      "enum": [
+        "cuda",
+        "vulkan"
+      ]
+    },
+    "runtime_archive_sha256": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "model_sha256": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "build_commit": {
+      "type": "string",
+      "minLength": 40,
+      "maxLength": 40,
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "chat_template_sha256": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "host": {},
+    "server": {}
+  },
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "tier": {
+              "const": "gpu-cuda"
+            },
+            "backend": {
+              "const": "cuda"
+            }
+          }
+        },
+        {
+          "properties": {
+            "tier": {
+              "const": "gpu-vulkan"
+            },
+            "backend": {
+              "const": "vulkan"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "platform": {
+              "const": "linux-x64"
+            },
+            "host": {
+              "$ref": "#/$defs/linux_process"
+            },
+            "server": {
+              "$ref": "#/$defs/linux_process"
+            }
+          }
+        },
+        {
+          "properties": {
+            "platform": {
+              "const": "windows-x64"
+            },
+            "host": {
+              "$ref": "#/$defs/windows_process"
+            },
+            "server": {
+              "$ref": "#/$defs/windows_process"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "u64_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20,
+      "pattern": "^(0|[1-9][0-9]*)(?![\\s\\S])"
+    },
+    "positive_u64_text": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/u64_text"
+        },
+        {
+          "not": {
+            "const": "0"
+          }
+        }
+      ]
+    },
+    "uuid": {
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "uuid_v4": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/uuid"
+        },
+        {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        }
+      ]
+    },
+    "linux_process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pid",
+        "start_ticks",
+        "boot_id"
+      ],
+      "properties": {
+        "pid": {
+          "$ref": "#/$defs/positive_u64_text"
+        },
+        "start_ticks": {
+          "$ref": "#/$defs/u64_text"
+        },
+        "boot_id": {
+          "$ref": "#/$defs/uuid"
+        }
+      }
+    },
+    "windows_process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pid",
+        "creation_filetime"
+      ],
+      "properties": {
+        "pid": {
+          "$ref": "#/$defs/positive_u64_text"
+        },
+        "creation_filetime": {
+          "$ref": "#/$defs/positive_u64_text"
+        }
+      }
+    }
+  }
+}
