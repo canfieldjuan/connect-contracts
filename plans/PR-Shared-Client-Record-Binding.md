@@ -167,6 +167,10 @@ retained failed attempt. No automatic retry or fallback approval.
 
 ## Assumptions and explicit blockers
 
+The proposed [app-binding and observation-scope formats](PR-Shared-Client-App-Binding-Scope.md)
+refine the representation prerequisite below. They do not close runtime validity
+rules or authorize executable changes.
+
 The generic obligations can be reviewed now. Full executable sign-off remains
 blocked until a separately reviewed prerequisite closes:
 
