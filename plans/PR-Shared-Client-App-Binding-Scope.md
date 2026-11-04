@@ -279,6 +279,10 @@ in a schema-only slice. Reuse the frozen parity harness and durable receipts.
 
 ## Assumptions, blockers and explicit non-scope
 
+The proposed [runtime observation evidence contract](PR-Shared-Runtime-Observation-Evidence.md)
+inventories existing source owners and the remaining per-field validity evidence.
+It does not register rules, select a runtime or authorize implementation.
+
 These formats are proposed equality/requirement metadata, not authenticated
 capabilities. Their acceptance would close only the documented representation
 choice, not supply executable schemas or validity proof. Runtime rules must still
