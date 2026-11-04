@@ -255,16 +255,40 @@ class RecordBindingSchemaTests(unittest.TestCase):
         self.assert_valid('app-bindings.schema.json', dict(app, requests=[
             dict(app['requests'][0], alias='offer-' + str(i)) for i in range(200)]))
 
-    def test_alias_digest_and_u64text_boundaries(self):
-        app = fixture('app-paired.json')
-        for alias in ('a', 'a' * 128):
-            self.assert_valid('app-bindings.schema.json', replace(app, ('profile', 'alias'), alias))
-        for alias, keyword in [('', 'minLength'), ('a'*129, 'maxLength'), ('../x', 'pattern'), ('a\n', 'pattern')]:
-            self.assert_rejected('app-bindings.schema.json', replace(app, ('profile', 'alias'), alias), ['profile','alias'], keyword)
-        for digest in ('0'*64, 'f'*64):
-            self.assert_valid('app-bindings.schema.json', dict(app, instance_id=digest))
-        for digest in ('', 'a'*63, 'a'*65, 'G'*64):
-            self.assertFalse(validator('app-bindings.schema.json').is_valid(dict(app, instance_id=digest)))
+    def test_digest_and_alias_bounds_at_every_populated_reference(self):
+        # One lexical boundary set covers direct digests and nested Artifact/rule
+        # references in both formats, including every array occurrence.
+        boundaries = {
+            'digest': (('0' * 64, 'f' * 64), (
+                ('', 'minLength'), ('a' * 63, 'minLength'),
+                ('a' * 65, 'maxLength'), ('A' * 64, 'pattern'),
+                ('g' * 64, 'pattern'))),
+            'alias': (('a', 'a' * 128), (
+                ('', 'minLength'), ('a' * 129, 'maxLength'),
+                ('../x', 'pattern'), ('a\n', 'pattern'))),
+        }
+        fields = {
+            'instance_id': 'digest', 'app_bindings_sha256': 'digest',
+            'bundle_manifest_sha256': 'digest', 'ruleset_sha256': 'digest',
+            'sha256': 'digest', 'alias': 'alias', 'rule_id': 'alias',
+        }
+        covered = set()
+        for name, base in positive_cases():
+            for path, value in nodes(base):
+                if not path or path[-1] not in fields:
+                    continue
+                covered.add(path[-1])
+                self.assertIsInstance(value, str)
+                good, bad = boundaries[fields[path[-1]]]
+                for valid in good:
+                    with self.subTest(schema=name, path=path, valid=valid):
+                        self.assert_valid(name, replace(base, path, valid))
+                for invalid, keyword in bad:
+                    with self.subTest(schema=name, path=path, invalid=invalid):
+                        self.assert_rejected(name, replace(base, path, invalid), path, keyword)
+        self.assertEqual(covered, set(fields))
+
+    def test_u64text_boundaries(self):
         scope = fixture('scope-linux-cuda.json')
         for key in ('start', 'end'):
             path = ('requirements', 0, 'interval', key)
