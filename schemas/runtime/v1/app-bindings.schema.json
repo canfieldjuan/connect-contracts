@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/app-bindings.schema.json",
+  "title": "Independent app binding shape only; not record binding or source authentication",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "app_bindings_version",
+    "instance_id",
+    "application_route",
+    "profile",
+    "requests",
+    "sources"
+  ],
+  "properties": {
+    "app_bindings_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "instance_id": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "application_route": {
+      "$ref": "qualification.schema.json#/$defs/route"
+    },
+    "profile": {
+      "$ref": "qualification.schema.json#/$defs/artifact"
+    },
+    "requests": {
+      "type": "array",
+      "items": {
+        "$ref": "qualification.schema.json#/$defs/artifact"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/app_source"
+      },
+      "maxItems": 2
+    }
+  },
+  "$defs": {
+    "app_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "kind",
+        "artifact",
+        "request_indices"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "artifact": {
+          "$ref": "qualification.schema.json#/$defs/artifact"
+        },
+        "request_indices": {
+          "type": "array",
+          "items": {
+            "$ref": "qualification.schema.json#/$defs/count"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "field": {
+              "const": "effective_settings.prompt_cache_reuse"
+            },
+            "kind": {
+              "const": "request"
+            }
+          }
+        },
+        {
+          "properties": {
+            "field": {
+              "const": "concurrency.requests_overlap"
+            },
+            "kind": {
+              "const": "workload"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

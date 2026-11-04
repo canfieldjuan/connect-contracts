@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/observation-scope.schema.json",
+  "title": "Independent required-scope shape only; no validity or clock proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "observation_scope_version",
+    "instance_id",
+    "app_bindings_sha256",
+    "bundle_manifest_sha256",
+    "clock",
+    "clock_binding",
+    "requirements"
+  ],
+  "properties": {
+    "observation_scope_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "instance_id": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "app_bindings_sha256": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "bundle_manifest_sha256": {
+      "$ref": "qualification.schema.json#/$defs/sha256"
+    },
+    "clock": {
+      "type": "string",
+      "enum": [
+        "linux-boottime-ns",
+        "windows-uptime-ms"
+      ]
+    },
+    "clock_binding": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "qualification.schema.json#/$defs/artifact"
+        }
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/requirement"
+      },
+      "maxItems": 20
+    }
+  },
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "interval",
+        "rule"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "concurrency.requests_overlap",
+            "concurrency.slots",
+            "device.api_version",
+            "device.compute_capability",
+            "device.cuda_runtime_version",
+            "device.driver_implementation",
+            "device.driver_version",
+            "device.name",
+            "device.nvidia_driver_version",
+            "device.physical_device_identity",
+            "effective_settings.context_checkpoints",
+            "effective_settings.context_per_slot",
+            "effective_settings.flash_attention",
+            "effective_settings.kv_cache_type_k",
+            "effective_settings.kv_cache_type_v",
+            "effective_settings.logical_batch",
+            "effective_settings.offloaded_layers",
+            "effective_settings.physical_micro_batch",
+            "effective_settings.prompt_cache_reuse",
+            "effective_settings.slots"
+          ]
+        },
+        "interval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "start": {
+              "$ref": "instance.schema.json#/$defs/u64_text"
+            },
+            "end": {
+              "$ref": "instance.schema.json#/$defs/u64_text"
+            }
+          }
+        },
+        "rule": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ruleset_sha256",
+                "rule_id"
+              ],
+              "properties": {
+                "ruleset_sha256": {
+                  "$ref": "qualification.schema.json#/$defs/sha256"
+                },
+                "rule_id": {
+                  "$ref": "qualification.schema.json#/$defs/alias"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

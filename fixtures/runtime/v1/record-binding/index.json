@@ -1,0 +1,147 @@
+[
+  {
+    "fixture": "app-empty.json",
+    "schema": "app-bindings.schema.json",
+    "sha256": "641fe2838270c3e3723dae42b24b49612565ffa1a20748030b5b09b93d0a9b68",
+    "valid": true,
+    "constraint": "empty offline shape; no workload or qualification claim"
+  },
+  {
+    "fixture": "app-paired.json",
+    "schema": "app-bindings.schema.json",
+    "sha256": "4e789f9e694009b99f62d3246cad547841295690cbf9be6818f30ead60d7b864",
+    "valid": true,
+    "constraint": "ordered distinct offers of identical bytes; source attribution shape only"
+  },
+  {
+    "fixture": "app-invalid-kind.json",
+    "schema": "app-bindings.schema.json",
+    "sha256": "dfad07a162d3b5c75bab51d7e4cc9408d806fccec3d45928a486ff8f036e840e",
+    "valid": false,
+    "constraint": "source kind pairing",
+    "error": {
+      "path": [
+        "sources",
+        0,
+        "kind"
+      ],
+      "keyword": "const"
+    }
+  },
+  {
+    "fixture": "app-invalid-indices.json",
+    "schema": "app-bindings.schema.json",
+    "sha256": "0567d3be178ee190934c4c8914b5c158ea084667bcc33fc7459a75064e836582",
+    "valid": false,
+    "constraint": "indices must be unique",
+    "error": {
+      "path": [
+        "sources",
+        0,
+        "request_indices"
+      ],
+      "keyword": "uniqueItems"
+    }
+  },
+  {
+    "fixture": "app-semantic-alias.json",
+    "schema": "app-bindings.schema.json",
+    "sha256": "d5b428e64bb6f669cd2f515ad5ff1aa02e51c2c8a80c6341f9a0a42c85cc7d47",
+    "valid": true,
+    "constraint": "shape valid; duplicate occurrence alias needs future record-binding refusal"
+  },
+  {
+    "fixture": "app-semantic-indices.json",
+    "schema": "app-bindings.schema.json",
+    "sha256": "4e377d41df1baf4be54fe625ad5e1adeb5286a6c33fac22fba27d81cf02bf5ea",
+    "valid": true,
+    "constraint": "shape valid; unsorted out-of-range indices need future semantic refusal"
+  },
+  {
+    "fixture": "app-semantic-source-field.json",
+    "schema": "app-bindings.schema.json",
+    "sha256": "a221dc513d1db7dd055179af5754b3312014e3ab56a8a8ca2d52c4027b61b58b",
+    "valid": true,
+    "constraint": "shape valid; duplicate source field needs future semantic refusal"
+  },
+  {
+    "fixture": "scope-empty.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "ab7f0524cdf68a5df263882cadfdeaf15dc1ae6f1baae72ace6e4a0d8b56cd54",
+    "valid": true,
+    "constraint": "empty requirements and null clock proof; no qualification claim"
+  },
+  {
+    "fixture": "scope-linux-cuda.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "fe48e61a2c649398a8754063b2fffada9c4804500cd12ada36f7f81a7989afa3",
+    "valid": true,
+    "constraint": "Linux clock and CUDA path shapes; null rules are not validity proof"
+  },
+  {
+    "fixture": "scope-windows-vulkan.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "209ae82c966aa85d42a3f8e0782773e8c2a46abd03d8a63463ab702b74f011cc",
+    "valid": true,
+    "constraint": "Windows clock and Vulkan paths; unregistered rule reference remains untrusted"
+  },
+  {
+    "fixture": "scope-invalid-field.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "ce4427f2aa42b446151e4b76dd3ddcbda10f8fc4399c1d3b36f8b6fcaa81dfd1",
+    "valid": false,
+    "constraint": "closed observation path enum",
+    "error": {
+      "path": [
+        "requirements",
+        0,
+        "field"
+      ],
+      "keyword": "enum"
+    }
+  },
+  {
+    "fixture": "scope-invalid-time.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "2dcdd4da307cd922d33dec5c508b61b6de0d89fdbe256ae6255e5c12c95d0fed",
+    "valid": false,
+    "constraint": "canonical decimal-string syntax",
+    "error": {
+      "path": [
+        "requirements",
+        0,
+        "interval",
+        "start"
+      ],
+      "keyword": "pattern"
+    }
+  },
+  {
+    "fixture": "scope-semantic-reversed.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "33609c1178f05aedd6616431ea809b3d63663f0b6dddda2c7d21963825e9de60",
+    "valid": true,
+    "constraint": "shape valid; reversed interval needs future BindingMismatch"
+  },
+  {
+    "fixture": "scope-semantic-overflow.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "6b86f91e26d4860a7b71eb4919c13adf40a9c3ad18be4e9470a548c93482c991",
+    "valid": true,
+    "constraint": "shape valid; u64 overflow needs future checked conversion"
+  },
+  {
+    "fixture": "scope-semantic-field.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "cdae2972b53d70d9ec4ee89a8c2c883f4a3aed6722ed0319dc96984c579b8890",
+    "valid": true,
+    "constraint": "shape valid; duplicate requirement field needs future semantic refusal"
+  },
+  {
+    "fixture": "scope-semantic-backend.json",
+    "schema": "observation-scope.schema.json",
+    "sha256": "3abea7d7c677e2ef62e6749f7f0c544a13beca30a0367ae4c988f3c43807a650",
+    "valid": true,
+    "constraint": "shape valid; mixed device paths need independent instance backend comparison"
+  }
+]
