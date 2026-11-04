@@ -70,6 +70,10 @@ record-binding owner must still port the complete oracle, bind request/workload
 artifacts and enforce independently required observation intervals. Preserve
 that obligation; do not drop it because pure bundles can be inspected earlier.
 
+The proposed [final record-binding contract](PR-Shared-Client-Record-Binding.md)
+refines that subsequent boundary. It is documentation only; runtime-specific
+validity rules and separate implementation authorization remain open.
+
 The pure module must accept Linux and Windows instance variants without OS access.
 Any dependency target-gating adjustment is limited to that purpose; it provides
 no Windows attachment/native-delivery proof. If the inspected canonical base has
