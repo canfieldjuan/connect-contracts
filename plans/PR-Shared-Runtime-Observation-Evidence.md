@@ -203,6 +203,10 @@ later schema, client, host, capture and live-test authorization.
 
 ## Assumptions, blockers and gap audit
 
+The proposed [llama.cpp c1d0e7a source annex](PR-Llama-C1d0e7a-Observation-Annex.md)
+maps the nominated source for comparison only. It does not choose the runtime,
+register trusted rules or authorize implementation or execution.
+
 DONE for preparation only: source inventory, historical receipt reuse and explicit
 per-field evidence obligations. NOT DONE for source-rule closure or implementation.
 The next gates are:
