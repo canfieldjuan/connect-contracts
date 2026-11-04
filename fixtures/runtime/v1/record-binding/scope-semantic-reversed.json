@@ -1,0 +1,37 @@
+{
+  "observation_scope_version": 1,
+  "instance_id": "9bfd67d39556c6f03b7fbdaef5517d83ba498529654aed3cdb22566a9f03f6b4",
+  "app_bindings_sha256": "3bd66634d6481c9f67cde77fe0bbb53c8bce6965b9614b7d7c8ec76c5c81d830",
+  "bundle_manifest_sha256": "3ce7aea4c00affe47181eeb33e5f7e48c2db90300a4f16fd7af30ec6fcf7b250",
+  "clock": "linux-boottime-ns",
+  "clock_binding": {
+    "alias": "clock-receipt",
+    "sha256": "802dbf64634812005a6992f6a64662abc689aeff8fdea8cbfbab98cbf1444e9a"
+  },
+  "requirements": [
+    {
+      "field": "device.compute_capability",
+      "interval": {
+        "start": "2",
+        "end": "1"
+      },
+      "rule": null
+    },
+    {
+      "field": "effective_settings.prompt_cache_reuse",
+      "interval": {
+        "start": "0",
+        "end": "18446744073709551615"
+      },
+      "rule": null
+    },
+    {
+      "field": "concurrency.requests_overlap",
+      "interval": {
+        "start": "0",
+        "end": "18446744073709551615"
+      },
+      "rule": null
+    }
+  ]
+}

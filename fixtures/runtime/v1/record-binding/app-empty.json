@@ -1,0 +1,15 @@
+{
+  "app_bindings_version": 1,
+  "instance_id": "9bfd67d39556c6f03b7fbdaef5517d83ba498529654aed3cdb22566a9f03f6b4",
+  "application_route": {
+    "application": "synthetic",
+    "capability": "extract",
+    "request_profile": "offline"
+  },
+  "profile": {
+    "alias": "profile",
+    "sha256": "1900eab6c028483d7126599ee6f50de0d27907b5c65fa90524580b4b0f9852b0"
+  },
+  "requests": [],
+  "sources": []
+}
