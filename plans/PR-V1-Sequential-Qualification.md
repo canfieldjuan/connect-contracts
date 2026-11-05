@@ -26,7 +26,10 @@ The current [canonical profile](../runtime/v1/profile.json) remains unchanged at
 `58bf361ec2d2a082931ffe19fb70dc9a22ffd8d7c10bc7837df137f843cd60d1`.
 Staging avoids presenting new settings as already qualified or making consumers
 silently adopt a new PROFILE_ID. The candidate is not a second production selector.
-After qualification, adoption needs a separately reviewed coordinated migration.
+The [migration and replay preparation contract](PR-V1-Profile-Migration-Replay.md)
+proposes canonical migration on a reviewed development branch before qualification,
+using the exact artifacts intended to ship. Installed adoption remains separately
+reviewed and authorized after qualification; migration is not a qualification claim.
 The current ADR-0011 exact-argv conformance owner still describes the canonical
 profile, so its admission check does not accept this suffix yet. The staged file
 is shape-valid and independently pinned, not promised launchable by unchanged

@@ -54,6 +54,9 @@ canonical profile above. The staged profile is not approved for app adoption.
 RTX 3090 Linux, RTX 4060 Ti, Windows 11 native and real app qualification remain
 pending; no live run is authorized until Juan approves the plan and budgets.
 Issue 88 remains open independently of the settled runtime choice.
+The [proposed canonical-profile migration and offline replay contract](plans/PR-V1-Profile-Migration-Replay.md)
+orders the remaining readiness work; acceptance authorizes no implementation, build
+or live call. The prepared Linux packet remains not runnable.
 
 Before a coordinated profile migration can qualify, run the offline copy check
 against explicit commits in the contracts, client and host repositories:
