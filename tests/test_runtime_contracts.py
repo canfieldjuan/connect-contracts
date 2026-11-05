@@ -204,6 +204,27 @@ def errors_for(schema_name, document):
 
 
 class RuntimeContractTests(unittest.TestCase):
+    def test_v1_sequential_candidate_pins_settings_without_rebinding_assets(self):
+        candidate = ROOT / "runtime/v1/candidates/sequential/profile.json"
+        self.assertTrue(candidate.is_file(), "staged V1 sequential profile is absent")
+        document = load(candidate)
+        validator = Draft202012Validator(load(SCHEMAS / "profile.schema.json"))
+        self.assertEqual(list(validator.iter_errors(document)), [])
+        canonical = load(CANONICAL)
+        explicit = [
+            "-b", "2048", "-ub", "512", "--ctx-checkpoints", "32",
+            "--checkpoint-min-step", "8192", "--cache-ram", "8192",
+            "--cache-reuse", "0", "--no-cache-prompt",
+        ]
+        expected = copy.deepcopy(canonical)
+        for tier in expected["tiers"]:
+            tier["argv"] = expected_argv(tier["id"]) + explicit
+        # Full equality also protects tier order, model/template and every build pin.
+        self.assertEqual(document, expected)
+        self.assertEqual(document["llama_cpp_commit"],
+                         "c1d0e7a004015f23bc0233470b747b596f29b264")
+        self.assertNotEqual(candidate.read_bytes(), CANONICAL.read_bytes())
+
     def test_schema_documents_are_valid(self):
         for name in SEMANTIC:
             with self.subTest(schema=name):
