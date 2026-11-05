@@ -67,8 +67,17 @@ counterexamples. No expected semantic outcomes are implemented in the shape runn
 The two duplicate-field fixture payloads keep their original names, bytes and
 SHA-256s. Their index expectations now require a `maxContains` error at `sources`
 or `requirements`; old sealed results are unchanged. The current schema version
-and IDs stay fixed as the accepted pre-adoption correction; asset-byte pins must
-identify which revision a replay used.
+and IDs stay fixed as the accepted pre-adoption correction.
+[The schema asset manifest](../../../../schemas/runtime/v1/record-binding-assets.json)
+pins the original bytes of both metadata schemas and their complete fixed local
+reference closure (qualification and instance). The test loader's `documents`
+owner verifies the exact manifest key/digest set before returning those same bytes
+as parsed schemas. Manifest names cannot select files or enable remote retrieval.
+The focused regression checks missing/extra/wrong pins and each independently
+altered schema, including whitespace-only changes. Archive this manifest with
+replay results to distinguish revisions under unchanged schema IDs; old sealed
+packets stay unchanged. A pin is byte identity, not source authentication or
+client adoption.
 
 This is schema rejection (the contracted client category is `Malformed`), not
 semantic `BindingMismatch`. The existing Python test-only `inspect_shapes` reports

@@ -24,6 +24,7 @@ FIXTURES = ROOT / 'fixtures/runtime/v1/record-binding'
 BASE = 'https://local-connect.invalid/schemas/runtime/v1/'
 NAMES = ('app-bindings', 'observation-scope')
 SCHEMA_NAMES = tuple(n + '.schema.json' for n in (*NAMES, 'qualification', 'instance'))
+ASSET_MANIFEST = SCHEMAS / 'record-binding-assets.json'
 METADATA_BYTES = 256 * 1024
 MAX_DEPTH = 32
 CASES = {
@@ -38,7 +39,12 @@ CASES = {
 
 
 def documents():
-    return {BASE + n: json.loads((SCHEMAS / n).read_bytes()) for n in SCHEMA_NAMES}
+    # Fixed local assets only: manifest keys never select files or network URLs.
+    raw = {name: (SCHEMAS / name).read_bytes() for name in SCHEMA_NAMES}
+    pins = _parse(ASSET_MANIFEST.read_bytes())
+    if pins != {name: sha256(data).hexdigest() for name, data in raw.items()}:
+        raise EvidenceError('schema asset manifest mismatch')
+    return {BASE + name: json.loads(data) for name, data in raw.items()}
 
 
 def no_retrieval(uri):
@@ -118,6 +124,47 @@ class RecordBindingSchemaTests(unittest.TestCase):
         errors = list(validator(name, docs).iter_errors(value))
         self.assertTrue(errors, 'missing schema rejection')
         self.assertIn((tuple(path), keyword), set(error_details(errors)))
+
+    def test_schema_asset_manifest_pins_original_bytes(self):
+        self.assertTrue(ASSET_MANIFEST.is_file(), 'missing schema asset manifest')
+        pins = _parse(ASSET_MANIFEST.read_bytes())
+        self.assertEqual(pins, {name: sha256((SCHEMAS / name).read_bytes()).hexdigest()
+                                for name in SCHEMA_NAMES})
+        self.assertEqual(set(documents()), {BASE + name for name in SCHEMA_NAMES})
+
+    def test_schema_asset_manifest_rejects_pin_and_byte_changes(self):
+        pristine = _parse(ASSET_MANIFEST.read_bytes())
+        read_bytes = Path.read_bytes
+        for name in SCHEMA_NAMES:
+            missing = dict(pristine)
+            del missing[name]
+            wrong = dict(pristine, **{name: '0' * 64})
+            for pins in (missing, wrong):
+                with self.subTest(asset=name, pins=pins):
+                    def read(path):
+                        return json.dumps(pins).encode() if path == ASSET_MANIFEST else read_bytes(path)
+                    with patch.object(Path, 'read_bytes', read):
+                        with self.assertRaisesRegex(EvidenceError, '^schema asset manifest mismatch$'):
+                            documents()
+            # Same parsed JSON, different original bytes: normalization cannot hide it.
+            original = read_bytes(SCHEMAS / name)
+            self.assertEqual(json.loads(original), json.loads(original + b' '))
+            def altered(path):
+                data = read_bytes(path)
+                return data + b' ' if path == SCHEMAS / name else data
+            with self.subTest(asset=name, mutation='raw bytes'), patch.object(Path, 'read_bytes', altered):
+                with self.assertRaisesRegex(EvidenceError, '^schema asset manifest mismatch$'):
+                    documents()
+        for pins in (dict(pristine, **{'../unlisted.json': '0' * 64}), {}, None, False, 0, ''):
+            reads = []
+            def read(path):
+                reads.append(path)
+                return json.dumps(pins).encode() if path == ASSET_MANIFEST else read_bytes(path)
+            with self.subTest(pins=pins), patch.object(Path, 'read_bytes', read):
+                with self.assertRaisesRegex(EvidenceError, '^schema asset manifest mismatch$'):
+                    documents()
+                self.assertEqual(set(reads), {ASSET_MANIFEST, *(SCHEMAS / n for n in SCHEMA_NAMES)})
+        self.assertEqual(set(documents()), {BASE + name for name in SCHEMA_NAMES})
 
     def test_duplicate_field_fixtures_fail_shape(self):
         for name, collection in (
@@ -441,10 +488,10 @@ class RecordBindingSchemaTests(unittest.TestCase):
 
     def test_returned_values_are_parsed_originals_without_reserialization(self):
         app, scope = raw_fixture('app-paired.json'), raw_fixture('scope-windows-vulkan.json')
-        with patch(__name__ + '._parse', wraps=_parse) as parser:
+        # Observe the metadata boundary; schema-manifest parsing is independent.
+        with patch(__name__ + '.parse_metadata', wraps=parse_metadata) as parser:
             result = inspect_shapes(app, scope)
-            self.assertEqual(parser.call_args_list[0].args, (app,))
-            self.assertEqual(parser.call_args_list[1].args, (scope,))
+            self.assertEqual([call.args for call in parser.call_args_list], [(app,), (scope,)])
         self.assertEqual(result, (_parse(app), _parse(scope)))
         reordered = json.dumps(dict(reversed(list(result[0].items())))).encode()
         self.assertNotEqual(sha256(app).digest(), sha256(reordered).digest())
