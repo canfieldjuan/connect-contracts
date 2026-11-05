@@ -56,19 +56,24 @@ pending; no live run is authorized until Juan approves the plan and budgets.
 Issue 88 remains open independently of the settled runtime choice.
 
 Before a coordinated profile migration can qualify, run the offline copy check
-against the exact contracts, client and host checkouts intended for that migration:
+against explicit commits in the contracts, client and host repositories:
 
 ```text
-python3 tools/verify_profile_copies.py --contracts <contracts-checkout> --client <client-checkout> --host <host-checkout> --expected-sha256 <independently-reviewed-profile-digest>
+python3 tools/verify_profile_copies.py --contracts <contracts-checkout> --contracts-revision <contracts-commit> --client <client-checkout> --client-revision <client-commit> --host <host-checkout> --host-revision <host-commit> --expected-sha256 <independently-reviewed-profile-digest>
 ```
 
-The check compares original bytes in `runtime/v1/profile.json`, the client's
+The check resolves each revision once to a full commit ID, then uses Git blob
+reads at those commits to compare original bytes in `runtime/v1/profile.json`,
+the client's
 `crates/model-primitives/assets/profile.json`, and both host copies under
 `vendor/local-connect-model-client/` and `vendor/connect-contracts/`. It refuses
 any mismatch, including all copies drifting together from the reviewed digest.
-Record the exact source revisions, clean working-tree states and output receipt
-with the migration; do not derive the expected digest from an unreviewed input.
-This trusted-checkout consistency check does not authenticate source, replace
+The receipt contains all three full commit IDs and all four digests/sizes.
+Uncommitted edits, checkout changes and Git replacement objects cannot stand in
+for those committed bytes. Save the receipt with the migration; do not derive the
+expected digest from an unreviewed input. A passing receipt does not certify a
+working tree or build output. This trusted-repository consistency check does not
+authenticate source, replace
 complete vendor-manifest verification or host admission, build artifacts, or
 qualify a model. It makes no changes and starts no host or runtime.
 
