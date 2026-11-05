@@ -47,6 +47,14 @@ synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itsel
 (invoice-processor MODEL-SETUP MS-PIN-4): today `gpu-cuda` and `gpu-vulkan`. Applications
 vendor its exact bytes, and its `PROFILE_ID` is their SHA-256.
 
+Juan has selected **llama.cpp c1d0e7a, sequential calls, one slot** for V1.
+The [staged explicit-settings profile and qualification plan](plans/PR-V1-Sequential-Qualification.md)
+pins the remaining batch/checkpoint/cache settings without changing the qualified
+canonical profile above. The staged profile is not approved for app adoption.
+RTX 3090 Linux, RTX 4060 Ti, Windows 11 native and real app qualification remain
+pending; no live run is authorized until Juan approves the plan and budgets.
+Issue 88 remains open independently of the settled runtime choice.
+
 Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts tests.test_runtime_qualification tests.test_runtime_companion tests.test_runtime_numeric_ingestion`
 after installing the development dependencies in `requirements-dev.txt`.
 

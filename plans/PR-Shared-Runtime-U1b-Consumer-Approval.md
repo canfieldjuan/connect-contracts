@@ -19,10 +19,13 @@ Juan's v1 decisions are:
 - **Model-call concurrency:** sequential model calls, one slot.
 - **Model:** "We're going to ship the first version with the 9b model."
 
-These decisions do not select quantization or runtime build, accept
-any other budget, or authorize execution. Runtime build selection remains OPEN
-under the Runtime Identity Selection gate below. [Issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88)
-remains OPEN: the hardware floor does not choose refusal, warning or record-only
+**Subsequent direct operator decision:** V1 ships llama.cpp
+`c1d0e7a004015f23bc0233470b747b596f29b264` with sequential calls and one slot.
+The [explicit-settings profile and qualification proposal](PR-V1-Sequential-Qualification.md)
+records the selected Qwen3.5-9B-Q4_K_M identity and staged launch pins. Runtime
+choice is SETTLED; qualification, live budgets and adoption remain pending.
+[Issue #88](https://github.com/canfieldjuan/connect-contracts/issues/88)
+remains OPEN: neither runtime selection nor the hardware floor chooses refusal, warning or record-only
 behavior for unqualified execution identities. Existing qualification, acceptance,
 review, enrollment and release gates remain unchanged. No implementation,
 builds, tests, benchmarks, tokenizer/model calls or live changes are authorized
@@ -145,16 +148,19 @@ future slices is dispatched or accepted by this proposal.
    observations explicitly. No final PASS receipt or completed live run is required
    to deliver this candidate; those are outputs of subsequent qualification.
    G0 binding on either Linux or Windows is also gated by the [coordinated profile migration in ADR-0012](../adr/0012-shared-local-model-runtime-windows.md#profile).
-   **Runtime Identity Selection gate — Juan, OPEN (before step 8).** Juan must
-   decide which runtime identity G0 binds. Until that decision, request neither
-   a preflight nor a G2 annex. Steps 1-7 may continue except where they would bind
-   or freeze a specific runtime identity; today's inventory pins do not select it.
+   **Runtime Identity Selection gate — Juan, SETTLED for V1.** Juan selects
+   `c1d0e7a004015f23bc0233470b747b596f29b264`, sequential calls, one slot.
+   The [V1 profile/qualification proposal](PR-V1-Sequential-Qualification.md)
+   stages the existing Linux artifacts plus explicit settings. Complete native
+   artifact binding and effective observations remain G0 obligations, including
+   Windows. This decision authorizes plan preparation, not preflight or G2 calls;
+   Juan must approve the concrete plan and live budgets before execution.
    Oversight mail `3248f3b9` cites the operator-accepted arithmetic contract
    `llama-moe-sandbox/CONTRACT-CANONICAL-ARITHMETIC.md`, local commit `4da6517`:
    the canonical build is a new pinned identity, each app requalifies, and old
    baselines do not carry over. This is a relayed citation, not a sandbox inspection
    or an implementation/result claim. That work remains unowned and untouched here.
-   After selection, bind the chosen artifacts and derive that identity's budgets;
+   Bind the selected artifacts and derive that identity's budgets;
    do not carry over the prior identity's accuracy evidence or time ceilings.
 8. **G1 preparation and separately authorized preflight — ds-qualify-c9.** Reuse
    the existing harness to freeze source-derived request inputs, tokenizer request
@@ -240,8 +246,10 @@ lane or generic bypass here.
 
 ## Differences from validated work
 
-No runtime/model/prompt/quantization/cache/slot/context change is proposed.
-That scope statement does not settle the Runtime Identity Selection gate above.
+The original U1b proposal made no runtime/model/prompt/quantization/cache/slot/context
+change. The subsequent operator decision settles runtime selection above; the
+separate V1 qualification proposal enumerates its staged settings differences.
+Neither record makes those settings a deployed or qualified profile.
 Later admission is a new trust boundary absent from synthetic tests. Later
 transport changes from the old app-owned native path to the verified shared Unix
 session, and later opt-in snapshot metadata follows U1. Each needs byte/typed-error
