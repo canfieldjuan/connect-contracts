@@ -20,23 +20,20 @@ their original review state; this explicit decision supersedes that gate only.
 
 ## Profile, provenance and differences
 
-The staged file is [the sequential candidate](../runtime/v1/candidates/sequential/profile.json).
-Its PROFILE_ID is SHA-256 of its exact bytes, to be frozen in each run receipt.
-The current [canonical profile](../runtime/v1/profile.json) remains unchanged at
-`58bf361ec2d2a082931ffe19fb70dc9a22ffd8d7c10bc7837df137f843cd60d1`.
-Staging avoids presenting new settings as already qualified or making consumers
-silently adopt a new PROFILE_ID. The candidate is not a second production selector.
-The [migration and replay preparation contract](PR-V1-Profile-Migration-Replay.md)
-proposes canonical migration on a reviewed development branch before qualification,
-using the exact artifacts intended to ship. Installed adoption remains separately
-reviewed and authorized after qualification; migration is not a qualification claim.
-The current ADR-0011 exact-argv conformance owner still describes the canonical
-profile, so its admission check does not accept this suffix yet. The staged file
-is shape-valid and independently pinned, not promised launchable by unchanged
-host/client consumers. Offline launch/admission compatibility and a reviewed
-profile-contract migration must precede G0 delivery or any model call.
+The [retained candidate](../runtime/v1/candidates/sequential/profile.json) and
+[current canonical source](../runtime/v1/profile.json) now have identical bytes:
+`a5abe4eec9434a128a2d63a5dcbc285b4b3113e71df5454c234ee681c11ad274`.
+The old released profile
+`58bf361ec2d2a082931ffe19fb70dc9a22ffd8d7c10bc7837df137f843cd60d1`
+remains the installed rollback baseline, not a second accepted identity. This
+source migration implements the ordering in the
+[migration contract](PR-V1-Profile-Migration-Replay.md); it is not qualification
+or installed adoption. ADR-0011 and offline conformance now describe the suffix.
+The native host still embeds the old client distribution until its separately
+reviewed vendor integration and native delivery complete. No runtime call or
+G0 delivery is implied by source equality.
 
-The candidate copies the canonical CUDA and Vulkan tiers, order, context 32768,
+The candidate copied the prior canonical CUDA and Vulkan tiers, order, context 32768,
 one slot, model/template, artifact URLs, archive and per-file hashes verbatim.
 CUDA reference archive SHA256 is
 `2d4988729ab0df576efdaa58be27c55b4de1eb574256049a0f2b6d5abe9bff10`;
@@ -214,11 +211,11 @@ inference capacity or cross-device deterministic arithmetic.
   approved isolated qualification experiment; it blocks assuming product policy.
 
 Offline verification covers schema shape, the exact candidate argv, preservation
-of every existing artifact/model/template pin and the unchanged canonical profile.
+of every existing artifact/model/template pin and exact migrated canonical bytes.
 The focused regression fails before the candidate file exists. It is not a server
 parser, GPU-fit, live determinism, accuracy or performance test. No old sealed
 receipt or fixture is relabelled. Rollback before adoption is simply not adopting
-the candidate; the existing canonical profile and application copies remain intact.
+the candidate; the prior released profile and installed application copies remain intact.
 
 [defaults]: https://github.com/ggml-org/llama.cpp/blob/c1d0e7a004015f23bc0233470b747b596f29b264/common/common.h#L443
 [cache-defaults]: https://github.com/ggml-org/llama.cpp/blob/c1d0e7a004015f23bc0233470b747b596f29b264/common/common.h#L611

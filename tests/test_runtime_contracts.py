@@ -1,6 +1,7 @@
 """Offline ADR-0011 runtime conformance: shape and metadata only, not a model host."""
 
 import copy
+import hashlib
 import json
 import re
 import unittest
@@ -32,6 +33,14 @@ CPU_ARGV = [
     "--alias", "<GGUF sha256>", "--api-key-file", "<key>", "--offline", "--no-webui",
     "--no-warmup", "--host", "<socket>",
 ]
+SEQUENTIAL_SUFFIX = [
+    "-b", "2048", "-ub", "512", "--ctx-checkpoints", "32",
+    "--checkpoint-min-step", "8192", "--cache-ram", "8192",
+    "--cache-reuse", "0", "--no-cache-prompt",
+]
+GPU_ARGV += SEQUENTIAL_SUFFIX
+CPU_ARGV += SEQUENTIAL_SUFFIX
+
 TIER_ORDER = ["gpu-cuda", "gpu-vulkan", "cpu"]
 DEVICE_CLASS = {"gpu-cuda": "nvidia-cuda", "gpu-vulkan": "vulkan-discrete", "cpu": "cpu"}
 ARCHIVE_SUFFIXES = (".tar.gz", ".tar.xz")
@@ -204,26 +213,25 @@ def errors_for(schema_name, document):
 
 
 class RuntimeContractTests(unittest.TestCase):
-    def test_v1_sequential_candidate_pins_settings_without_rebinding_assets(self):
+    def test_migration_uses_exact_reviewed_candidate_bytes(self):
+        expected = (ROOT / "runtime/v1/candidates/sequential/profile.json").read_bytes()
+        self.assertEqual(hashlib.sha256(expected).hexdigest(),
+                         "a5abe4eec9434a128a2d63a5dcbc285b4b3113e71df5454c234ee681c11ad274")
+        self.assertEqual(CANONICAL.read_bytes(), expected)
+
+    def test_canonical_and_retained_candidate_are_identical(self):
         candidate = ROOT / "runtime/v1/candidates/sequential/profile.json"
         self.assertTrue(candidate.is_file(), "staged V1 sequential profile is absent")
         document = load(candidate)
         validator = Draft202012Validator(load(SCHEMAS / "profile.schema.json"))
         self.assertEqual(list(validator.iter_errors(document)), [])
         canonical = load(CANONICAL)
-        explicit = [
-            "-b", "2048", "-ub", "512", "--ctx-checkpoints", "32",
-            "--checkpoint-min-step", "8192", "--cache-ram", "8192",
-            "--cache-reuse", "0", "--no-cache-prompt",
-        ]
-        expected = copy.deepcopy(canonical)
-        for tier in expected["tiers"]:
-            tier["argv"] = expected_argv(tier["id"]) + explicit
-        # Full equality also protects tier order, model/template and every build pin.
-        self.assertEqual(document, expected)
+        self.assertEqual(document, canonical)
+        for tier in canonical["tiers"]:
+            self.assertEqual(tier["argv"], expected_argv(tier["id"]))
         self.assertEqual(document["llama_cpp_commit"],
                          "c1d0e7a004015f23bc0233470b747b596f29b264")
-        self.assertNotEqual(candidate.read_bytes(), CANONICAL.read_bytes())
+        self.assertEqual(candidate.read_bytes(), CANONICAL.read_bytes())
 
     def test_schema_documents_are_valid(self):
         for name in SEMANTIC:
@@ -276,6 +284,7 @@ class RuntimeContractTests(unittest.TestCase):
     def test_any_argv_change_is_refused(self):
         base = load(FIXTURES / "valid/profile-three-tiers.json")
         mutations = {
+            "retired implicit defaults": lambda argv: argv[:-len(SEQUENTIAL_SUFFIX)],
             "extra listener": lambda argv: argv + ["--port", "8080"],
             "network download": lambda argv: argv + ["-hf", "org/repo"],
             "inline key": lambda argv: argv[:19] + ["--api-key", "secret"] + argv[21:],

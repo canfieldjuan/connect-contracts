@@ -387,7 +387,12 @@ Installation, login and licensing never start it.
 
 **The file.** The profile is one data file in this repository:
 `runtime/v1/profile.json`. The schema `schemas/runtime/v1/profile.schema.json`
-validates it.
+validates it. The current source profile has migrated to the exact sequential
+candidate from PR107 under the [migration contract](../plans/PR-V1-Profile-Migration-Replay.md).
+This is source preparation, not a qualification, installed adoption or release.
+The prior released profile remains the rollback identity; it is not an additional
+profile admitted by a migrated build. Native host delivery and qualification are
+still pending. CPU syntax below is conformance coverage, not a shipped CPU tier.
 
 **What each tier holds:**
 - the device class;
@@ -408,6 +413,8 @@ use:
 --chat-template-kwargs {"enable_thinking":false} --reasoning off
 --alias <GGUF sha256> --api-key-file <key> --offline --no-webui
 --no-warmup --host <socket>
+-b 2048 -ub 512 --ctx-checkpoints 32 --checkpoint-min-step 8192
+--cache-ram 8192 --cache-reuse 0 --no-cache-prompt
 ```
 
 The CPU tier uses `-ngl 0 -t <physical cores>` in place of
