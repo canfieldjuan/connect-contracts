@@ -63,8 +63,10 @@ Both proposed documents are closed JSON objects. Every listed member is required
 no unspecified members, implicit defaults, hidden observation values, commands,
 URLs to fetch, parser expressions or extension bags. Nested objects are closed
 as well. `oneOf` discriminators, `const`, enums, bounds, required members and
-reference types belong in schemas. Cross-document equality, indexed uniqueness
-and coverage belong to the future shared record-binding owner, not app regexes.
+reference types belong in schemas. The proposed [evidence-association amendment](PR-Shared-Runtime-Evidence-Association.md#explicit-pr102-uniqueness-and-error-boundary-amendment)
+places finite per-field uniqueness in schemas. Cross-document equality, arbitrary
+alias/occurrence uniqueness and coverage remain with the future shared record-binding
+owner, not app regexes. Executable schemas remain unchanged pending separate authority.
 
 Use the existing corrected integer-only JSON parser: no duplicate members,
 nonfinite values, fraction/exponent notation, negative zero or out-of-range
@@ -233,7 +235,9 @@ Task receipts and human review remain opaque and retained.
 
 Keep PR100's error meanings: malformed shape/unknown version is `Malformed`;
 duplicate members and nonfinite numbers retain their dedicated parser errors;
-byte/depth limits are `Limit`; mismatched instance is `InstanceChanged`; raw
+the proposed evidence-association amendment makes duplicate source/requirement
+fields schema `Malformed` (not `BindingMismatch`) after its separately authorized
+implementation; byte/depth limits are `Limit`; mismatched instance is `InstanceChanged`; raw
 artifact/digest mismatch is `Integrity`; ordered-reference, alias, attribution or
 other cross-document disagreement is `BindingMismatch`; invalid/missing validity
 support for asserted observations is `ObservationScope`. Reversed requirement
@@ -273,7 +277,9 @@ Later separately authorized offline format work must cover:
   resolution, file acquisition or capability conversion reachable from metadata.
 
 Schema expression owns shape constraints; named cross-artifact semantic checks
-own equality/uniqueness/coverage. Later implementation must show guard-removal
+own cross-document equality, arbitrary alias/occurrence uniqueness and coverage.
+Finite source/requirement field uniqueness follows the linked schema amendment.
+Later implementation must show guard-removal
 controls for actual semantic guards, not create a duplicate speculative oracle
 in a schema-only slice. Reuse the frozen parity harness and durable receipts.
 

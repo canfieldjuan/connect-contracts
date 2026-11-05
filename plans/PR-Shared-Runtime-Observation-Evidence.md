@@ -162,15 +162,16 @@ establish any of those outcomes. Preserve all task receipts unchanged.
 ## Schema ownership and differences from prior work
 
 Use schemas for every expressible shape constraint; parsed cross-artifact equality
-and source-validity evaluation belong to their named semantic owner. Oversight's
-PR102 follow-up identified that per-field uniqueness can use per-field `contains`
-with `minContains: 0` and `maxContains: 1`. The accepted format currently assigns
-duplicate-field refusal to `BindingMismatch`, and its fixtures deliberately pass
-shape validation. Moving this constraint into schemas changes the accepted error
-boundary and fixtures: a separate explicit amendment must reconcile that before
-implementation. This proposal neither makes that amendment nor adds a parallel
-regex/validator. Interval ordering and cross-document correspondence remain
-semantic obligations.
+and source-validity evaluation belong to their named semantic owner. The proposed
+[evidence-format and association contract](PR-Shared-Runtime-Evidence-Association.md)
+defines safe retained formats, load/device/clock associations and canonical private
+rule-membership ownership without selecting a runtime. Its
+[explicit uniqueness amendment](PR-Shared-Runtime-Evidence-Association.md#explicit-pr102-uniqueness-and-error-boundary-amendment)
+resolves the PR102 follow-up: per-field contains/minContains:0/maxContains:1 guards
+move duplicate source/requirement fields to schema Malformed; arbitrary alias
+uniqueness and cross-document/interval comparisons remain semantic. Acceptance and
+separate executable authorization are still required. Current schemas/fixture
+expectations are not changed here; old evidence is not retroactively rewritten.
 
 Difference from validated work: this document adds a source/validity review map
 and distinguishes historical client timing from future qualified execution timing.
