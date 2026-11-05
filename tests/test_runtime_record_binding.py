@@ -119,6 +119,90 @@ class RecordBindingSchemaTests(unittest.TestCase):
         self.assertTrue(errors, 'missing schema rejection')
         self.assertIn((tuple(path), keyword), set(error_details(errors)))
 
+    def test_duplicate_field_fixtures_fail_shape(self):
+        for name, collection in (
+                ('app-semantic-source-field.json', 'sources'),
+                ('scope-semantic-field.json', 'requirements')):
+            with self.subTest(fixture=name):
+                self.assert_rejected(CASES[name], fixture(name), [collection], 'maxContains')
+
+    def field_collection_cases(self):
+        app = fixture('app-paired.json')
+        yield 'app-bindings.schema.json', app, 'sources', app['sources']
+        scope = fixture('scope-linux-cuda.json')
+        fields = documents()[BASE + 'observation-scope.schema.json'][
+            '$defs']['requirement']['properties']['field']['enum']
+        entries = [dict(scope['requirements'][0], field=field,
+                        interval={'start': '0', 'end': '0'}, rule=None)
+                   for field in fields]
+        yield 'observation-scope.schema.json', scope, 'requirements', entries
+
+    def test_field_uniqueness_accepts_empty_partial_and_all_distinct(self):
+        for name, base, collection, entries in self.field_collection_cases():
+            for size in (0, 1, len(entries)-1, len(entries)):
+                with self.subTest(schema=name, size=size):
+                    self.assert_valid(name, dict(base, **{collection: entries[:size]}))
+            # Every individual field remains optional; no implicit contains minimum.
+            for entry in entries:
+                with self.subTest(schema=name, field=entry['field']):
+                    self.assert_valid(name, dict(base, **{collection: [entry]}))
+
+    def test_each_field_rejects_identical_and_different_duplicates(self):
+        for name, base, collection, entries in self.field_collection_cases():
+            for entry in entries:
+                changed = copy.deepcopy(entry)
+                if collection == 'sources':
+                    changed['artifact']['alias'] = 'different-source'
+                else:
+                    changed['interval']['end'] = '1'
+                self.assertNotEqual(entry, changed)
+                other = next(e for e in entries if e['field'] != entry['field'])
+                for duplicate in (entry, changed):
+                    # Two entries stay within maxItems, isolating the field guard.
+                    wrong = dict(base, **{collection: [entry, duplicate]})
+                    with self.subTest(schema=name, field=entry['field'], duplicate=duplicate):
+                        errors = list(validator(name).iter_errors(wrong))
+                        self.assertEqual(set(error_details(errors)), {((collection,), 'maxContains')})
+                        mixed = dict(base, **{collection: [other, entry, duplicate]})
+                        self.assert_rejected(name, mixed, [collection], 'maxContains')
+                        # App's mixed triple also exceeds maxItems=2; scope does not.
+                        self.assert_rejected(name, dict(base, **{collection: [entry]*3}),
+                                             [collection], 'maxContains')
+
+    def test_each_field_guard_removal_and_optional_minimum_mutations(self):
+        for name, base, collection, entries in self.field_collection_cases():
+            original = documents()
+            guards = original[BASE + name]['properties'][collection]['allOf']
+            self.assertEqual(len(guards), len(entries))
+            self.assertEqual({g['contains']['properties']['field']['const'] for g in guards},
+                             {e['field'] for e in entries})
+            for i, guard in enumerate(guards):
+                field = guard['contains']['properties']['field']['const']
+                entry = next(e for e in entries if e['field'] == field)
+                other = next(e for e in entries if e['field'] != field)
+                duplicate = dict(base, **{collection: [entry, entry]})
+                with self.subTest(schema=name, field=field):
+                    self.assert_rejected(name, duplicate, [collection], 'maxContains')
+                    weakened = copy.deepcopy(original)
+                    del weakened[BASE + name]['properties'][collection]['allOf'][i]['maxContains']
+                    self.assert_valid(name, duplicate, weakened)
+                    too_strict = copy.deepcopy(original)
+                    del too_strict[BASE + name]['properties'][collection]['allOf'][i]['minContains']
+                    for allowed in ([], [other]):
+                        value = dict(base, **{collection: allowed})
+                        self.assert_valid(name, value)
+                        self.assert_rejected(name, value, [collection], 'contains', too_strict)
+
+    def test_duplicate_fields_reach_existing_shape_error_boundary(self):
+        app, scope = raw_fixture('app-empty.json'), raw_fixture('scope-empty.json')
+        for a, s in ((raw_fixture('app-semantic-source-field.json'), scope),
+                     (app, raw_fixture('scope-semantic-field.json'))):
+            with self.subTest(app_sha=sha256(a).hexdigest(), scope_sha=sha256(s).hexdigest()):
+                with self.assertRaisesRegex(EvidenceError, '^metadata shape invalid$'):
+                    inspect_shapes(a, s)
+        # The test-only runner has no Rust Malformed type or record-binding API.
+        # It must reject through its existing schema-error path, not a new scanner.
+
     def test_canonical_schema_files_exist(self):
         for name in NAMES:
             with self.subTest(schema=name):
@@ -371,7 +455,8 @@ class RecordBindingSchemaTests(unittest.TestCase):
 
     def test_semantic_counterexamples_are_not_misreported_as_shape_failures(self):
         for name in CASES:
-            if '-semantic-' in name:
+            if '-semantic-' in name and name not in (
+                    'app-semantic-source-field.json', 'scope-semantic-field.json'):
                 self.assert_valid(CASES[name], fixture(name))
         # This runner deliberately cannot authenticate hashes, clock origins,
         # runtime rule IDs, actual backend, interval order, or extraction scores.

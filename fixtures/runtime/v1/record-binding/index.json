@@ -61,8 +61,14 @@
     "fixture": "app-semantic-source-field.json",
     "schema": "app-bindings.schema.json",
     "sha256": "a221dc513d1db7dd055179af5754b3312014e3ab56a8a8ca2d52c4027b61b58b",
-    "valid": true,
-    "constraint": "shape valid; duplicate source field needs future semantic refusal"
+    "valid": false,
+    "constraint": "PR105 amendment: duplicate field is a shape failure; original fixture bytes preserved",
+    "error": {
+      "path": [
+        "sources"
+      ],
+      "keyword": "maxContains"
+    }
   },
   {
     "fixture": "scope-empty.json",
@@ -134,8 +140,14 @@
     "fixture": "scope-semantic-field.json",
     "schema": "observation-scope.schema.json",
     "sha256": "cdae2972b53d70d9ec4ee89a8c2c883f4a3aed6722ed0319dc96984c579b8890",
-    "valid": true,
-    "constraint": "shape valid; duplicate requirement field needs future semantic refusal"
+    "valid": false,
+    "constraint": "PR105 amendment: duplicate field is a shape failure; original fixture bytes preserved",
+    "error": {
+      "path": [
+        "requirements"
+      ],
+      "keyword": "maxContains"
+    }
   },
   {
     "fixture": "scope-semantic-backend.json",

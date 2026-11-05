@@ -37,7 +37,39 @@
       "items": {
         "$ref": "#/$defs/app_source"
       },
-      "maxItems": 2
+      "maxItems": 2,
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "field"
+            ],
+            "properties": {
+              "field": {
+                "const": "effective_settings.prompt_cache_reuse"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "field"
+            ],
+            "properties": {
+              "field": {
+                "const": "concurrency.requests_overlap"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      ]
     }
   },
   "$defs": {
