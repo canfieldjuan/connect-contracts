@@ -58,6 +58,30 @@ The [proposed canonical-profile migration and offline replay contract](plans/PR-
 orders the remaining readiness work; acceptance authorizes no implementation, build
 or live call. The prepared Linux packet remains not runnable.
 
+Before a coordinated profile migration can qualify, run the offline copy check
+against explicit commits in the contracts, client and host repositories:
+
+```text
+python3 tools/verify_profile_copies.py --contracts <contracts-checkout> --contracts-revision <contracts-commit> --client <client-checkout> --client-revision <client-commit> --host <host-checkout> --host-revision <host-commit> --expected-sha256 <independently-reviewed-profile-digest>
+```
+
+The check resolves each revision once to a full commit ID, then uses Git blob
+reads at those commits to compare original bytes in `runtime/v1/profile.json`,
+the client's
+`crates/model-primitives/assets/profile.json`, and both host copies under
+`vendor/local-connect-model-client/` and `vendor/connect-contracts/`. It refuses
+any mismatch, including all copies drifting together from the reviewed digest.
+The receipt contains all three full commit IDs and all four digests/sizes.
+Uncommitted edits, checkout changes and Git replacement objects cannot stand in
+for those committed bytes. Save the receipt with the migration; do not derive the
+expected digest from an unreviewed input. A passing receipt does not certify a
+working tree or build output. This trusted-repository consistency check does not
+authenticate source, replace
+complete vendor-manifest verification or host admission, build artifacts, or
+qualify a model. It makes no changes and starts no host or runtime.
+
+Focused offline regression: `python3 -m unittest tests.test_profile_copies`.
+
 Run `python3 -m unittest tests.test_contracts tests.test_streamed_contracts tests.test_runtime_contracts tests.test_runtime_qualification tests.test_runtime_companion tests.test_runtime_numeric_ingestion`
 after installing the development dependencies in `requirements-dev.txt`.
 
