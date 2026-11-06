@@ -43,14 +43,16 @@ ADR-0011's shared model runtime is not a Connect wire protocol. Its documents
 live in their own family: the schemas for the canonical profile, the host's
 `server.json` and its `failure.json` are under `schemas/runtime/v1/`, and their
 synthetic fixtures are under `fixtures/runtime/v1/`. The canonical profile itself is
-`runtime/v1/profile.json`. It carries only tiers that qualified on the ADR's exact argv
-(invoice-processor MODEL-SETUP MS-PIN-4): today `gpu-cuda` and `gpu-vulkan`. Applications
-vendor its exact bytes, and its `PROFILE_ID` is their SHA-256.
+`runtime/v1/profile.json`. Its source bytes now match the reviewed sequential
+candidate. The CUDA and Vulkan artifact pins are unchanged, but the explicit
+argv requires new qualification; this is not installed adoption or release.
+Applications vendor its exact bytes, and its `PROFILE_ID` is their SHA-256.
 
 Juan has selected **llama.cpp c1d0e7a, sequential calls, one slot** for V1.
-The [staged explicit-settings profile and qualification plan](plans/PR-V1-Sequential-Qualification.md)
-pins the remaining batch/checkpoint/cache settings without changing the qualified
-canonical profile above. The staged profile is not approved for app adoption.
+The [explicit-settings profile and qualification plan](plans/PR-V1-Sequential-Qualification.md)
+records the launch settings. The retained candidate is byte-identical to the
+canonical source, not a second admitted profile. Host migration/delivery and
+application adoption remain pending.
 RTX 3090 Linux, RTX 4060 Ti, Windows 11 native and real app qualification remain
 pending; no live run is authorized until Juan approves the plan and budgets.
 Issue 88 remains open independently of the settled runtime choice.

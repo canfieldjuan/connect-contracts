@@ -62,7 +62,20 @@
         "--no-webui",
         "--no-warmup",
         "--host",
-        "<socket>"
+        "<socket>",
+        "-b",
+        "2048",
+        "-ub",
+        "512",
+        "--ctx-checkpoints",
+        "32",
+        "--checkpoint-min-step",
+        "8192",
+        "--cache-ram",
+        "8192",
+        "--cache-reuse",
+        "0",
+        "--no-cache-prompt"
       ]
     },
     {
@@ -167,7 +180,20 @@
         "--no-webui",
         "--no-warmup",
         "--host",
-        "<socket>"
+        "<socket>",
+        "-b",
+        "2048",
+        "-ub",
+        "512",
+        "--ctx-checkpoints",
+        "32",
+        "--checkpoint-min-step",
+        "8192",
+        "--cache-ram",
+        "8192",
+        "--cache-reuse",
+        "0",
+        "--no-cache-prompt"
       ]
     }
   ]
