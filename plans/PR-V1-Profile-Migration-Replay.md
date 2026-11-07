@@ -129,6 +129,14 @@ identity requires renewed retained-answer parity, not an existence check. Bind t
 Summary scorer similarly through existing source pins and retained verdicts.
 Scorer equivalence is independent of model correctness and human task quality.
 
+The [proposed Summary replay-identity contract](PR-Summary-Offline-Replay-Identity.md)
+addresses the fresh-ingestion identity mismatch at the offline fixture owner.
+It preserves archived document/run identities through the existing typed store
+in a new isolated test database and requires an original-answer control with
+strict request/preflight association. Retained FAILED-verdict parity does not
+qualify a successful Summary chain. The proposal grants no implementation,
+build or replay authority and does not close this gate.
+
 ### C. Sequential replay and effective capture preparation
 
 Adapt the existing proven harness into a new durable packet; never rerun or edit
