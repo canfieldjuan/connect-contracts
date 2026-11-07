@@ -115,6 +115,14 @@ Record every mismatch, including whether it changes an accuracy verdict. Do not
 repair or loosen an oracle during this parity gate; a required oracle amendment
 is separately reviewed and preserves both old and new verdicts.
 
+The [proposed application-clock comparison amendment](PR-Retained-Scorer-Clock-Comparison.md)
+defines an exact task/path exception for unscored clock metadata, a hash-bound
+enclosing-attempt interval for one retained packet, and per-case intervals for
+future replays. It preserves the strict verdict beside a separately checked
+amended verdict. Until its exact revision is accepted and its separately
+authorized implementation is verified, the strict gate here remains unchanged;
+the retained receipt is evidence, not a completed gate.
+
 Reuse the accepted Email proof and recheck import/environment identity before a
 new replay; its archived source wins over the editable main tree. A changed
 identity requires renewed retained-answer parity, not an existence check. Bind the
