@@ -70,10 +70,9 @@ inventory; Cargo.toml and Cargo.lock bind its third-party dependencies.
 | src/pipeline/control.rs:5/:24/:33 | Cancellation owner used during handoff/retrieval; no uncontrolled replacement for cancelled work. |
 | build.rs; Cargo.toml; Cargo.lock; tauri configs/capabilities/assets | Build inputs: build.rs embeds a bounded public keyring or empty default and invokes tauri-build; future environment/output must be bound. No real entitlement read is authorized. |
 
-The test-only lexical location is the child of existing streamed/tests.rs described
-in the contract. Its enclosing gate is `#[cfg(all(test, unix))]` at streamed.rs:717,
-so it is Unix-only. The Linux lane uses this seam; native Windows needs a separately
-reviewed seam. It can reach private ancestors without exporting a production API.
+The test-only lexical location, exact source gate and platform restrictions have one
+owner: [the contract overlay surface](PR-Real-Document-Offline-Preparation.md#exact-future-overlay-surface).
+That child test module can reach private ancestors without exporting a production API.
 No binary is built here to claim that path compiles; that proof is a later gate.
 
 ## Differences that affect interpretation
