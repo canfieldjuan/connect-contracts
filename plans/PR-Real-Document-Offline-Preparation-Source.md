@@ -71,7 +71,9 @@ inventory; Cargo.toml and Cargo.lock bind its third-party dependencies.
 | build.rs; Cargo.toml; Cargo.lock; tauri configs/capabilities/assets | Build inputs: build.rs embeds a bounded public keyring or empty default and invokes tauri-build; future environment/output must be bound. No real entitlement read is authorized. |
 
 The test-only lexical location is the child of existing streamed/tests.rs described
-in the contract. It can reach private ancestors without exporting a production API.
+in the contract. Its enclosing gate is `#[cfg(all(test, unix))]` at streamed.rs:717,
+so it is Unix-only. The Linux lane uses this seam; native Windows needs a separately
+reviewed seam. It can reach private ancestors without exporting a production API.
 No binary is built here to claim that path compiles; that proof is a later gate.
 
 ## Differences that affect interpretation

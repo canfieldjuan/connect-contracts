@@ -60,11 +60,15 @@ The permitted Rust overlay is:
 
 1. A test-only module inclusion in
    `src-tauri/src/connect/ocr_consumer/streamed/tests.rs`, already included only by
-   `#[cfg(test)] mod tests` in `streamed.rs`.
+   `#[cfg(all(test, unix))] mod tests` in `streamed.rs:717`.
 2. New sibling file
    `src-tauri/src/connect/ocr_consumer/streamed/real_document_preparation.rs`, included
    as a child module of those tests. Use the existing lexical test scope to access
    private owners. No production API export, release feature or visibility widening.
+
+This overlay is Unix-only and scoped to the Linux offline preparation lane. Native
+Windows qualification needs a separately reviewed test seam; this contract does not
+widen the existing platform gate or provide Windows preparation evidence.
 
 The later isolated packet may also contain a bounded launcher/receipt reader and
 saved-response fixture server. These are test tooling only, not an OCR engine or
