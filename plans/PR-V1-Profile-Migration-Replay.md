@@ -137,6 +137,11 @@ strict request/preflight association. Retained FAILED-verdict parity does not
 qualify a successful Summary chain. The proposal grants no implementation,
 build or replay authority and does not close this gate.
 
+The [real-document offline preparation contract](PR-Real-Document-Offline-Preparation.md)
+binds the operator-selected Doc Sum source and its complete crate/lock inventory for
+native extraction and saved OCR receipt validation. It is separate from synthetic
+C0/C1 replay and authorizes no implementation, build, private preparation or live call.
+
 ### C. Sequential replay and effective capture preparation
 
 Adapt the existing proven harness into a new durable packet; never rerun or edit
