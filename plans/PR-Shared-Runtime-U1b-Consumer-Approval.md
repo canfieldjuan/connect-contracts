@@ -73,16 +73,38 @@ the qualification owner integrates the delivered runtime with the held writer
 stack; held summary semantics are not a prerequisite for the main-based framing
 or client infrastructure. This does not release any held branch.
 
-The existing proposed `DS-HOST-CANARY-1` selects the approved marker from a
-synthetic record. Expected decoded bytes are exactly `CEDAR-17`; logical seed is
-4294967295, output cap 1500, decoder schema null. Preserve the owner's verbatim
-system/user strings, production framing, historical temperature 0/cache_prompt
-true, normal-stop/full-envelope check and no trim or answer-forcing grammar.
-Those are proposal parameters, not a live allowance or measured effective state.
+#### Doc Sum shared-route prompt cache
+
+For the V1 shared route, the Doc Sum completion constructor serializes an
+explicit `"cache_prompt":false` on every completion, including
+`DS-HOST-CANARY-1`. Its request type exposes no caller-settable cache field.
+The [selected profile](../runtime/v1/profile.json) sets the CUDA tier's server
+default with `--no-cache-prompt`. The historical native constructor overrides
+that default with `true`, allowing reuse of a previous request's prefix in the
+shared slot. The verified byte transport must forward the constructor's bytes
+unchanged.
+
+The canary selects the approved marker from a synthetic record. Preserve the
+owner's verbatim system/user strings, production framing, temperature 0,
+output cap 1500 and null decoder schema. The wire seed `4294967295` is
+llama.cpp's random-seed sentinel. Decoding is greedy at this temperature.
+Require the full response envelope, normal stop and exact untrimmed decoded
+bytes `CEDAR-17`, without answer-forcing grammar.
+
+The historical `true` bodies serve only as byte-transport evidence for the
+earlier route. The shared-route canary and six proposed cache-off vectors
+become qualification expectations only after Juan accepts this amendment at
+its exact revision. The six vectors cover Analyze, Synthesize and Verify,
+each with text and public non-C9 structured output. Only the cache boolean
+differs from the original closed-thinking completion bytes. Evidence alias
+`docsum-cache-off-vectors` identifies `offline-evidence.json` by SHA-256
+`80c5124f7acd731a9149c04ffbead4504579f7207c04607864ae4768202b19e5`.
+[Original wire captures](https://github.com/canfieldjuan/local-connect-model-client/blob/1796f3d47468f760d4d43388f905a053e333c039/crates/model-client/tests/fixtures/native-wire/binding.json)
+
 The handoff names the existing writer preparation/budget-owner harness for G1,
 then a separate G2 numeric annex with exact-revision operator acceptance.
-The earlier 509 bound is explicitly not a new budget. No canary/request redesign
-or new qualification harness is needed to replace this existing design.
+The earlier 509 bound is historical. The existing checker and qualification
+harness apply to the amended request.
 Actual delivered wire/token/checker binding, G2 budgets and acceptance remain pending.
 
 ## Required change surface and sequence
@@ -265,6 +287,16 @@ permissions. Any other departure requires an amended contract before implementat
 For this preparation: verify source pins and saved payload/source hashes, current
 merge/open-ADR status, inventory references, local Markdown links and diff scope.
 No build/model test is appropriate for a documentation-only change.
+
+In the later Doc Sum implementation, one offline unit test must read the
+selected CUDA tier from the actual vendored profile, assert its argv contains
+`--no-cache-prompt`, and assert that the production shared-route constructor
+serializes the JSON boolean `false`. Removing the flag or changing or omitting
+the emitted field must fail the test. Exercise that constructor for both a
+regular completion and the canary. After exact-revision acceptance, compare
+the six full request bodies and the separately constructed canary with their
+expected bytes at the existing isolated Unix peer. Preserve the held writer's
+schema order through the final write. Full C9 parity still needs its own capture.
 
 For later accepted code: reuse the native wire/response corpus and existing real
 isolated Unix-peer tests. Prove valid enrollment succeeds and wrong/missing/partial/

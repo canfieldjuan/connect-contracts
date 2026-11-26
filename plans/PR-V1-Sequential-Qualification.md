@@ -74,10 +74,11 @@ server prohibition. [`eval_llama_cmpl_schema`][cache-read] starts from that
 default; request `cache_prompt: true` overrides it. The server uses that request
 value for [prefix reuse][reuse]. Every candidate occurrence must bind its exact
 request bytes and effective false policy. Do not rewrite bytes in transport or
-claim omitted/null/true are interchangeable. If a frozen app uses true (the
-existing proposed Doc Sum canary does), record the mismatch and prepare a separate
-owner-reviewed request-policy amendment before its live lane. Keep its old bytes
-and scoring as a historical control. No app code changes are made here.
+claim omitted/null/true are interchangeable. If a frozen app uses true, record
+the mismatch and obtain an owner-reviewed request-policy amendment before its
+live lane. Retain the app's earlier bytes and scores as historical records.
+The [Doc Sum shared-route amendment](PR-Shared-Runtime-U1b-Consumer-Approval.md#doc-sum-shared-route-prompt-cache)
+owns its canary, cache-off vectors and exact-revision acceptance gate.
 
 One slot limits runtime capacity; it does not serialize application callers.
 Qualification dispatches the next model request only after the prior response
