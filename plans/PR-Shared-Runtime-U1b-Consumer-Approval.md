@@ -132,7 +132,9 @@ future slices is dispatched or accepted by this proposal.
    inventing an approval from arbitrary caller-selected hashes. Step 2 must also
    prove the qualification entry shipped in production bytes is unreachable without
    its permit, name the trust anchors for record and permit, and obtain the r2
-   owner's agreement to step 8's staging refinement. These remain design obligations.
+   owner's agreement to step 8's staging refinement. The [qualification permit and
+   enrollment proposal](PR-Shared-Runtime-U1b-Qualification-Permit.md) addresses
+   this design step and records its outstanding acceptance gates.
 3. **Effective-settings capture — connect-runtime, private host.** After step 1,
    implement the separately reviewed host capture slice (ADR landing-order item 3)
    using the pinned server's actual reporting owners. Prove parser/schema behavior
