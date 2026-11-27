@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-connect.invalid/schemas/runtime/v1/g1-preflight-annex.schema.json",
+  "title": "G1 preflight numeric annex",
+  "description": "Unsigned limits for a single preflight phase. All numbers are inclusive ceilings. Qualification authority requires an independently admitted invocation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "phase",
+    "total",
+    "operations"
+  ],
+  "properties": {
+    "phase": {
+      "const": "G1"
+    },
+    "total": {
+      "$ref": "#/$defs/total"
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start_host": {
+          "$ref": "#/$defs/local_action"
+        },
+        "observe_settings": {
+          "$ref": "#/$defs/read"
+        },
+        "verify_models": {
+          "$ref": "#/$defs/read"
+        },
+        "verify_props": {
+          "$ref": "#/$defs/read"
+        },
+        "reverify_models": {
+          "$ref": "#/$defs/read"
+        },
+        "reverify_props": {
+          "$ref": "#/$defs/read"
+        },
+        "tokenize": {
+          "$ref": "#/$defs/tokenizer"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "u64": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "total": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calls",
+        "request_bytes",
+        "response_bytes",
+        "input_tokens",
+        "elapsed_ms"
+      ],
+      "properties": {
+        "calls": {
+          "$ref": "#/$defs/u64"
+        },
+        "request_bytes": {
+          "$ref": "#/$defs/u64"
+        },
+        "response_bytes": {
+          "$ref": "#/$defs/u64"
+        },
+        "input_tokens": {
+          "$ref": "#/$defs/u64"
+        },
+        "elapsed_ms": {
+          "$ref": "#/$defs/u64"
+        }
+      }
+    },
+    "local_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calls",
+        "elapsed_ms_per_call"
+      ],
+      "properties": {
+        "calls": {
+          "$ref": "#/$defs/u64"
+        },
+        "elapsed_ms_per_call": {
+          "$ref": "#/$defs/u64"
+        }
+      }
+    },
+    "tokenizer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calls",
+        "elapsed_ms_per_call",
+        "request_bytes_per_call",
+        "response_bytes_per_call",
+        "input_tokens_per_call"
+      ],
+      "properties": {
+        "calls": {
+          "$ref": "#/$defs/u64"
+        },
+        "elapsed_ms_per_call": {
+          "$ref": "#/$defs/u64"
+        },
+        "request_bytes_per_call": {
+          "$ref": "#/$defs/u64"
+        },
+        "response_bytes_per_call": {
+          "$ref": "#/$defs/u64"
+        },
+        "input_tokens_per_call": {
+          "$ref": "#/$defs/u64"
+        }
+      }
+    },
+    "read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calls",
+        "elapsed_ms_per_call",
+        "response_bytes_per_call"
+      ],
+      "properties": {
+        "calls": {
+          "$ref": "#/$defs/u64"
+        },
+        "elapsed_ms_per_call": {
+          "$ref": "#/$defs/u64"
+        },
+        "response_bytes_per_call": {
+          "$ref": "#/$defs/u64"
+        }
+      }
+    }
+  }
+}

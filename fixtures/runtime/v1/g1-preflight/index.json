@@ -1,0 +1,14 @@
+{
+  "synthetic.json": {
+    "sha256": "79936c0d178493ae798fcb2f3ab6f65e0106db20b2537a5f87a33a25c2f5224a",
+    "outcome": "valid"
+  },
+  "completion.invalid.json": {
+    "sha256": "3b6bff61f2b30a625fe0ae2cf9885dfe29634472f665585d9832b5aa23f1b252",
+    "outcome": "shape-invalid"
+  },
+  "duplicate.invalid.json": {
+    "sha256": "6c3fcf9eccaf3cf0b3bc6745b45cf77fe64b2b355419e51eb124757957099fa1",
+    "outcome": "duplicate-member"
+  }
+}
