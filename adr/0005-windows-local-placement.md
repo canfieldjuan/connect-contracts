@@ -22,7 +22,8 @@ commercial entitlement.
 
 ### Preserve the existing transport
 
-Windows uses the existing `http-loopback-v1` and `http-loopback-v2` transports,
+Windows uses the existing `http-loopback-v1`, `http-loopback-v2`, and
+ADR-0010's `http-loopback-v3` transports,
 including exact-loopback endpoint validation, per-process bearer-token rotation,
 authenticated manifest attribution, bounded requests and responses, and refusal
 of browser-Origin requests. No registration, manifest, job, artifact, or error
@@ -45,14 +46,15 @@ When `LOCALAPPDATA` is absent, relative, or unusable, Connect is unavailable.
 There is no fallback to the working directory, a machine-wide directory, or a
 shared temporary directory.
 
-V1 and v2 runtime registrations are stored under:
+V1, v2, and v3 runtime registrations are stored under:
 
 ```text
 %LOCALAPPDATA%\LocalConnect\runtime\v1\providers\
 %LOCALAPPDATA%\LocalConnect\runtime\v2\providers\
+%LOCALAPPDATA%\LocalConnect\runtime\v3\providers\
 ```
 
-Their direct-addressed persistent ownership locks are stored outside those
+V1 and v2 direct-addressed persistent ownership locks are stored outside those
 consumer-enumerated directories under:
 
 ```text
@@ -60,12 +62,23 @@ consumer-enumerated directories under:
 %LOCALAPPDATA%\LocalConnect\runtime\v2\locks\
 ```
 
+V3 uses the existing v2 durable-instance lock, including for a v3-only
+publisher; there is no separate v3 ownership-lock directory. The existing
+[ADR-0010 Windows extension](0010-streamed-output-retrieval.md#version-discovery-and-compatibility)
+defines its fixed registration and temporary names, shared-lock acquisition,
+mixed-version exclusion, bounded discovery, and cleanup of both protocol
+destinations during an identity reset. A process publishing v2 and v3 acquires
+that shared lock once. These rules preserve one owner of a durable instance
+even when another installed process supports only v2.
+
 The shared entitlement and persistent activation lock are stored at:
 
 ```text
 %LOCALAPPDATA%\LocalConnect\entitlement-v1.json
 %LOCALAPPDATA%\LocalConnect\.entitlement-v1.lock
 ```
+
+The v3 extension does not change the shared entitlement location.
 
 Application-private databases, job artifacts, logs, and settings remain outside
 the interoperability contract and use each application's own per-user state
@@ -248,12 +261,15 @@ consumer model.
 
 - Windows providers and consumers can share one deterministic registration and
   entitlement location without a broker.
-- Existing v1/v2 wire documents and Linux behavior remain unchanged.
+- Existing v1/v2/v3 wire documents and Linux behavior remain unchanged.
 - Windows packages must implement and test Windows-native locking, bounded
   regular-file handling, reparse-point refusal, and atomic replacement before
   claiming Connect support.
 - V1 and v2 crash/restart cycles cannot accumulate one registration per process;
   v1 admits one active publisher per `app_id`, and Windows consumers apply the
   common 256-entry stale-candidate scan.
+- V3 follows ADR-0010's fixed durable-instance registration and shares v2
+  ownership; enumerating a v3 providers directory does not introduce another
+  serving owner or OCR worker.
 - Named pipes, brokered identity, code signing, installers, auto-update, and
   macOS placement remain deferred.
