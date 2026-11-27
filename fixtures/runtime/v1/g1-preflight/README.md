@@ -24,8 +24,8 @@ and all applicable totals. A high total cannot authorize an omitted operation.
 
 `calls` counts physical attempts. The per-call byte and token fields apply to
 one offer. The corresponding `total` fields apply across the invocation,
-including observation bytes in `response_bytes`. Time ceilings are monotonic
-wall-clock durations in milliseconds. `total.elapsed_ms` runs from dispatch,
+including observation bytes in `response_bytes`. Time ceilings are elapsed durations
+measured in milliseconds on a monotonic clock. `total.elapsed_ms` runs from dispatch,
 and `elapsed_ms_per_call` also limits the attempt. Generation and canary have
 no representation at any level. The client still owns admission, reservation
 before side effects, and enforcement against actual sends and responses.
