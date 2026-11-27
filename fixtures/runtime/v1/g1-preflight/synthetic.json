@@ -1,0 +1,48 @@
+{
+  "phase": "G1",
+  "total": {
+    "calls": 7,
+    "request_bytes": 256,
+    "response_bytes": 3072,
+    "input_tokens": 16,
+    "elapsed_ms": 3500
+  },
+  "operations": {
+    "start_host": {
+      "calls": 1,
+      "elapsed_ms_per_call": 500
+    },
+    "observe_settings": {
+      "calls": 1,
+      "elapsed_ms_per_call": 500,
+      "response_bytes_per_call": 512
+    },
+    "verify_models": {
+      "calls": 1,
+      "elapsed_ms_per_call": 500,
+      "response_bytes_per_call": 512
+    },
+    "verify_props": {
+      "calls": 1,
+      "elapsed_ms_per_call": 500,
+      "response_bytes_per_call": 512
+    },
+    "reverify_models": {
+      "calls": 1,
+      "elapsed_ms_per_call": 500,
+      "response_bytes_per_call": 512
+    },
+    "reverify_props": {
+      "calls": 1,
+      "elapsed_ms_per_call": 500,
+      "response_bytes_per_call": 512
+    },
+    "tokenize": {
+      "calls": 1,
+      "elapsed_ms_per_call": 500,
+      "request_bytes_per_call": 256,
+      "response_bytes_per_call": 512,
+      "input_tokens_per_call": 16
+    }
+  }
+}

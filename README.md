@@ -92,6 +92,8 @@ check offline evidence shape and bindings only; they do not approve an execution
 identity or exercise a model, GPU, host, or application.
 The [numeric-ingestion fixtures](fixtures/runtime/v1/numeric-ingestion/README.md)
 pin raw number admission separately from schema-only and task-quality outcomes.
+The [G1 preflight annex fixtures](fixtures/runtime/v1/g1-preflight/README.md) check the
+closed numeric budget for the Doc Sum preflight.
 
 ADR-0013 negotiated fixed-parameter schemas and static context vectors have a
 separate conformance runner: `python3 -m unittest tests.test_fixed_parameters_contract`.

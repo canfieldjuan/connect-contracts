@@ -52,9 +52,11 @@ def _fraction(_token):
     raise EvidenceError('integer JSON notation required')
 
 
-def _parse(raw):
+def _parse(raw, *, max_bytes=None):
     if not isinstance(raw, bytes):
         raise EvidenceError('raw UTF-8 JSON bytes required')
+    if max_bytes is not None and len(raw) > max_bytes:
+        raise EvidenceError('input byte limit')
     try:
         return json.loads(raw.decode('utf-8'), object_pairs_hook=_object,
                           parse_constant=_constant, parse_int=_integer, parse_float=_fraction)
@@ -66,6 +68,16 @@ def _validate(schema, value, label):
     if not Draft202012Validator(schema).is_valid(value):
         # Do not echo private input values in diagnostics.
         raise EvidenceError(label + ' shape invalid')
+
+
+G1_ANNEX_MAX_BYTES = 2048
+
+
+def check_g1_preflight_annex(raw):
+    """Check the retained numeric annex bytes offline. Success grants no authority."""
+    annex = _parse(raw, max_bytes=G1_ANNEX_MAX_BYTES)
+    schema_path = SCHEMA_PATH.with_name('g1-preflight-annex.schema.json')
+    _validate(json.loads(schema_path.read_bytes()), annex, 'G1 annex')
 
 
 def _observations(record):
